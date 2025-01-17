@@ -1,0 +1,97 @@
+﻿@page "/Monthsheets"
+
+@using MoneyManager.Data
+@using MoneyManager.Data.Interface
+@using MoneyManager.Data.Models
+
+@inject IMonthSheet monthSheetService
+@inject NavigationManager navigationManager
+
+<PageTitle>Month Sheets</PageTitle>
+
+<h1>Month Sheets</h1>
+
+<p>This table provides a clear summary of your income and expenses across different months. Use it to track patterns, compare financial performance, and maintain a well-organized view of your finances at a glance. Keep your budgeting simple and effective!</p>
+
+<button class="btn btn-primary" @onclick=@AddNewMonthSheetAsync>
+    Add Current Month
+</button>
+
+<button class="btn btn-danger" @onclick=@DeleteCurrentMonthSheet>
+    Delete Current Month
+</button>
+
+@if (MonthSheets != null && MonthSheets.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var month in MonthSheets)
+            {
+                <tr>
+                    <td @onclick=@(x => OpenDetail(month))>@month.Date.ToString("Y")</td>
+                    <td>@month.Balance</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p><em>No records found.</em></p>
+}
+
+@code {
+    #region Properties
+    public List<MonthSheetModel> MonthSheets = new List<MonthSheetModel>();
+    #endregion
+
+    #region Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        await GetDataAsync();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task GetDataAsync()
+    private async Task GetDataAsync()
+    {
+        MonthSheets = monthSheetService.SearchMonthSheets();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task AddNewMonthSheetAsync()
+    private async Task AddNewMonthSheetAsync()
+    {
+        monthSheetService.CreateMonthSheet(new());
+        await GetDataAsync();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task DeleteCurrentMonthSheet()
+    private async Task DeleteCurrentMonthSheet()
+    {
+        var currentMonthsheet = MonthSheets.Where(m => m.Date.Year == DateTime.Today.Year
+                                                    && m.Date.Month == DateTime.Today.Month).FirstOrDefault();
+
+        monthSheetService.DeleteMonthSheet(currentMonthsheet!.Id);
+        await GetDataAsync();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region OpenDetail(MonthSheetModel month)
+    private void OpenDetail(MonthSheetModel month)
+    {
+        navigationManager.NavigateTo(DetailView.GetUri(month.Date, month.Id));
+    }
+    #endregion
+}

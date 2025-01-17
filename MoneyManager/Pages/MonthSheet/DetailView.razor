@@ -1,0 +1,47 @@
+﻿@page "/Monthsheets/{MonthDate}/{MonthSheetId:guid}"
+
+@using MoneyManager.Data.Interface
+@using MoneyManager.Data.Models
+
+@inject IMonthSheet monthSheetService
+
+<h1>@MonthSheet.Date.ToString("Y")</h1>
+
+<!--TODO: Categories tables -->
+
+<h3>No Categories detected</h3>
+
+@code {
+    #region Parameters
+    [Parameter] public string? MonthDate { get; set; }
+    [Parameter] public Guid MonthSheetId { get; set; }
+    #endregion
+
+    #region GetUri(string monthDate, Guid monthId)
+    public static string GetUri(DateTime monthDate, Guid monthId)
+    {
+        string month = monthDate.Date.ToString("MMMM") + monthDate.Date.ToString("yyyy");
+        return $"/Monthsheets/{month}/{monthId}";
+    }
+    #endregion
+
+    #region Properties
+    public MonthSheetModel MonthSheet = null!;
+    #endregion
+
+    #region Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        await GetDataAsync(MonthSheetId);
+        await base.OnInitializedAsync();
+    }
+    #endregion
+
+    #region Task GetDataAsync(Guid id)
+    public async Task GetDataAsync(Guid id)
+    {
+        MonthSheet = monthSheetService.GetMonthSheet(MonthSheetId);
+        await Task.CompletedTask;
+    }
+    #endregion
+}

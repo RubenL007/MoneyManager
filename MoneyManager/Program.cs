@@ -1,4 +1,3 @@
-using MoneyManager.Data;
 using MoneyManager.Data.Interface;
 using MoneyManager.Data.Services;
 
@@ -8,7 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<IMonthSheet, MonthSheetService>();
-builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();
 

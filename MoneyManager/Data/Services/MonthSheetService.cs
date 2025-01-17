@@ -8,21 +8,21 @@ namespace MoneyManager.Data.Services
     {
         private MongoClient _mongoClient = null!;
         private IMongoDatabase _database = null!;
-        private IMongoCollection<MonthSheetModel> _Months = null!;
+        private IMongoCollection<MonthSheetModel> _MonthsCollection = null!;
         public MonthSheetService()
         {
             _mongoClient = new MongoClient("mongodb://localhost:27017");
             _database = _mongoClient.GetDatabase("MoneyManager");
-            _Months = _database.GetCollection<MonthSheetModel>("MonthsSheets");
+            _MonthsCollection = _database.GetCollection<MonthSheetModel>("MonthsSheets");
         }
 
         public string CreateMonthSheet(MonthSheetModel monthSheet)
         {
-            var monthSheetObj = _Months.Find(x => x.Id == monthSheet.Id
+            var monthSheetObj = _MonthsCollection.Find(x => x.Id == monthSheet.Id
                                             || (x.Date.Year == monthSheet.Date.Year && x.Date.Month == monthSheet.Date.Month)).FirstOrDefault();
             if (monthSheetObj == null)
             {
-                _Months.InsertOne(monthSheet);
+                _MonthsCollection.InsertOne(monthSheet);
                 return "Month Sheet saved sucessfully.";
             }
             else
@@ -33,10 +33,9 @@ namespace MoneyManager.Data.Services
 
         public string UpdateMonthSheet(MonthSheetModel monthSheet)
         {
-            var monthSheetObj = _Months.Find(x => x.Id == monthSheet.Id).FirstOrDefault();
-            if (monthSheetObj == null)
+            if (_MonthsCollection.Find(x => x.Id == monthSheet.Id).Any())
             {
-                _Months.ReplaceOne(x => x.Id == monthSheet.Id, monthSheet);
+                _MonthsCollection.ReplaceOne(x => x.Id == monthSheet.Id, monthSheet);
                 return "Month Sheet updated sucessfully.";
             }
             else
@@ -47,18 +46,25 @@ namespace MoneyManager.Data.Services
 
         public MonthSheetModel GetMonthSheet(Guid id)
         {
-            return _Months.Find(x => x.Id == id).FirstOrDefault();
+            return _MonthsCollection.Find(x => x.Id == id).FirstOrDefault();
         }
 
-        public List<MonthSheetModel> SearchMonthSheetList()
+        public List<MonthSheetModel> SearchMonthSheets()
         {
-            return _Months.Find(FilterDefinition<MonthSheetModel>.Empty).ToList();
+            return _MonthsCollection.Find(FilterDefinition<MonthSheetModel>.Empty).ToList();
         }
 
         public string DeleteMonthSheet(Guid id)
         {
-            _Months.DeleteOne(x => x.Id == id);
-            return "Deleted with success.";
+            if (_MonthsCollection.Find(x=>x.Id == id).Any())
+            {
+                _MonthsCollection.DeleteOne(x => x.Id == id);
+                return "Deleted with success.";
+            }
+            else
+            {
+                return "The month sheet could not be found.";
+            }
         }
     }
 }

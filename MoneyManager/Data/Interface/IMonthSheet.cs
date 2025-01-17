@@ -7,7 +7,7 @@ namespace MoneyManager.Data.Interface
         string CreateMonthSheet(MonthSheetModel monthSheet);
         string UpdateMonthSheet(MonthSheetModel monthSheet);
         MonthSheetModel GetMonthSheet(Guid id);
-        List<MonthSheetModel> SearchMonthSheetList();
+        List<MonthSheetModel> SearchMonthSheets();
         string DeleteMonthSheet(Guid id);
     }
 }

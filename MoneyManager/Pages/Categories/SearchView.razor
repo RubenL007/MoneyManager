@@ -1,0 +1,132 @@
+﻿@page "/Categories"
+@using MoneyManager.Data.Interface
+@using MoneyManager.Data.Models
+
+@inject ICategory categoryService
+@inject NavigationManager navigationManager
+
+<h1>Categories</h1>
+<div class="row">
+    <div class="col-auto">
+        <EditForm Model=@Category>
+            <InputText @bind-Value=@Category.Name />
+        </EditForm>
+    </div>
+    <div class="col">
+        <ButtonComponent OnClick=@(x=> AddNewCategory())
+                         Color=ColorsEnum.primary
+                         DisplayName="Add New Category"
+                         Disabled=IsEditMode />
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Category Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Categories.Count != 0)
+        {
+            foreach (var cat in Categories)
+            {
+                <tr>
+                    <td style="width:300px;">
+                        @if (IsEditMode)
+                        {
+                            <EditForm Model=@cat>
+                                <InputText @bind-Value=@cat.Name />
+                            </EditForm>
+                        }
+                        else
+                        {
+                            @cat.Name
+                        }
+                    </td>
+                    <td>
+                        <div class="row">
+                            <div class="col-auto">
+                                <ButtonComponent OnClick=@(x=> IsEditMode = !IsEditMode)
+                                                 Color=ColorsEnum.secondary
+                                                 DisplayName="Edit"
+                                                 Visible=!IsEditMode />
+                                <ButtonComponent OnClick=@(x=> UpdateCategory(cat))
+                                                 Color=ColorsEnum.primary
+                                                 DisplayName="Save"
+                                                 Visible=IsEditMode />
+                            </div>
+                            <div class="col-auto">
+                                <ButtonComponent OnClick=@(x=> DeleteCategory(cat))
+                                                 Color=ColorsEnum.danger
+                                                 DisplayName="Delete" />
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td>No records found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    #region Properties
+    CategoryBaseModel Category = new();
+    List<CategoryBaseModel> Categories = new();
+    bool IsEditMode = false;
+    #endregion
+
+    #region Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        await SearchCategories();
+        await base.OnInitializedAsync();
+    }
+    #endregion
+
+    #region Task SearchCategories()
+    private async Task SearchCategories()
+    {
+        Categories = categoryService.SearchCategories();
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task AddNewCategory()
+    private async Task AddNewCategory()
+    {
+        categoryService.CreateCategory(Category);
+        Category = new();
+        await SearchCategories();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task UpdateCategory(CategoryBaseModel category)
+    private async Task UpdateCategory(CategoryBaseModel category)
+    {
+        categoryService.UpdateCategory(category);
+        await SearchCategories();
+        IsEditMode = false;
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task DeleteCategory(CategoryBaseModel category)
+    private async Task DeleteCategory(CategoryBaseModel category)
+    {
+        categoryService.DeleteCategory(category.Id);
+        await SearchCategories();
+        await Task.CompletedTask;
+    }
+    #endregion
+}

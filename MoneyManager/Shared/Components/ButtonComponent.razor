@@ -1,0 +1,29 @@
+﻿@namespace MoneyManager.Shared.Components
+
+<button @onclick=OnClick
+        class ="btn btn-@Color"
+        type="button"
+        hidden=@(!Visible)
+        disabled=@Disabled>
+    @DisplayName
+</button>
+
+@code {
+    [Parameter]
+    public string DisplayName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Executes the method given when clicked
+    /// </summary>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter]
+    public ColorsEnum Color { get; set; } = ColorsEnum.primary;
+
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+}

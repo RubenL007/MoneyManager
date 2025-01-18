@@ -3,13 +3,8 @@ using MongoDB.Bson;
 
 namespace MoneyManager.Data.Models
 {
-    public class CategoryModel
+    public class CategoryModel : CategoryBaseModel
     {
-        [BsonGuidRepresentation(GuidRepresentation.Standard)]
-        public Guid Id { get; set; } = Guid.NewGuid();
-
-        public string Name { get; set; } = string.Empty;
-
         public List<ExpenseModel> Expenses { get; set; } = null!;
 
         public double TotalSpent { get; set; } = 0;

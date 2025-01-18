@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<IMonthSheet, MonthSheetService>();
+builder.Services.AddScoped<ICategory, CategoryService>();
 
 var app = builder.Build();
 

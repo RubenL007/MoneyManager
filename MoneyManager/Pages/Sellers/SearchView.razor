@@ -1,0 +1,132 @@
+﻿@page "/Sellers"
+@using MoneyManager.Data.Interface
+@using MoneyManager.Data.Models
+
+@inject ISeller sellerService
+@inject NavigationManager navigationManager
+
+<h1>Sellers</h1>
+<div class="row">
+    <div class="col-auto">
+        <EditForm Model=@Seller>
+            <InputText @bind-Value=@Seller.Name />
+        </EditForm>
+    </div>
+    <div class="col">
+        <ButtonComponent OnClick=@(x=> CreateSeller())
+                         Color=ColorsEnum.primary
+                         DisplayName="Add New Seller"
+                         Disabled=IsEditMode />
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Seller Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Sellers.Count != 0)
+        {
+            foreach (var seller in Sellers)
+            {
+                <tr>
+                    <td style="width:300px;">
+                        @if (IsEditMode)
+                        {
+                            <EditForm Model=@seller>
+                                <InputText @bind-Value=@seller.Name />
+                            </EditForm>
+                        }
+                        else
+                        {
+                            @seller.Name
+                        }
+                    </td>
+                    <td>
+                        <div class="row">
+                            <div class="col-auto">
+                                <ButtonComponent OnClick=@(x=> IsEditMode = !IsEditMode)
+                                                 Color=ColorsEnum.secondary
+                                                 DisplayName="Edit"
+                                                 Visible=!IsEditMode />
+                                <ButtonComponent OnClick=@(x=> UpdateSeller(seller))
+                                                 Color=ColorsEnum.primary
+                                                 DisplayName="Save"
+                                                 Visible=IsEditMode />
+                            </div>
+                            <div class="col-auto">
+                                <ButtonComponent OnClick=@(x=> DeleteSeller(seller))
+                                                 Color=ColorsEnum.danger
+                                                 DisplayName="Delete" />
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td>No records found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    #region Properties
+    SellerModel Seller = new();
+    List<SellerModel> Sellers = new();
+    bool IsEditMode = false;
+    #endregion
+
+    #region Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        await SearchSellers();
+        await base.OnInitializedAsync();
+    }
+    #endregion
+
+    #region Task SearchSellers()
+    private async Task SearchSellers()
+    {
+        Sellers = sellerService.SearchSellers();
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task CreateSeller()
+    private async Task CreateSeller()
+    {
+        sellerService.CreateSeller(Seller);
+        Seller = new();
+        await SearchSellers();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task UpdateSeller(SellerModel seller)
+    private async Task UpdateSeller(SellerModel seller)
+    {
+        sellerService.UpdateSeller(seller);
+        await SearchSellers();
+        IsEditMode = false;
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task DeleteSeller(SellerModel seller)
+    private async Task DeleteSeller(SellerModel seller)
+    {
+        sellerService.DeleteSeller(seller.Id);
+        await SearchSellers();
+        await Task.CompletedTask;
+    }
+    #endregion
+}

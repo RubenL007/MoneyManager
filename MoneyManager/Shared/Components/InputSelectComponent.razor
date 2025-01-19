@@ -1,8 +1,14 @@
 ﻿@namespace MoneyManager.Shared.Components
 @typeparam TValue
 
-<span>@DisplayName</span>
-    <select @bind=@InternalSelectedItemID 
+@if (IsEditMode)
+{
+    @if (!string.IsNullOrWhiteSpace(DisplayName))
+    {
+        <span>@DisplayName</span>
+    }
+
+    <select @bind=@InternalSelectedItemID
             @onclick=@ChangeSelectedItem
             id=@Id
             disabled=@Disabled>
@@ -29,6 +35,11 @@
             }
         }
     </select>
+}
+else
+{
+    <span>@SelectedItem?.GetType().GetProperty("Name")?.GetValue(SelectedItem, null) </span>
+}
 
 @code {
     #region Internal Properties
@@ -58,12 +69,17 @@
     public List<TValue> Items { get; set; } = new();
 
     [Parameter]
-    public string DisplayName { get; set; } = "Select";
+    public string DisplayName { get; set; } = string.Empty;
 
     [Parameter]
     public bool Disabled { get; set; } = false;
+
+
+    [Parameter]
+    public bool IsEditMode { get; set; } = false;
     #endregion
 
+    #region ChangeSelectedItem()
     private void ChangeSelectedItem()
     {
         if (!string.IsNullOrWhiteSpace(InternalSelectedItemID))
@@ -78,4 +94,5 @@
         }
         base.OnParametersSet();
     }
+    #endregion
 }

@@ -1,0 +1,81 @@
+﻿@namespace MoneyManager.Shared.Components
+@typeparam TValue
+
+<span>@DisplayName</span>
+    <select @bind=@InternalSelectedItemID 
+            @onclick=@ChangeSelectedItem
+            id=@Id
+            disabled=@Disabled>
+        @if (SelectedItem != null)
+        {
+            <option value=@SelectedItem.GetType().GetProperty("Id")!.GetValue(SelectedItem, null)>
+                @SelectedItem.GetType().GetProperty("Name")!.GetValue(SelectedItem, null)
+            </option>
+        }
+        else
+        {
+            <option value="">Select One</option>
+        }
+        @if (Items.Any())
+        {
+            foreach (var item in Items)
+            {
+                if (item != null)
+                {
+                    <option value="@item.GetType().GetProperty("Id")?.GetValue(item, null)">
+                        @item.GetType().GetProperty("Name")?.GetValue(item, null)
+                    </option>
+                }
+            }
+        }
+    </select>
+
+@code {
+    #region Internal Properties
+    private string Id = Guid.NewGuid().ToString();
+
+    #region InternalSelectedItemID
+    string internalSelectedItemID = null!;
+    string InternalSelectedItemID
+    {
+        get => internalSelectedItemID;
+        set
+        {
+            internalSelectedItemID = value;
+        }
+    }
+    #endregion
+    #endregion
+
+    #region Parameters
+    [Parameter]
+    public TValue? SelectedItem { get; set; }
+
+    [Parameter]
+    public EventCallback<TValue> SelectedItemChanged { get; set; }
+
+    [Parameter]
+    public List<TValue> Items { get; set; } = new();
+
+    [Parameter]
+    public string DisplayName { get; set; } = "Select";
+
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+    #endregion
+
+    private void ChangeSelectedItem()
+    {
+        if (!string.IsNullOrWhiteSpace(InternalSelectedItemID))
+        {
+            var selectedItem = Items.FirstOrDefault(item => item.GetType().GetProperty("Id")!.GetValue(item, null)?.ToString() == InternalSelectedItemID);
+
+            if (selectedItem != null)
+            {
+                SelectedItem = selectedItem;
+                SelectedItemChanged.InvokeAsync(SelectedItem);
+            }
+        }
+        base.OnParametersSet();
+    }
+}

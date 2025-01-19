@@ -1,0 +1,24 @@
+﻿@namespace MoneyManager.Shared.Components
+@typeparam TValue
+@inherits InputNumber<TValue>
+
+<label>@DisplayName</label>
+
+@if (IsEditMode)
+{
+    <input @bind=@CurrentValue
+           type="number"
+           disabled=@Disabled>
+}
+else
+{
+    <span>@CurrentValue</span>
+}
+
+@code {
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    [Parameter]
+    public bool IsEditMode { get; set; } = false;
+}

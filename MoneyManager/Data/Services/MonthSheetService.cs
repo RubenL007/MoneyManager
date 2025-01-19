@@ -35,12 +35,6 @@ namespace MoneyManager.Data.Services
         {
             if (_MonthsCollection.Find(x => x.Id == monthSheet.Id).Any())
             {
-                foreach (var category in monthSheet.Categories)
-                {
-                    category.TotalSpent = category.Expenses.Sum(x => x.Spent);
-                }
-                monthSheet.TotalSpent = monthSheet.Categories.Sum(x => x.TotalSpent);
-
                 _MonthsCollection.ReplaceOne(x => x.Id == monthSheet.Id, monthSheet);
                 return "Month Sheet updated sucessfully.";
             }
@@ -62,7 +56,7 @@ namespace MoneyManager.Data.Services
 
         public string DeleteMonthSheet(Guid id)
         {
-            if (_MonthsCollection.Find(x => x.Id == id).Any())
+            if (_MonthsCollection.Find(x=>x.Id == id).Any())
             {
                 _MonthsCollection.DeleteOne(x => x.Id == id);
                 return "Deleted with success.";

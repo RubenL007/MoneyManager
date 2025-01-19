@@ -10,11 +10,11 @@ namespace MoneyManager.Data.Models
 
         public string Name { get; set; } = string.Empty;
 
-        public SellerModel? Seller { get; set; } = null!;
+        public SellerModel Seller { get; set; } = null!;
 
         public DateTime BuyDate { get; set; } = DateTime.Today;
 
-        public AccountModel? Account { get; set; } = null!;
+        public AccountModel Account { get; set; } = null!;
 
         public double Spent { get; set; } = 0;
     }

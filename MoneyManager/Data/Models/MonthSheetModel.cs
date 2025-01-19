@@ -11,7 +11,7 @@ namespace MoneyManager.Data.Models
 
         public DateTime Date { get; set; } = DateTime.Now;
 
-        public List<CategoryModel> Categories { get; set; } = new();
+        public List<CategoryModel> Categories { get; set; } = null!;
 
         public double TotalSpent { get; set; } = 0;
         public double EstimatedEarned { get; set; } = 0;

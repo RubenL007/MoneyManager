@@ -5,7 +5,7 @@ namespace MoneyManager.Data.Models
 {
     public class CategoryModel : CategoryBaseModel
     {
-        public List<ExpenseModel> Expenses { get; set; } = new();
+        public List<ExpenseModel> Expenses { get; set; } = null!;
 
         public double TotalSpent { get; set; } = 0;
     }

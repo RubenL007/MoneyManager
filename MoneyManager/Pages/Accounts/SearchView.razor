@@ -1,0 +1,132 @@
+﻿@page "/Accounts"
+@using MoneyManager.Data.Interface
+@using MoneyManager.Data.Models
+
+@inject IAccount accountService
+@inject NavigationManager navigationManager
+
+<h1>Accounts</h1>
+<div class="row">
+    <div class="col-auto">
+        <EditForm Model=@Account>
+            <InputText @bind-Value=@Account.Name />
+        </EditForm>
+    </div>
+    <div class="col">
+        <ButtonComponent OnClick=@(x=> CreateAccount())
+                         Color=ColorsEnum.primary
+                         DisplayName="Add New Account"
+                         Disabled=IsEditMode />
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Account Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Accounts.Count != 0)
+        {
+            foreach (var account in Accounts)
+            {
+                <tr>
+                    <td style="width:300px;">
+                        @if (IsEditMode)
+                        {
+                            <EditForm Model=@account>
+                                <InputText @bind-Value=@account.Name />
+                            </EditForm>
+                        }
+                        else
+                        {
+                            @account.Name
+                        }
+                    </td>
+                    <td>
+                        <div class="row">
+                            <div class="col-auto">
+                                <ButtonComponent OnClick=@(x=> IsEditMode = !IsEditMode)
+                                                 Color=ColorsEnum.secondary
+                                                 DisplayName="Edit"
+                                                 Visible=!IsEditMode />
+                                <ButtonComponent OnClick=@(x=> UpdateAccount(account))
+                                                 Color=ColorsEnum.primary
+                                                 DisplayName="Save"
+                                                 Visible=IsEditMode />
+                            </div>
+                            <div class="col-auto">
+                                <ButtonComponent OnClick=@(x=> DeleteAccount(account))
+                                                 Color=ColorsEnum.danger
+                                                 DisplayName="Delete" />
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td>No records found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    #region Properties
+    AccountModel Account = new();
+    List<AccountModel> Accounts = new();
+    bool IsEditMode = false;
+    #endregion
+
+    #region Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        await SearchAccounts();
+        await base.OnInitializedAsync();
+    }
+    #endregion
+
+    #region Task SearchAccounts()
+    private async Task SearchAccounts()
+    {
+        Accounts = accountService.SearchAccounts();
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task CreateAccount()
+    private async Task CreateAccount()
+    {
+        accountService.CreateAccount(Account);
+        Account = new();
+        await SearchAccounts();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task UpdateAccount(AccountModel account)
+    private async Task UpdateAccount(AccountModel account)
+    {
+        accountService.UpdateAccount(account);
+        await SearchAccounts();
+        IsEditMode = false;
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task DeleteAccount(AccountModel account)
+    private async Task DeleteAccount(AccountModel account)
+    {
+        accountService.DeleteAccount(account.Id);
+        await SearchAccounts();
+        await Task.CompletedTask;
+    }
+    #endregion
+}

@@ -1,0 +1,74 @@
+﻿@namespace MoneyManager.Shared.Components
+@inherits InputDate<DateTime>
+
+<label>@DisplayName</label>
+
+@if (IsEditMode)
+{
+    <input @bind=@CurrentValue
+           type="date"
+           disabled=@Disabled
+           min=@MinimumDate
+           max=@MaximumDate />
+}
+else
+{
+    <span>@CurrentValue.ToString("d")</span>
+}
+
+@code {
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    [Parameter]
+    public bool IsEditMode { get; set; } = false;
+
+    /// <summary>
+    /// If this parameter is used, the component will automaticly limit the MinimumDate and MaximumDate to the first and last day of the month of the date provided.
+    /// </summary>
+    [Parameter]
+    public DateTime? LimitToThisDateMonth { get; set; } = null!;
+
+    /// <summary>
+    /// Sets a limit for the date, pass a string in the following format: "2018-12-31"
+    /// </summary>
+    [Parameter]
+    public string MinimumDate { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Sets a limit for the date, pass a string in the following format: "2018-12-31"
+    /// </summary>
+    [Parameter]
+    public string MaximumDate { get; set; } = string.Empty;
+
+    #region void OnInitialized()
+    protected override void OnInitialized()
+    {
+        LimitDates();
+        base.OnInitialized();
+    }
+    #endregion
+
+    #region void OnParametersSet()
+    protected override void OnParametersSet()
+    {
+        LimitDates();
+        base.OnParametersSet();
+    }
+    #endregion
+
+    #region LimitDates()
+    private void LimitDates()
+    {
+        if (LimitToThisDateMonth != null)
+        {
+            string yearLimit = LimitToThisDateMonth.Value.ToString("yyyy");
+            string monthLimit = LimitToThisDateMonth.Value.ToString("MM");
+            string lastDayOfTheMonth = System.DateTime.DaysInMonth(Int16.Parse(yearLimit), Int16.Parse(monthLimit)).ToString();
+
+            MinimumDate = $"{yearLimit}-{monthLimit}-01";
+            MaximumDate = $"{yearLimit}-{monthLimit}-{lastDayOfTheMonth}";
+        }
+    }
+    #endregion
+}

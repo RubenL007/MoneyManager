@@ -4,12 +4,119 @@
 @using MoneyManager.Data.Models
 
 @inject IMonthSheet monthSheetService
+@inject ICategory categoryService
+@inject ISeller sellerService
+@inject IAccount accountService
 
 <h1>@MonthSheet.Date.ToString("Y")</h1>
 
-<!--TODO: Categories tables -->
+<br />
 
-<h3>No Categories detected</h3>
+<InputSelectComponent @bind-SelectedItem=@NewCategory
+                      TValue=CategoryBaseModel
+                      Items=@Categories
+                      DisplayName="Category" />
+
+<ButtonComponent OnClick=@(x=> AddNewCategory(NewCategory))
+                 DisplayName="Add to the Month Sheet"
+                 Color=ColorsEnum.primary
+                 Disabled=@(string.IsNullOrWhiteSpace(NewCategory.Name) || MonthSheet.Categories.Any(x => x.Id == NewCategory.Id)) />
+
+@if (MonthSheet.Categories.Any())
+{
+    foreach (var cat in MonthSheet.Categories)
+    {
+        <div class="row">
+            <div class="col-auto">
+                <h4>@cat.Name</h4>
+            </div>
+            <div class="col-auto">
+                <ButtonComponent OnClick=@(x => IsEditMode = true)
+                                 DisplayName="Edit"
+                                 Color=ColorsEnum.secondary
+                                 Visible=!IsEditMode />
+
+                <ButtonComponent OnClick=@(x => UpdateMonthSheet())
+                                 DisplayName="Save"
+                                 Color=ColorsEnum.primary
+                                 Visible=IsEditMode />
+
+                <ButtonComponent OnClick=@(x => AddNewExpense(cat))
+                                 DisplayName="Add Expense"
+                                 Color=ColorsEnum.secondary
+                                 Visible=IsEditMode />
+            </div>
+            <div class="col">
+                <ButtonComponent OnClick=@(x => MonthSheet.Categories.Remove(cat))
+                                 DisplayName="Delete"
+                                 Color=ColorsEnum.danger />
+            </div>
+        </div>
+
+        <EditForm Model=@cat.Expenses>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Seller</th>
+                        <th>Buy Date</th>
+                        <th>Account</th>
+                        <th>Money Spent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var expense in cat.Expenses)
+                    {
+                        <tr>
+                                <td>
+                                    <InputTextComponent @bind-Value=@expense.Name
+                                                        IsEditMode=@IsEditMode />
+                                </td>
+                                <td>
+                                    <InputSelectComponent @bind-SelectedItem=@expense.Seller
+                                                          TValue=SellerModel
+                                                          Items=@Sellers
+                                                          IsEditMode=@IsEditMode />
+                                </td>
+                                <td>
+                                    <InputDateComponent @bind-Value=expense.BuyDate
+                                                        IsEditMode=@IsEditMode
+                                                        LimitToThisDateMonth=@MonthSheet.Date />
+                                </td>
+                                <td>
+                                    <InputSelectComponent @bind-SelectedItem=@expense.Account
+                                                          TValue=AccountModel
+                                                          Items=@Accounts
+                                                          IsEditMode=@IsEditMode />
+                                </td>
+                                <td>
+                                    <InputNumberComponent @bind-Value=@expense.Spent
+                                                          IsEditMode=@IsEditMode />
+                                </td>
+                           
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </EditForm>
+
+        if (!IsEditMode)
+        {
+            <h4>Total Spent @cat.TotalSpent €</h4>
+        }
+        else
+        {
+            <h4>Calculating Total Spent... Save first.</h4>
+        }
+        <br />
+        <br />
+    }
+}
+else
+{
+    <h4>No Categories added.</h4>
+}
+
 
 @code {
     #region Parameters
@@ -27,20 +134,83 @@
 
     #region Properties
     public MonthSheetModel MonthSheet = null!;
+    public List<CategoryBaseModel> Categories = null!;
+    public List<SellerModel> Sellers = null!;
+    public List<AccountModel> Accounts = null!;
+    public CategoryBaseModel NewCategory = new();
+
+    public bool IsEditMode = false;
     #endregion
 
     #region Task OnInitializedAsync()
     protected override async Task OnInitializedAsync()
     {
         await GetDataAsync(MonthSheetId);
+        await SearchCategories();
+        await SearchSellers();
+        await SearchAccounts();
         await base.OnInitializedAsync();
     }
     #endregion
 
     #region Task GetDataAsync(Guid id)
-    public async Task GetDataAsync(Guid id)
+    private async Task GetDataAsync(Guid id)
     {
         MonthSheet = monthSheetService.GetMonthSheet(MonthSheetId);
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task SearchCategories()
+    private async Task SearchCategories()
+    {
+        Categories = categoryService.SearchCategories();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region AddNewCategory(CategoryBaseModel categoryToAdd)
+    private void AddNewCategory(CategoryBaseModel categoryToAdd)
+    {
+        CategoryModel categoryParsed = new()
+            {
+                Id = categoryToAdd.Id,
+                Name = categoryToAdd.Name,
+            };
+        MonthSheet.Categories.Add(categoryParsed);
+        StateHasChanged();
+        NewCategory = new();
+    }
+    #endregion
+
+    #region UpdateMonthSheet()
+    private void UpdateMonthSheet()
+    {
+        monthSheetService.UpdateMonthSheet(MonthSheet);
+        IsEditMode = false;
+    }
+    #endregion
+
+    #region AddNewExpense()
+    private void AddNewExpense(CategoryModel cat)
+    {
+        cat.Expenses.Add(new());
+        StateHasChanged();
+    }
+    #endregion
+
+    #region Task SearchSellers()
+    private async Task SearchSellers()
+    {
+        Sellers = sellerService.SearchSellers();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task SearchAccounts()
+    private async Task SearchAccounts()
+    {
+        Accounts = accountService.SearchAccounts();
         await Task.CompletedTask;
     }
     #endregion

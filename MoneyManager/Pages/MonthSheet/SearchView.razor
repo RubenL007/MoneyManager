@@ -13,13 +13,13 @@
 
 <p>This table provides a clear summary of your income and expenses across different months. Use it to track patterns, compare financial performance, and maintain a well-organized view of your finances at a glance. Keep your budgeting simple and effective!</p>
 
-<button class="btn btn-primary" @onclick=@AddNewMonthSheetAsync>
-    Add Current Month
-</button>
+<EditForm Model=@NewMonthSheetDate>
+    <InputDateComponent @bind-Value=@NewMonthSheetDate />
 
-<button class="btn btn-danger" @onclick=@DeleteCurrentMonthSheet>
-    Delete Current Month
-</button>
+    <ButtonComponent OnClick=@(x => AddNewMonthSheetAsync(new() {Date = NewMonthSheetDate}))
+                     Color=@ColorsEnum.primary
+                     DisplayName="Add This Month" />
+</EditForm>
 
 @if (MonthSheets != null && MonthSheets.Any())
 {
@@ -28,6 +28,7 @@
             <tr>
                 <th>Month</th>
                 <th>Balance</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -36,8 +37,22 @@
                 <tr>
                     <td @onclick=@(x => OpenDetail(month))>@month.Date.ToString("Y")</td>
                     <td>@month.Balance</td>
+                    <td>
+                        <ButtonComponent OnClick=@(x => DeleteMonthSheet(month.Id))
+                                         Color=@ColorsEnum.danger
+                                         DisplayName="Delete" />
+                    </td>
                 </tr>
             }
+            <tr>
+                <td>
+                    <ButtonComponent OnClick=@(x => AddNewMonthSheetAsync(new()))
+                                     Color=@ColorsEnum.primary
+                                     DisplayName="Add Current Month" />
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
         </tbody>
     </table>
 }
@@ -48,7 +63,8 @@ else
 
 @code {
     #region Properties
-    public List<MonthSheetModel> MonthSheets = new List<MonthSheetModel>();
+    List<MonthSheetModel> MonthSheets = new List<MonthSheetModel>();
+    DateTime NewMonthSheetDate = DateTime.Now;
     #endregion
 
     #region Task OnInitializedAsync()
@@ -68,21 +84,18 @@ else
     #endregion
 
     #region Task AddNewMonthSheetAsync()
-    private async Task AddNewMonthSheetAsync()
+    private async Task AddNewMonthSheetAsync(MonthSheetModel monthSheet)
     {
-        monthSheetService.CreateMonthSheet(new());
+        monthSheetService.CreateMonthSheet(monthSheet);
         await GetDataAsync();
         await Task.CompletedTask;
     }
     #endregion
 
-    #region Task DeleteCurrentMonthSheet()
-    private async Task DeleteCurrentMonthSheet()
+    #region Task DeleteMonthSheet()
+    private async Task DeleteMonthSheet(Guid id)
     {
-        var currentMonthsheet = MonthSheets.Where(m => m.Date.Year == DateTime.Today.Year
-                                                    && m.Date.Month == DateTime.Today.Month).FirstOrDefault();
-
-        monthSheetService.DeleteMonthSheet(currentMonthsheet!.Id);
+        monthSheetService.DeleteMonthSheet(id);
         await GetDataAsync();
         await Task.CompletedTask;
     }

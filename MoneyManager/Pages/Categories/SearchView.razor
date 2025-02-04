@@ -16,7 +16,7 @@
         <ButtonComponent OnClick=@(x=> AddNewCategory())
                          Color=ColorsEnum.primary
                          DisplayName="Add New Category"
-                         Disabled=IsEditMode />
+                         IsVisible=@(ViewMode == ViewModeEnum.View ? true : false) />
     </div>
 </div>
 
@@ -34,28 +34,22 @@
             {
                 <tr>
                     <td style="width:300px;">
-                        @if (IsEditMode)
-                        {
-                            <EditForm Model=@cat>
-                                <InputText @bind-Value=@cat.Name />
-                            </EditForm>
-                        }
-                        else
-                        {
-                            @cat.Name
-                        }
+                        <EditForm Model=@cat>
+                            <InputTextComponent @bind-Value=@cat.Name
+                                                ViewMode=@ViewMode />
+                        </EditForm>
                     </td>
                     <td>
                         <div class="row">
                             <div class="col-auto">
-                                <ButtonComponent OnClick=@(x=> IsEditMode = !IsEditMode)
+                                <ButtonComponent OnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
                                                  Color=ColorsEnum.secondary
                                                  DisplayName="Edit"
-                                                 Visible=!IsEditMode />
+                                                 IsVisible=@(ViewMode == ViewModeEnum.View ? true : false) />
                                 <ButtonComponent OnClick=@(x=> UpdateCategory(cat))
                                                  Color=ColorsEnum.primary
                                                  DisplayName="Save"
-                                                 Visible=IsEditMode />
+                                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
                             </div>
                             <div class="col-auto">
                                 <ButtonComponent OnClick=@(x=> DeleteCategory(cat))
@@ -81,7 +75,7 @@
     #region Properties
     CategoryBaseModel Category = new();
     List<CategoryBaseModel> Categories = new();
-    bool IsEditMode = false;
+    ViewModeEnum ViewMode = ViewModeEnum.View;
     #endregion
 
     #region Task OnInitializedAsync()
@@ -116,7 +110,7 @@
     {
         categoryService.UpdateCategory(category);
         await SearchCategories();
-        IsEditMode = false;
+        ViewMode = ViewModeEnum.View;
         await Task.CompletedTask;
     }
     #endregion

@@ -26,7 +26,7 @@
 </div>
 
 <div class="row">
-    <div class="col-auto">
+    <div class="col-5">
         <EditForm Model=MonthSheet>
             <div class="row mb-2 mt-2">
                 <div class="col">
@@ -60,7 +60,7 @@
             </div>
         </EditForm>
     </div>
-    <div class="col-4 offset-md-2">
+    <div class="col-6 offset-md-1">
         <div class="row">
             <div class="col-auto">
                 <h3>Earnings</h3>
@@ -121,17 +121,20 @@
 
 @if (ViewMode == ViewModeEnum.Edit)
 {
-    <div class="mt-4 mb-4">
+    <div class="row mt-4 mb-4">
+        <div class="col-auto">
         <InputSelectComponent @bind-SelectedItem=@NewCategory
                               TValue=CategoryBaseModel
                               Items=@Categories
-                              DisplayName="New Category"
                               ViewMode=@ViewMode />
+        </div>
+        <div class="col">
         <ButtonComponent OnClick=@(x=> AddNewCategory(NewCategory))
                          DisplayName="Add Category "
                          Color=ColorsEnum.primary
                          ViewMode=@((string.IsNullOrWhiteSpace(NewCategory.Name) || MonthSheet.Categories.Any(x => x.Id == NewCategory.Id)) ? ViewModeEnum.View : ViewModeEnum.Edit)
                          IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
+        </div>
     </div>
 }
 

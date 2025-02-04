@@ -62,3 +62,17 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+
+input, select {
+    width: 100%;
+    padding: 6px 10px;
+    margin: 4px;
+    border: 1px solid #cdcfd1;
+    border-radius: 4px;
+    min-height: 38px;
+}
+
+    input:disabled, select:disabled {
+        background-color: #FAFAFA;
+    }

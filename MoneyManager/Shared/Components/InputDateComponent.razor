@@ -1,27 +1,20 @@
 ﻿@namespace MoneyManager.Shared.Components
 @inherits InputDate<DateTime>
 
-<label>@DisplayName</label>
+@if (!string.IsNullOrWhiteSpace(DisplayName))
+{
+    <label>@DisplayName</label>
+}
 
-@if (IsEditMode)
-{
-    <input @bind=@CurrentValue
-           type="date"
-           disabled=@Disabled
-           min=@MinimumDate
-           max=@MaximumDate />
-}
-else
-{
-    <span>@CurrentValue.ToString("d")</span>
-}
+<input @bind=@CurrentValue
+       type="date"
+       disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)
+       min=@MinimumDate
+       max=@MaximumDate />
 
 @code {
     [Parameter]
-    public bool Disabled { get; set; } = false;
-
-    [Parameter]
-    public bool IsEditMode { get; set; } = true;
+    public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.View;
 
     /// <summary>
     /// If this parameter is used, the component will automaticly limit the MinimumDate and MaximumDate to the first and last day of the month of the date provided.

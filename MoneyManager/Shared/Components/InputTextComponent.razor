@@ -1,23 +1,16 @@
 ﻿@namespace MoneyManager.Shared.Components
-
 @inherits InputText
 
-<label>@DisplayName</label>
+@if (!string.IsNullOrWhiteSpace(DisplayName))
+{
+    <label>@DisplayName</label>
+}
 
-@if (IsEditMode)
-{
-    <input @bind=@CurrentValue
-           disabled=@Disabled />
-}
-else
-{
-    <span>@CurrentValue</span>
-}
+<input @bind=@CurrentValue
+       disabled=@(ViewMode == ViewModeEnum.Edit ? false : true) />
 
 @code {
-    [Parameter]
-    public bool Disabled { get; set; } = false;
 
     [Parameter]
-    public bool IsEditMode { get; set; } = false;
+    public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.View;
 }

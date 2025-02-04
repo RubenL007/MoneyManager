@@ -1,45 +1,39 @@
 ﻿@namespace MoneyManager.Shared.Components
 @typeparam TValue
 
-@if (IsEditMode)
+@if (!string.IsNullOrWhiteSpace(DisplayName))
 {
-    @if (!string.IsNullOrWhiteSpace(DisplayName))
-    {
-        <span>@DisplayName</span>
-    }
+    <label>@DisplayName</label>
+}
 
-    <select @bind=@InternalSelectedItemID
-            @onclick=@ChangeSelectedItem
-            id=@Id
-            disabled=@Disabled>
-        @if (SelectedItem != null)
+<select @bind=@InternalSelectedItemID
+        @onclick=@ChangeSelectedItem
+        id=@Id
+        disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)>
+    @if (SelectedItem != null)
+    {
+        <option value=@SelectedItem.GetType().GetProperty("Id")!.GetValue(SelectedItem, null)>
+            @SelectedItem.GetType().GetProperty("Name")!.GetValue(SelectedItem, null)
+        </option>
+    }
+    else
+    {
+        <option value="">Select One</option>
+    }
+    @if (Items.Any())
+    {
+        foreach (var item in Items)
         {
-            <option value=@SelectedItem.GetType().GetProperty("Id")!.GetValue(SelectedItem, null)>
-                @SelectedItem.GetType().GetProperty("Name")!.GetValue(SelectedItem, null)
-            </option>
-        }
-        else
-        {
-            <option value="">Select One</option>
-        }
-        @if (Items.Any())
-        {
-            foreach (var item in Items)
+            if (item != null)
             {
-                if (item != null)
-                {
-                    <option value="@item.GetType().GetProperty("Id")?.GetValue(item, null)">
-                        @item.GetType().GetProperty("Name")?.GetValue(item, null)
-                    </option>
-                }
+                <option value="@item.GetType().GetProperty("Id")?.GetValue(item, null)">
+                    @item.GetType().GetProperty("Name")?.GetValue(item, null)
+                </option>
             }
         }
-    </select>
-}
-else
-{
-    <span>@SelectedItem?.GetType().GetProperty("Name")?.GetValue(SelectedItem, null) </span>
-}
+    }
+</select>
+@* <span>@SelectedItem?.GetType().GetProperty("Name")?.GetValue(SelectedItem, null) </span> *@
 
 @code {
     #region Internal Properties
@@ -72,11 +66,7 @@ else
     public string DisplayName { get; set; } = string.Empty;
 
     [Parameter]
-    public bool Disabled { get; set; } = false;
-
-
-    [Parameter]
-    public bool IsEditMode { get; set; } = true;
+    public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.View;
     #endregion
 
     #region ChangeSelectedItem()

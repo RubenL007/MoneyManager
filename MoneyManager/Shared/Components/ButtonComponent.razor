@@ -3,8 +3,8 @@
 <button @onclick=OnClick
         class ="btn btn-@Color"
         type="button"
-        hidden=@(!Visible)
-        disabled=@Disabled>
+        hidden=@(!IsVisible)
+        disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)>
     @DisplayName
 </button>
 
@@ -22,8 +22,8 @@
     public ColorsEnum Color { get; set; } = ColorsEnum.primary;
 
     [Parameter]
-    public bool Visible { get; set; } = true;
+    public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.Edit;
 
     [Parameter]
-    public bool Disabled { get; set; } = false;
+    public bool IsVisible { get; set; } = true;
 }

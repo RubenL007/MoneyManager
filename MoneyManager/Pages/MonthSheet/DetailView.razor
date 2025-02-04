@@ -13,15 +13,15 @@
         <h1>@MonthSheet.Date.ToString("Y")</h1>
     </div>
     <div class="col">
-        <ButtonComponent OnClick=@(x => IsEditMode = true)
+        <ButtonComponent OnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
                          DisplayName="Edit"
                          Color=ColorsEnum.secondary
-                         Visible=!IsEditMode />
+                         IsVisible=@(ViewMode == ViewModeEnum.View ? true : false) />
 
         <ButtonComponent OnClick=@(x => UpdateMonthSheet())
                          DisplayName="Save"
                          Color=ColorsEnum.primary
-                         Visible=IsEditMode />
+                         IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
     </div>
 </div>
 
@@ -31,39 +31,31 @@
             <div class="row mb-2 mt-2">
                 <div class="col">
                     <InputNumberComponent @bind-Value=@MonthSheet.EstimatedEarned
-                                          DisplayName="Estimated Earned "
-                                          IsEditMode=@IsEditMode />
+                                          DisplayName="Estimated Earned"
+                                          ViewMode=@ViewMode />
                 </div>
                 <div class="col">
                     <InputNumberComponent @bind-Value=@MonthSheet.EstimatedSpent
-                                          DisplayName="Estimated Spent "
-                                          IsEditMode=@IsEditMode />
+                                          DisplayName="Estimated Spent"
+                                          ViewMode=@ViewMode />
                 </div>
                 <div class="col">
                     <InputNumberComponent @bind-Value=@MonthSheet.EstimatedBalance
-                                          DisplayName="Estimated Balance "
-                                          IsEditMode=@IsEditMode
-                                          Disabled=true />
+                                          DisplayName="Estimated Balance" />
                 </div>
             </div>
             <div class="row mb-2 mt-2">
                 <div class="col">
                     <InputNumberComponent @bind-Value=@MonthSheet.Earned
-                                          DisplayName="Earned "
-                                          IsEditMode=@IsEditMode
-                                          Disabled=true />
+                                          DisplayName="Earned" />
                 </div>
                 <div class="col">
                     <InputNumberComponent @bind-Value=@MonthSheet.TotalSpent
-                                          DisplayName="Spent "
-                                          IsEditMode=@IsEditMode
-                                          Disabled=true />
+                                          DisplayName="Spent" />
                 </div>
                 <div class="col">
                     <InputNumberComponent @bind-Value=@MonthSheet.Balance
-                                          DisplayName="Balance "
-                                          IsEditMode=@IsEditMode
-                                          Disabled=true />
+                                          DisplayName="Balance" />
                 </div>
             </div>
         </EditForm>
@@ -77,7 +69,7 @@
                 <ButtonComponent OnClick=@(x=> MonthSheet.Earnings.Add(new()))
                                  Color=@ColorsEnum.primary
                                  DisplayName="Add"
-                                 Visible=@IsEditMode />
+                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
             </div>
         </div>
         <EditForm Model=@MonthSheet>
@@ -97,27 +89,27 @@
                         <tr>
                             <td>
                                 <InputTextComponent @bind-Value=earning.Name
-                                                    IsEditMode=@IsEditMode />
+                                                    ViewMode=@ViewMode />
                             </td>
                             <td>
                                 <InputDateComponent @bind-Value=earning.Date
-                                                    IsEditMode=@IsEditMode
+                                                    ViewMode=@ViewMode
                                                     LimitToThisDateMonth=@MonthSheet.Date />
                             </td>
                             <td>
                                 <InputSelectComponent @bind-SelectedItem=@earning.Account
                                                       Items=@Accounts
-                                                      IsEditMode=@IsEditMode />
+                                                      ViewMode=@ViewMode />
                             </td>
                             <td>
                                 <InputNumberComponent @bind-Value=@earning.Value
-                                                      IsEditMode=@IsEditMode />
+                                                      ViewMode=@ViewMode />
                             </td>
                             <td>
                                 <ButtonComponent OnClick=@(x=> MonthSheet.Earnings.Remove(earning))
                                                  Color=@ColorsEnum.danger
                                                  DisplayName="Delete"
-                                                 Visible=@IsEditMode />
+                                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
                             </td>
                         </tr>
                     }
@@ -127,16 +119,19 @@
     </div>
 </div>
 
-@if (IsEditMode)
+@if (ViewMode == ViewModeEnum.Edit)
 {
     <div class="mt-4 mb-4">
         <InputSelectComponent @bind-SelectedItem=@NewCategory
                               TValue=CategoryBaseModel
-                              Items=@Categories />
+                              Items=@Categories
+                              DisplayName="New Category"
+                              ViewMode=@ViewMode />
         <ButtonComponent OnClick=@(x=> AddNewCategory(NewCategory))
                          DisplayName="Add Category "
                          Color=ColorsEnum.primary
-                         Disabled=@(string.IsNullOrWhiteSpace(NewCategory.Name) || MonthSheet.Categories.Any(x => x.Id == NewCategory.Id)) />
+                         ViewMode=@((string.IsNullOrWhiteSpace(NewCategory.Name) || MonthSheet.Categories.Any(x => x.Id == NewCategory.Id)) ? ViewModeEnum.View : ViewModeEnum.Edit)
+                         IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
     </div>
 }
 
@@ -152,13 +147,15 @@
                 <ButtonComponent OnClick=@(x => AddNewExpense(cat))
                                  DisplayName="Add Expense"
                                  Color=ColorsEnum.secondary
-                                 Visible=@IsEditMode />
+                                 ViewMode=@ViewMode
+                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
             </div>
             <div class="col">
                 <ButtonComponent OnClick=@(x => MonthSheet.Categories.Remove(cat))
                                  DisplayName="Delete"
                                  Color=ColorsEnum.danger
-                                 Visible=@IsEditMode />
+                                 ViewMode=@ViewMode
+                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
             </div>
         </div>
 
@@ -180,34 +177,35 @@
                         <tr>
                             <td>
                                 <InputTextComponent @bind-Value=@expense.Name
-                                                    IsEditMode=@IsEditMode />
+                                                    ViewMode=@ViewMode />
                             </td>
                             <td>
                                 <InputSelectComponent @bind-SelectedItem=@expense.Seller
                                                       TValue=SellerModel
                                                       Items=@Sellers
-                                                      IsEditMode=@IsEditMode />
+                                                      ViewMode=@ViewMode />
                             </td>
                             <td>
                                 <InputDateComponent @bind-Value=expense.BuyDate
-                                                    IsEditMode=@IsEditMode
+                                                    ViewMode=@ViewMode
                                                     LimitToThisDateMonth=@MonthSheet.Date />
                             </td>
                             <td>
                                 <InputSelectComponent @bind-SelectedItem=@expense.Account
                                                       TValue=AccountModel
                                                       Items=@Accounts
-                                                      IsEditMode=@IsEditMode />
+                                                      ViewMode=@ViewMode />
                             </td>
                             <td>
                                 <InputNumberComponent @bind-Value=@expense.Spent
-                                                      IsEditMode=@IsEditMode />
+                                                      ViewMode=@ViewMode />
                             </td>
                             <td>
                                 <ButtonComponent OnClick=@(x=> cat.Expenses.Remove(expense))
                                                  Color=@ColorsEnum.danger
                                                  DisplayName="Delete"
-                                                 Visible=@IsEditMode />
+                                                 ViewMode=@ViewMode
+                                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
                             </td>
                         </tr>
                     }
@@ -215,7 +213,7 @@
             </table>
         </EditForm>
 
-        if (!IsEditMode)
+        if (ViewMode == ViewModeEnum.View)
         {
             <h4>Total Spent @cat.TotalSpent €</h4>
         }
@@ -254,7 +252,7 @@ else
     public List<AccountModel> Accounts = null!;
     public CategoryBaseModel NewCategory = new();
 
-    public bool IsEditMode = false;
+    public ViewModeEnum ViewMode = ViewModeEnum.View;
     #endregion
 
     #region Task OnInitializedAsync()
@@ -302,7 +300,7 @@ else
     private void UpdateMonthSheet()
     {
         monthSheetService.UpdateMonthSheet(MonthSheet);
-        IsEditMode = false;
+        ViewMode = ViewModeEnum.View;
     }
     #endregion
 

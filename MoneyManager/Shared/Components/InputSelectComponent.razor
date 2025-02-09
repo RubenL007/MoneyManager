@@ -12,13 +12,16 @@
         disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)>
     @if (SelectedItem != null)
     {
-        <option value=@SelectedItem.GetType().GetProperty("Id")!.GetValue(SelectedItem, null)>
-            @SelectedItem.GetType().GetProperty("Name")!.GetValue(SelectedItem, null)
-        </option>
+        var idProperty = SelectedItem.GetType().GetProperty("Id");
+        var nameProperty = SelectedItem.GetType().GetProperty("Name");
+        var idValue = idProperty != null ? idProperty.GetValue(SelectedItem, null)?.ToString() : string.Empty;
+        var nameValue = nameProperty != null ? nameProperty.GetValue(SelectedItem, null)?.ToString() : string.Empty;
+
+        <option value="@idValue">@nameValue</option>
     }
     else
     {
-        <option value="">Select One</option>
+        <option value=""></option>
     }
     @if (Items.Any())
     {

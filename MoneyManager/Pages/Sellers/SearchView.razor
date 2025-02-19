@@ -5,71 +5,29 @@
 @inject ISeller sellerService
 @inject NavigationManager navigationManager
 
-<h1>Sellers</h1>
-<div class="row">
-    <div class="col-auto">
+<AutoTableComponent DataSource=@Sellers
+                TItem=SellerModel
+                Title="Sellers"
+                ViewMode=@ViewMode
+                IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
+                DeleteRowMethod=@(row => DeleteSeller(row))
+                EditMethod=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
+                SaveMethod=@(row => UpdateSeller(row)!)>
+    <FooterTools>
         <EditForm Model=@Seller>
-            <InputText @bind-Value=@Seller.Name />
+            <div class="row d-flex align-items-center">
+                <div class="col-2">
+                    <InputText @bind-Value=@Seller.Name />
+                </div>
+                <div class="col">
+                    <ButtonComponent OnClick=@(x=> CreateSeller())
+                                     Color=ColorsEnum.primary
+                                     DisplayName="Add New Seller" />
+                </div>
+            </div>
         </EditForm>
-    </div>
-    <div class="col">
-        <ButtonComponent OnClick=@(x=> CreateSeller())
-                         Color=ColorsEnum.primary
-                         DisplayName="Add New Seller"
-                         IsVisible=@(ViewMode == ViewModeEnum.View ? true : false) />
-    </div>
-</div>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Seller Name</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Sellers.Count != 0)
-        {
-            foreach (var seller in Sellers)
-            {
-                <tr>
-                    <td style="width:300px;">
-                        <EditForm Model=@seller>
-                            <InputTextComponent @bind-Value=@seller.Name
-                                                ViewMode=@ViewMode />
-                        </EditForm>
-                    </td>
-                    <td>
-                        <div class="row">
-                            <div class="col-auto">
-                                <ButtonComponent OnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                                                 Color=ColorsEnum.secondary
-                                                 DisplayName="Edit"
-                                                 IsVisible=@(ViewMode == ViewModeEnum.View ? true : false) />
-                                <ButtonComponent OnClick=@(x=> UpdateSeller(seller))
-                                                 Color=ColorsEnum.primary
-                                                 DisplayName="Save"
-                                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
-                            </div>
-                            <div class="col-auto">
-                                <ButtonComponent OnClick=@(x=> DeleteSeller(seller))
-                                                 Color=ColorsEnum.danger
-                                                 DisplayName="Delete" />
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td>No records found.</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
+    </FooterTools>
+</AutoTableComponent>
 
 @code {
     #region Properties

@@ -1,0 +1,385 @@
+﻿@namespace MoneyManager.Shared.Components
+
+@using System.Reflection
+@using System.Text
+
+@typeparam TItem
+
+@if (EditMethod.HasDelegate || SaveMethod.HasDelegate || !string.IsNullOrWhiteSpace(Title))
+{
+    <div class="row d-flex align-items-center">
+        @if (!string.IsNullOrWhiteSpace(Title))
+        {
+            <div class="col-auto">
+                <h1>@Title</h1>
+            </div>
+        }
+        @if (EditMethod.HasDelegate)
+        {
+            <div class="col-auto">
+                <ButtonComponent OnClick=@(x => EditMethod.InvokeAsync())
+                                 Color=ColorsEnum.secondary
+                                 DisplayName="Edit"
+                                 IsVisible=true
+                                 ViewMode=@(ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View) />
+            </div>
+        }
+        @if (SaveMethod.HasDelegate)
+        {
+            <div class="col-auto">
+                <ButtonComponent OnClick=@(x => SaveAllAsync())
+                                 Color=ColorsEnum.primary
+                                 DisplayName="Save"
+                                 IsVisible=true
+                                 ViewMode=@ViewMode />
+            </div>
+        }
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            @if (Properties.Any())
+            {
+                foreach (var property in Properties)
+                {
+                    <th>@GetFieldName(property)</th>
+                }
+                if (DeleteRowMethod.HasDelegate && ViewMode == ViewModeEnum.Edit)
+                {
+                    <th></th>
+                }
+            }
+            else
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @if (DataSource.Any())
+        {
+            foreach (var item in DataSource)
+            {
+                <tr>
+                    @foreach (var property in Properties)
+                    {
+                        if (IsEditableTable && ViewMode == ViewModeEnum.Edit)
+                        {
+                            var propertyValue = property.GetValue(item);
+                            <td>
+                                <EditForm Model=propertyValue>
+                                    @switch (propertyValue)
+                                    {
+                                        case DateTime data:
+                                            <InputDateComponent @bind-Value=@PropertyWrapperHelper.GetDateTimeWrapper(item!, property).Value
+                                                                ViewMode=@ViewMode
+                                                                LimitToThisDateMonth=@LimitDateInputsToThisMonth />
+                                            break;
+
+                                        case string data:
+                                            <InputTextComponent @bind-Value=@PropertyWrapperHelper.GetStringWrapper(item!, property).Value
+                                                                ViewMode=@ViewMode />
+                                            break;
+
+                                        case double data:
+                                            <InputNumberComponent @bind-Value=@PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value
+                                                                  ViewMode=@ViewMode />
+                                            break;
+                                        case object _ when !propertyValue.GetType().IsPrimitive && propertyValue.GetType() != typeof(string):
+                                            {
+                                                if (DataForSelects.Any() && DataForSelects.Any(x => x.PropertyType == property.PropertyType && x.PropertyName == property.Name))
+                                                {
+                                                    <InputSelectComponent @bind-SelectedItem=@(PropertyWrapperHelper.GetObjectWrapper(item!, property).Value)
+                                                                          Items=@DataForSelects.First(x => x.PropertyType == property.PropertyType && x.PropertyName == property.Name).Options
+                                                                          ViewMode=@ViewMode />
+                                                }
+                                                break;
+                                            }
+                                        default:
+                                            @ShowValue(item, property)
+                                            break;
+                                    }
+                                </EditForm>
+                            </td>
+                        }
+                        else
+                        {
+                            if (property == Properties.FirstOrDefault() && OpenDetail.HasDelegate)
+                            {
+                                <td @onclick=@(x => OpenDetail.InvokeAsync(item))
+                                    style="cursor:pointer;">
+                                    @ShowValue(item, property)
+                                </td>
+                            }
+                            else
+                            {
+                                <td>@ShowValue(item, property)</td>
+                            }
+                        }
+                    }
+                    @if (DeleteRowMethod.HasDelegate && ViewMode == ViewModeEnum.Edit)
+                    {
+                        <td>
+                            <ButtonComponent OnClick=@(x => DeleteRowMethod.InvokeAsync(item))
+                                             Color=ColorsEnum.danger
+                                             DisplayName="Delete"
+                                             IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
+                        </td>
+                    }
+                </tr>
+            }
+        }
+        else
+        {
+        <td>
+            <h5>No Recourds Found.</h5>
+        </td>
+        }
+    </tbody>
+    @if (AddNewMethod.HasDelegate || FooterTools != null)
+    {
+        <tfoot>
+            <div class="row d-flex align-items-center">
+                @if (AddNewMethod.HasDelegate)
+                {
+                    <div class="col-auto">
+                        <ButtonComponent OnClick=@(async () => await AddNewMethod.InvokeAsync())
+                                         Color=ColorsEnum.primary
+                                         DisplayName="Add New"
+                                         ViewMode=@ViewMode />
+                    </div>
+                }
+                @if (FooterTools != null)
+                {
+                    <div class="col">
+                        @FooterTools
+                    </div>
+                }
+            </div>
+        </tfoot>
+    }
+</table>
+
+@code {
+    #region Parameters
+    #region Data
+    /// <summary>
+    ///DataSource to fill the data table
+    /// </summary>
+    [Parameter]
+    public List<TItem> DataSource { get; set; } = new();
+
+    /// <summary>
+    /// Data used to fill in the exisitng selects on the table with the options from the DB.
+    /// It needs a List<SelectOptionSet> that have the Model and the options of that Model, and the name given to that field.
+    /// </summary>
+    [Parameter]
+    public List<SelectOptionSet> DataForSelects { get; set; } = new();
+
+    /// <summary>
+    /// Use to give custom names to the table heads.
+    /// If no label given, it will automatically use the Property name and format it with spaces before uppercase letters
+    /// </summary>
+    [Parameter]
+    public List<FieldNameConvertedModel> CustomTableHeadNames { get; set; } = new();
+    #endregion
+
+    #region OnClickMethods
+    /// <summary>
+    /// Not showing by default.
+    /// If any method is passed, it will show the button and be executed when the delete button of the row is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback<TItem> DeleteRowMethod { get; set; } = new();
+
+    /// <summary>
+    /// Not showing by default.
+    /// If any method is passed, it will show the button and be executed when the Add button is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback<TItem> AddNewMethod { get; set; } = new();
+
+
+    /// <summary>
+    /// Not showing by default.
+    /// If any method is passed, it will show the button and be executed when the Edit button is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback EditMethod { get; set; } = new();
+
+    /// <summary>
+    /// Not showing by default.
+    /// If any method is passed, it will show the button and be executed when the Save button is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback<TItem> SaveMethod { get; set; } = new();
+
+    /// <summary>
+    /// Not active by default.
+    /// If any method is passed, it will execute when user clicks on the first column of each row
+    /// </summary>
+    [Parameter]
+    public EventCallback<TItem> OpenDetail { get; set; } = new();
+    #endregion
+
+    /// <summary>
+    /// Title defines the name that will be displayed on the top left of the table, giving context to the data presented.
+    /// </summary>
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Defines if the table will be used to only show data, or if it also be used to edit data.
+    /// </summary>
+    [Parameter]
+    public bool IsEditableTable { get; set; } = false;
+
+    [Parameter]
+    public DateTime LimitDateInputsToThisMonth { get; set; } = DateTime.Now;
+
+    /// <summary>
+    /// Defines the Viewmode of the table.
+    /// </summary>
+    [Parameter]
+    public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.View;
+
+    /// <summary>
+    /// Render fragment for extra buttons on the footer of the table, disabled by default.
+    /// </summary>
+    [Parameter]
+    public RenderFragment FooterTools { get; set; } = null!;
+    #endregion
+
+    #region Properties
+    private List<PropertyInfo> Properties { get; set; } = new();
+    #endregion
+
+    #region Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
+    {
+        //Prevents the Guid field of being rendered on the Data Table
+        if (DataSource?.Any() == true)
+        {
+            Properties = typeof(TItem).GetProperties()
+                .Where(p => p.PropertyType != typeof(Guid))
+                .ToList();
+        }
+
+        return base.OnInitializedAsync();
+    }
+    #endregion
+
+    #region Task OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
+    {
+        await UpdateProperties();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region string ShowValue(TItem item, PropertyInfo property)
+    private string ShowValue(TItem item, PropertyInfo property)
+    {
+        var value = property.GetValue(item);
+
+        // Handle Lists
+        if (value is System.Collections.IEnumerable enumerable && value is not string)
+        {
+            string propertyToExtract = "Name";
+            List<string> listItems = new();
+
+            foreach (var obj in enumerable)
+            {
+                var extractedValue = obj?.GetType().GetProperty(propertyToExtract)?.GetValue(obj)?.ToString();
+                if (extractedValue != null)
+                {
+                    listItems.Add(extractedValue);
+                }
+            }
+
+            return listItems.Any() ? string.Join(", ", listItems) : string.Empty;
+        }
+        else if (value is DateTime data)
+        {
+            if (IsEditableTable) return data.ToString("d");
+            else return data.ToString("Y");
+        }
+
+        // If it's a complex object and not a string, try to extract a "Name" property
+        else if (value != null && !(value is string) && !value.GetType().IsPrimitive)
+        {
+            var nameProp = value.GetType().GetProperty("Name");
+            if (nameProp != null)
+            {
+                var nameValue = nameProp.GetValue(value);
+                if (nameValue != null)
+                {
+                    return nameValue.ToString()!;
+                }
+            }
+        }
+
+        return value?.ToString() ?? string.Empty;
+    }
+    #endregion
+
+    #region string GetFieldName(PropertyInfo property)
+    private string GetFieldName(PropertyInfo property)
+    {
+        var match = CustomTableHeadNames.FirstOrDefault(x => x.FieldName == property.Name && !string.IsNullOrWhiteSpace(x.Label));
+
+        return match?.Label ?? FormatStringWithSpaces(property.Name);
+    }
+    #endregion
+
+    #region string FormatStringWithSpaces(string input)
+    private string FormatStringWithSpaces(string input)
+    {
+        // Return as is, if fewer than 2 uppercase letters
+        if (input.Count(char.IsUpper) < 2) return input;
+
+        var result = new StringBuilder();
+        bool firstUpperFound = false;
+
+        foreach (char c in input)
+        {
+            if (char.IsUpper(c))
+            {
+                // Add space before uppercase letters except the first one
+                if (firstUpperFound) result.Append(' ');
+
+                firstUpperFound = true;
+            }
+            result.Append(c);
+        }
+
+        return result.ToString();
+    }
+    #endregion
+
+    #region void SaveAllAsync()
+    public async void SaveAllAsync()
+    {
+        foreach (var item in DataSource)
+        {
+            await SaveMethod.InvokeAsync(item);
+        }
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region UpdateProperties()
+    private async Task UpdateProperties()
+    {
+        if (Properties != null && !Properties.Any())
+        {
+            Properties = typeof(TItem).GetProperties()
+                .Where(p => p.PropertyType != typeof(Guid))
+                .ToList();
+        }
+        await Task.CompletedTask;
+    }
+    #endregion
+}

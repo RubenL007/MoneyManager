@@ -5,71 +5,29 @@
 @inject ICategory categoryService
 @inject NavigationManager navigationManager
 
-<h1>Categories</h1>
-<div class="row">
-    <div class="col-auto">
+<AutoTableComponent DataSource=@Categories
+                TItem=CategoryBaseModel
+                Title="Categories"
+                ViewMode=@ViewMode
+                IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
+                DeleteRowMethod=@(row => DeleteCategory(row))
+                EditMethod=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
+                SaveMethod=@(row => UpdateCategory(row)!)>
+    <FooterTools>
         <EditForm Model=@Category>
-            <InputText @bind-Value=@Category.Name />
+            <div class="row d-flex align-items-center">
+                <div class="col-2">
+                    <InputText @bind-Value=@Category.Name />
+                </div>
+                <div class="col">
+                    <ButtonComponent OnClick=@(x=> AddNewCategory())
+                                     Color=ColorsEnum.primary
+                                     DisplayName="Add New Category" />
+                </div>
+            </div>
         </EditForm>
-    </div>
-    <div class="col">
-        <ButtonComponent OnClick=@(x=> AddNewCategory())
-                         Color=ColorsEnum.primary
-                         DisplayName="Add New Category"
-                         IsVisible=@(ViewMode == ViewModeEnum.View ? true : false) />
-    </div>
-</div>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Category Name</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Categories.Count != 0)
-        {
-            foreach (var cat in Categories)
-            {
-                <tr>
-                    <td style="width:300px;">
-                        <EditForm Model=@cat>
-                            <InputTextComponent @bind-Value=@cat.Name
-                                                ViewMode=@ViewMode />
-                        </EditForm>
-                    </td>
-                    <td>
-                        <div class="row">
-                            <div class="col-auto">
-                                <ButtonComponent OnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                                                 Color=ColorsEnum.secondary
-                                                 DisplayName="Edit"
-                                                 IsVisible=@(ViewMode == ViewModeEnum.View ? true : false) />
-                                <ButtonComponent OnClick=@(x=> UpdateCategory(cat))
-                                                 Color=ColorsEnum.primary
-                                                 DisplayName="Save"
-                                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
-                            </div>
-                            <div class="col-auto">
-                                <ButtonComponent OnClick=@(x=> DeleteCategory(cat))
-                                                 Color=ColorsEnum.danger
-                                                 DisplayName="Delete" />
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td>No records found.</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
+    </FooterTools>
+</AutoTableComponent>
 
 @code {
     #region Properties

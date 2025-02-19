@@ -61,61 +61,23 @@
         </EditForm>
     </div>
     <div class="col-6 offset-md-1">
-        <div class="row">
-            <div class="col-auto">
-                <h3>Earnings</h3>
-            </div>
-            <div class="col">
-                <ButtonComponent OnClick=@(x=> MonthSheet.Earnings.Add(new()))
-                                 Color=@ColorsEnum.primary
-                                 DisplayName="Add"
-                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
-            </div>
-        </div>
-        <EditForm Model=@MonthSheet>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Account</th>
-                        <th>Value</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var earning in MonthSheet.Earnings)
-                    {
-                        <tr>
-                            <td>
-                                <InputTextComponent @bind-Value=earning.Name
-                                                    ViewMode=@ViewMode />
-                            </td>
-                            <td>
-                                <InputDateComponent @bind-Value=earning.Date
+        <AutoTableComponent DataSource=@MonthSheet.Earnings
+                        Title="Earnings"
+                        TItem=EarningModel
                                                     ViewMode=@ViewMode
-                                                    LimitToThisDateMonth=@MonthSheet.Date />
-                            </td>
-                            <td>
-                                <InputSelectComponent @bind-SelectedItem=@earning.Account
-                                                      Items=@Accounts
-                                                      ViewMode=@ViewMode />
-                            </td>
-                            <td>
-                                <InputNumberComponent @bind-Value=@earning.Value
-                                                      ViewMode=@ViewMode />
-                            </td>
-                            <td>
-                                <ButtonComponent OnClick=@(x=> MonthSheet.Earnings.Remove(earning))
-                                                 Color=@ColorsEnum.danger
-                                                 DisplayName="Delete"
-                                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
-                            </td>
-                        </tr>
+                        DeleteRowMethod=@(earning => MonthSheet.Earnings.Remove(earning))
+                        AddNewMethod=@(x=> MonthSheet.Earnings.Add(new()))
+                        IsEditableTable
+                        DataForSelects=@(new List<SelectOptionSet>
+                        {
+                            new SelectOptionSet
+                            {
+                                PropertyName = nameof(EarningModel.Account),
+                                PropertyType = typeof(AccountModel),
+                                Options = Accounts.Cast<object>().ToList()
                     }
-                </tbody>
-            </table>
-        </EditForm>
+                        }) 
+                        LimitDateInputsToThisMonth=@MonthSheet.Date/>
     </div>
 </div>
 
@@ -140,85 +102,36 @@
 
 @if (MonthSheet.Categories.Any())
 {
-    foreach (var cat in MonthSheet.Categories)
+    foreach (CategoryModel cat in MonthSheet.Categories)
     {
-        <div class="row mt-3">
-            <div class="col-auto">
-                <h4>@cat.Name</h4>
-            </div>
-            <div class="col-auto">
-                <ButtonComponent OnClick=@(x => AddNewExpense(cat))
-                                 DisplayName="Add Expense"
-                                 Color=ColorsEnum.secondary
+        <AutoTableComponent DataSource=@cat.Expenses
+                            Title=@cat.Name
+                            TItem=ExpenseModel
                                  ViewMode=@ViewMode
-                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
-            </div>
-            <div class="col">
-                <ButtonComponent OnClick=@(x => MonthSheet.Categories.Remove(cat))
-                                 DisplayName="Delete"
-                                 Color=ColorsEnum.danger
-                                 ViewMode=@ViewMode
-                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
-            </div>
-        </div>
-
-        <EditForm Model=@cat.Expenses>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Seller</th>
-                        <th>Buy Date</th>
-                        <th>Account</th>
-                        <th>Money Spent</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var expense in cat.Expenses)
+                            DeleteRowMethod=@(expense => cat.Expenses.Remove(expense))
+                            AddNewMethod=@(x => AddNewExpense(cat))
+                            IsEditableTable 
+                            DataForSelects=@(new List<SelectOptionSet>
                     {
-                        <tr>
-                            <td>
-                                <InputTextComponent @bind-Value=@expense.Name
-                                                    ViewMode=@ViewMode />
-                            </td>
-                            <td>
-                                <InputSelectComponent @bind-SelectedItem=@expense.Seller
-                                                      TValue=SellerModel
-                                                      Items=@Sellers
-                                                      ViewMode=@ViewMode />
-                            </td>
-                            <td>
-                                <InputDateComponent @bind-Value=expense.BuyDate
-                                                    ViewMode=@ViewMode
-                                                    LimitToThisDateMonth=@MonthSheet.Date />
-                            </td>
-                            <td>
-                                <InputSelectComponent @bind-SelectedItem=@expense.Account
-                                                      TValue=AccountModel
-                                                      Items=@Accounts
-                                                      ViewMode=@ViewMode />
-                            </td>
-                            <td>
-                                <InputNumberComponent @bind-Value=@expense.Spent
-                                                      ViewMode=@ViewMode />
-                            </td>
-                            <td>
-                                <ButtonComponent OnClick=@(x=> cat.Expenses.Remove(expense))
-                                                 Color=@ColorsEnum.danger
-                                                 DisplayName="Delete"
-                                                 ViewMode=@ViewMode
-                                                 IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </EditForm>
+                                new SelectOptionSet
+                                {
+                                    PropertyName = nameof(ExpenseModel.Seller),
+                                    PropertyType = typeof(SellerModel),
+                                    Options = Sellers.Cast<object>().ToList()
+                                },
+                                new SelectOptionSet
+                                {
+                                    PropertyName = nameof(ExpenseModel.Account),
+                                    PropertyType = typeof(AccountModel),
+                                    Options = Accounts.Cast<object>().ToList()
+                                },
+                            })
+                            LimitDateInputsToThisMonth=@MonthSheet.Date/>
 
         if (ViewMode == ViewModeEnum.View)
         {
             <h4>Total Spent @cat.TotalSpent €</h4>
+            //TODO: Update on focus out
         }
         else
         {
@@ -308,7 +221,7 @@ else
     #endregion
 
     #region AddNewExpense()
-    private void AddNewExpense(CategoryModel cat)
+    public void AddNewExpense(CategoryModel cat)
     {
         cat.Expenses.Add(new());
         StateHasChanged();

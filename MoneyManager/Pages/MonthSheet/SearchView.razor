@@ -13,53 +13,32 @@
 
 <p>This table provides a clear summary of your income and expenses across different months. Use it to track patterns, compare financial performance, and maintain a well-organized view of your finances at a glance. Keep your budgeting simple and effective!</p>
 
-<EditForm Model=@NewMonthSheetDate>
-    <InputDateComponent @bind-Value=@NewMonthSheetDate />
-
-    <ButtonComponent OnClick=@(x => AddNewMonthSheetAsync(new() {Date = NewMonthSheetDate}))
-                     Color=@ColorsEnum.primary
-                     DisplayName="Add This Month" />
-</EditForm>
-
-@if (MonthSheets != null && MonthSheets.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Month</th>
-                <th>Balance</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var month in MonthSheets)
-            {
-                <tr>
-                    <td @onclick=@(x => OpenDetail(month))>@month.Date.ToString("Y")</td>
-                    <td>@month.Balance</td>
-                    <td>
-                        <ButtonComponent OnClick=@(x => DeleteMonthSheet(month.Id))
-                                         Color=@ColorsEnum.danger
-                                         DisplayName="Delete" />
-                    </td>
-                </tr>
-            }
-            <tr>
-                <td>
-                    <ButtonComponent OnClick=@(x => AddNewMonthSheetAsync(new()))
+<AutoTableComponent DataSource=@MonthSheets
+                    TItem=MonthSheetModel
+                    CustomTableHeadNames=@(new List<FieldNameConvertedModel>
+                                         {
+                                             new() { FieldName = nameof(MonthSheetModel.Date), Label = "Month" }
+                                         })
+                    ViewMode=@ViewModeEnum.Edit
+                    DeleteRowMethod=@(monthsheet => DeleteMonthSheet(monthsheet))
+                    OpenDetail=@(monthsheet => OpenDetail(monthsheet))>
+    <FooterTools>
+        <EditForm Model=@NewMonthSheetDate>
+            <div class="row d-flex align-items-center">
+                <div class="col">
+                    <InputDateComponent @bind-Value=@NewMonthSheetDate
+                                        ViewMode=@ViewModeEnum.Edit />
+                </div>
+                <div class="col">
+                    <ButtonComponent OnClick=@(x => {AddNewMonthSheetAsync(new() {Date = NewMonthSheetDate}); StateHasChanged();})
                                      Color=@ColorsEnum.primary
-                                     DisplayName="Add Current Month" />
-                </td>
-                <td></td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
-}
-else
-{
-    <p><em>No records found.</em></p>
-}
+                                     DisplayName="Add This Month"
+                                     ViewMode=@(MonthSheets.Any(x=>x.Date.Date.Month == NewMonthSheetDate.Month && x.Date.Date.Year == NewMonthSheetDate.Year) ? ViewModeEnum.View : ViewModeEnum.Edit) />
+                </div>
+            </div>
+        </EditForm>
+    </FooterTools>
+</AutoTableComponent>
 
 @code {
     #region Properties
@@ -93,9 +72,9 @@ else
     #endregion
 
     #region Task DeleteMonthSheet()
-    private async Task DeleteMonthSheet(Guid id)
+    private async Task DeleteMonthSheet(MonthSheetModel item)
     {
-        monthSheetService.DeleteMonthSheet(id);
+        monthSheetService.DeleteMonthSheet(item.Id);
         await GetDataAsync();
         await Task.CompletedTask;
     }

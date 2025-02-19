@@ -42,14 +42,6 @@
     }
     #endregion
 
-    #region void OnParametersSet()
-    protected override void OnParametersSet()
-    {
-        LimitDates();
-        base.OnParametersSet();
-    }
-    #endregion
-
     #region LimitDates()
     private void LimitDates()
     {
@@ -61,6 +53,10 @@
 
             MinimumDate = $"{yearLimit}-{monthLimit}-01";
             MaximumDate = $"{yearLimit}-{monthLimit}-{lastDayOfTheMonth}";
+            if (Value == default)
+            {
+                Value = new DateTime(int.Parse(yearLimit), int.Parse(monthLimit), DateTime.Today.Day);
+            }
         }
     }
     #endregion

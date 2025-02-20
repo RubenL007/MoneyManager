@@ -84,8 +84,15 @@
                                             break;
 
                                         case double data:
-                                            <InputNumberComponent @bind-Value=@PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value
-                                                                  ViewMode=@ViewMode />
+                                            <InputNumberComponent Value=@PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value
+                                                                  ValueExpression=@(() => PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value)
+                                                                  ViewMode=@ViewMode
+                                                                  ValueChanged=@(async (double newValue) =>
+                                                                    {
+                                                                        // To update and notify the parent view about the change
+                                                                        PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value = newValue;
+                                                                        await OnValueChange.InvokeAsync(null);
+                                                                    }) />
                                             break;
                                         case object _ when !propertyValue.GetType().IsPrimitive && propertyValue.GetType() != typeof(string):
                                             {
@@ -223,6 +230,12 @@
     [Parameter]
     public EventCallback<TItem> OpenDetail { get; set; } = new();
     #endregion
+
+    /// <summary>
+    /// To update the parent when changes are made in some components
+    /// </summary>
+    [Parameter]
+    public EventCallback OnValueChange { get; set; }
 
     /// <summary>
     /// Title defines the name that will be displayed on the top left of the table, giving context to the data presented.

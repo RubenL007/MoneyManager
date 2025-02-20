@@ -67,17 +67,17 @@
                                                     ViewMode=@ViewMode
                         DeleteRowMethod=@(earning => MonthSheet.Earnings.Remove(earning))
                         AddNewMethod=@(x=> MonthSheet.Earnings.Add(new()))
-                        IsEditableTable
-                        DataForSelects=@(new List<SelectOptionSet>
-                        {
+                            IsEditableTable=true
+                            LimitDateInputsToThisMonth=@MonthSheet.Date
+                            OnValueChange=@(x=> StateHasChanged())
+                            DataForSelects=@(new List<SelectOptionSet> {
                             new SelectOptionSet
                             {
                                 PropertyName = nameof(EarningModel.Account),
                                 PropertyType = typeof(AccountModel),
                                 Options = Accounts.Cast<object>().ToList()
                     }
-                        }) 
-                        LimitDateInputsToThisMonth=@MonthSheet.Date/>
+                                             }) />
     </div>
 </div>
 
@@ -110,9 +110,10 @@
                                  ViewMode=@ViewMode
                             DeleteRowMethod=@(expense => cat.Expenses.Remove(expense))
                             AddNewMethod=@(x => AddNewExpense(cat))
-                            IsEditableTable 
-                            DataForSelects=@(new List<SelectOptionSet>
-                    {
+                            IsEditableTable=true
+                            LimitDateInputsToThisMonth=@MonthSheet.Date
+                            OnValueChange=@(x=> StateHasChanged())
+                            DataForSelects=@(new List<SelectOptionSet> {
                                 new SelectOptionSet
                                 {
                                     PropertyName = nameof(ExpenseModel.Seller),
@@ -125,18 +126,9 @@
                                     PropertyType = typeof(AccountModel),
                                     Options = Accounts.Cast<object>().ToList()
                                 },
-                            })
-                            LimitDateInputsToThisMonth=@MonthSheet.Date/>
+                                             }) />
 
-        if (ViewMode == ViewModeEnum.View)
-        {
-            <h4>Total Spent @cat.TotalSpent €</h4>
-            //TODO: Update on focus out
-        }
-        else
-        {
-            <h4>Calculating Total Spent... Save first.</h4>
-        }
+        <h4>Total Spent: @cat.TotalSpent €</h4>
         <br />
         <br />
     }
@@ -145,7 +137,6 @@ else
 {
     <h4>No Categories added.</h4>
 }
-
 
 @code {
     #region Parameters

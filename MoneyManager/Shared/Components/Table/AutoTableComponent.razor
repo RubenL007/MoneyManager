@@ -18,8 +18,7 @@
         {
             <div class="col-auto">
                 <ButtonComponent OnClick=@(x => EditMethod.InvokeAsync())
-                                 Color=ColorsEnum.secondary
-                                 DisplayName="Edit"
+                                 ButtonType=@ButtonTypeEnum.Edit
                                  IsVisible=true
                                  ViewMode=@(ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View) />
             </div>
@@ -28,8 +27,7 @@
         {
             <div class="col-auto">
                 <ButtonComponent OnClick=@(x => SaveAllAsync())
-                                 Color=ColorsEnum.primary
-                                 DisplayName="Save"
+                                 ButtonType=@ButtonTypeEnum.Save
                                  IsVisible=true
                                  ViewMode=@ViewMode />
             </div>
@@ -88,11 +86,11 @@
                                                                   ValueExpression=@(() => PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value)
                                                                   ViewMode=@ViewMode
                                                                   ValueChanged=@(async (double newValue) =>
-                                                                    {
-                                                                        // To update and notify the parent view about the change
-                                                                        PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value = newValue;
-                                                                        await OnValueChange.InvokeAsync(null);
-                                                                    }) />
+                                          {
+                                          // To update and notify the parent view about the change
+                                          PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value = newValue;
+                                          await OnValueChange.InvokeAsync(null);
+                                          }) />
                                             break;
                                         case object _ when !propertyValue.GetType().IsPrimitive && propertyValue.GetType() != typeof(string):
                                             {
@@ -130,8 +128,7 @@
                     {
                         <td>
                             <ButtonComponent OnClick=@(x => DeleteRowMethod.InvokeAsync(item))
-                                             Color=ColorsEnum.danger
-                                             DisplayName="Delete"
+                                             ButtonType=@ButtonTypeEnum.Delete
                                              IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
                         </td>
                     }
@@ -153,8 +150,7 @@
                 {
                     <div class="col-auto">
                         <ButtonComponent OnClick=@(async () => await AddNewMethod.InvokeAsync())
-                                         Color=ColorsEnum.primary
-                                         DisplayName="Add New"
+                                         ButtonType=@ButtonTypeEnum.Add
                                          ViewMode=@ViewMode />
                     </div>
                 }

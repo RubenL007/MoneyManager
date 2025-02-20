@@ -31,8 +31,7 @@
                 </div>
                 <div class="col">
                     <ButtonComponent OnClick=@(x => {AddNewMonthSheetAsync(new() {Date = NewMonthSheetDate}); StateHasChanged();})
-                                     Color=@ColorsEnum.primary
-                                     DisplayName="Add This Month"
+                                     ButtonType=@ButtonTypeEnum.Add
                                      ViewMode=@(MonthSheets.Any(x=>x.Date.Date.Month == NewMonthSheetDate.Month && x.Date.Date.Year == NewMonthSheetDate.Year) ? ViewModeEnum.View : ViewModeEnum.Edit) />
                 </div>
             </div>

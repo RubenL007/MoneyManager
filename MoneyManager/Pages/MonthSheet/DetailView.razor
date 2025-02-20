@@ -14,13 +14,11 @@
     </div>
     <div class="col">
         <ButtonComponent OnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                         DisplayName="Edit"
-                         Color=ColorsEnum.secondary
+                         ButtonType=@ButtonTypeEnum.Edit
                          IsVisible=@(ViewMode == ViewModeEnum.View ? true : false) />
 
         <ButtonComponent OnClick=@(x => UpdateMonthSheet())
-                         DisplayName="Save"
-                         Color=ColorsEnum.primary
+                         ButtonType=@ButtonTypeEnum.Save
                          IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
     </div>
 </div>
@@ -92,17 +90,17 @@
 
 @if (ViewMode == ViewModeEnum.Edit)
 {
-    <div class="row mt-4 mb-4">
+    <div class="row mt-4 mb-4 d-flex align-items-center">
         <div class="col-auto">
             <InputSelectComponent @bind-SelectedItem=@NewCategory
+                                  DisplayName="New Category"
                                   TValue=CategoryBaseModel
                                   Items=@Categories
                                   ViewMode=@ViewMode />
         </div>
-        <div class="col">
+        <div class="col mt-4">
             <ButtonComponent OnClick=@(x=> AddNewCategory(NewCategory))
-                             DisplayName="Add Category "
-                             Color=ColorsEnum.primary
+                             ButtonType=@ButtonTypeEnum.Add
                              ViewMode=@((string.IsNullOrWhiteSpace(NewCategory.Name) || MonthSheet.Categories.Any(x => x.Id == NewCategory.Id)) ? ViewModeEnum.View : ViewModeEnum.Edit)
                              IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
         </div>

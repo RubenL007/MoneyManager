@@ -1,0 +1,79 @@
+﻿@namespace MoneyManager.Shared.Components
+
+<button @onclick=OnClick
+        class="btn btn-@Color"
+        type="button"
+        hidden=@(!IsVisible)
+        disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)>
+    @if (!string.IsNullOrWhiteSpace(IconClass))
+    {
+        <span class=@(IconClass + " pe-2") aria-hidden="true" />
+    }
+    @DisplayName
+</button>
+
+@code {
+    [Parameter]
+    public string DisplayName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Executes the method given when clicked
+    /// </summary>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter]
+    public ColorsEnum Color { get; set; } = ColorsEnum.primary;
+
+    [Parameter]
+    public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.Edit;
+
+    [Parameter]
+    public bool IsVisible { get; set; } = true;
+
+    /// <summary>
+    /// Defines the icon for the button, none by default.
+    /// Correct structure for the icon is "oi oi-Icon-Name".
+    /// </summary>
+    [Parameter]
+    public string IconClass { get; set; } = string.Empty;
+
+    [Parameter]
+    public ButtonTypeEnum ButtonType { get; set; } = ButtonTypeEnum.Default;
+
+
+    protected override void OnInitialized()
+    {
+        switch (ButtonType)
+        {
+            case ButtonTypeEnum.Add:
+                Color = ColorsEnum.primary;
+                DisplayName = "Add New";
+                IconClass = "oi oi-plus";
+                break;
+
+            case ButtonTypeEnum.Edit:
+                Color = ColorsEnum.secondary;
+                DisplayName = "Edit";
+                IconClass = "oi oi-pencil";
+                break;
+
+            case ButtonTypeEnum.Save:
+                Color = ColorsEnum.primary;
+                DisplayName = "Save";
+                IconClass = "oi oi-check";
+                break;
+
+            case ButtonTypeEnum.Delete:
+                Color = ColorsEnum.danger;
+                DisplayName = "Delete";
+                IconClass = "oi oi-trash";
+                break;
+
+            default:
+
+                break;
+        }
+        base.OnInitialized();
+    }
+}

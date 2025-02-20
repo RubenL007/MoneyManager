@@ -35,23 +35,6 @@ namespace MoneyManager.Data.Services
         {
             if (_MonthsCollection.Find(x => x.Id == monthSheet.Id).Any())
             {
-                foreach (var category in monthSheet.Categories)
-                {
-                    category.TotalSpent = category.Expenses.Sum(x => x.Spent);
-                }
-                monthSheet.TotalSpent = monthSheet.Categories.Sum(x => x.TotalSpent);
-
-                double earnings = 0;
-                foreach (var earning in monthSheet.Earnings)
-                {
-                    earnings += earning.Value;
-                }
-                monthSheet.Earned = earnings;
-
-                monthSheet.Balance = monthSheet.Earned - monthSheet.TotalSpent;
-
-                monthSheet.EstimatedBalance = monthSheet.EstimatedEarned - monthSheet.EstimatedSpent;
-
                 _MonthsCollection.ReplaceOne(x => x.Id == monthSheet.Id, monthSheet);
                 return "Month Sheet updated sucessfully.";
             }

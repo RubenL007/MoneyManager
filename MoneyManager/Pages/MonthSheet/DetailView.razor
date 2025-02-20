@@ -40,43 +40,52 @@
                                           ViewMode=@ViewMode />
                 </div>
                 <div class="col">
-                    <InputNumberComponent @bind-Value=@MonthSheet.EstimatedBalance
-                                          DisplayName="Estimated Balance" />
+                    <!--To show the values on inputs without binding because they are pointers-->
+                    <label>Estimated Balance</label>
+                    <input value=@MonthSheet.EstimatedBalance
+                           type="number"
+                           disabled=true>
                 </div>
             </div>
             <div class="row mb-2 mt-2">
                 <div class="col">
-                    <InputNumberComponent @bind-Value=@MonthSheet.Earned
-                                          DisplayName="Earned" />
+                    <label>Total Earned</label>
+                    <input value=@MonthSheet.Earned
+                           type="number"
+                           disabled=true>
                 </div>
                 <div class="col">
-                    <InputNumberComponent @bind-Value=@MonthSheet.TotalSpent
-                                          DisplayName="Spent" />
+                    <label>Total Spent</label>
+                    <input value=@MonthSheet.TotalSpent
+                           type="number"
+                           disabled=true>
                 </div>
                 <div class="col">
-                    <InputNumberComponent @bind-Value=@MonthSheet.Balance
-                                          DisplayName="Balance" />
+                    <label>Balance</label>
+                    <input value=@MonthSheet.Balance
+                           type="number"
+                           disabled=true>
                 </div>
             </div>
         </EditForm>
     </div>
     <div class="col-6 offset-md-1">
         <AutoTableComponent DataSource=@MonthSheet.Earnings
-                        Title="Earnings"
-                        TItem=EarningModel
-                                                    ViewMode=@ViewMode
-                        DeleteRowMethod=@(earning => MonthSheet.Earnings.Remove(earning))
-                        AddNewMethod=@(x=> MonthSheet.Earnings.Add(new()))
+                            Title="Earnings"
+                            TItem=EarningModel
+                            ViewMode=@ViewMode
+                            DeleteRowMethod=@(earning => MonthSheet.Earnings.Remove(earning))
+                            AddNewMethod=@(x=> MonthSheet.Earnings.Add(new()))
                             IsEditableTable=true
                             LimitDateInputsToThisMonth=@MonthSheet.Date
                             OnValueChange=@(x=> StateHasChanged())
                             DataForSelects=@(new List<SelectOptionSet> {
-                            new SelectOptionSet
-                            {
-                                PropertyName = nameof(EarningModel.Account),
-                                PropertyType = typeof(AccountModel),
-                                Options = Accounts.Cast<object>().ToList()
-                    }
+                                             new SelectOptionSet
+                                             {
+                                                 PropertyName = nameof(EarningModel.Account),
+                                                 PropertyType = typeof(AccountModel),
+                                                 Options = Accounts.Cast<object>().ToList()
+                                             }
                                              }) />
     </div>
 </div>
@@ -85,17 +94,17 @@
 {
     <div class="row mt-4 mb-4">
         <div class="col-auto">
-        <InputSelectComponent @bind-SelectedItem=@NewCategory
-                              TValue=CategoryBaseModel
-                              Items=@Categories
-                              ViewMode=@ViewMode />
+            <InputSelectComponent @bind-SelectedItem=@NewCategory
+                                  TValue=CategoryBaseModel
+                                  Items=@Categories
+                                  ViewMode=@ViewMode />
         </div>
         <div class="col">
-        <ButtonComponent OnClick=@(x=> AddNewCategory(NewCategory))
-                         DisplayName="Add Category "
-                         Color=ColorsEnum.primary
-                         ViewMode=@((string.IsNullOrWhiteSpace(NewCategory.Name) || MonthSheet.Categories.Any(x => x.Id == NewCategory.Id)) ? ViewModeEnum.View : ViewModeEnum.Edit)
-                         IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
+            <ButtonComponent OnClick=@(x=> AddNewCategory(NewCategory))
+                             DisplayName="Add Category "
+                             Color=ColorsEnum.primary
+                             ViewMode=@((string.IsNullOrWhiteSpace(NewCategory.Name) || MonthSheet.Categories.Any(x => x.Id == NewCategory.Id)) ? ViewModeEnum.View : ViewModeEnum.Edit)
+                             IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
         </div>
     </div>
 }
@@ -107,25 +116,25 @@
         <AutoTableComponent DataSource=@cat.Expenses
                             Title=@cat.Name
                             TItem=ExpenseModel
-                                 ViewMode=@ViewMode
+                            ViewMode=@ViewMode
                             DeleteRowMethod=@(expense => cat.Expenses.Remove(expense))
                             AddNewMethod=@(x => AddNewExpense(cat))
                             IsEditableTable=true
                             LimitDateInputsToThisMonth=@MonthSheet.Date
                             OnValueChange=@(x=> StateHasChanged())
                             DataForSelects=@(new List<SelectOptionSet> {
-                                new SelectOptionSet
-                                {
-                                    PropertyName = nameof(ExpenseModel.Seller),
-                                    PropertyType = typeof(SellerModel),
-                                    Options = Sellers.Cast<object>().ToList()
-                                },
-                                new SelectOptionSet
-                                {
-                                    PropertyName = nameof(ExpenseModel.Account),
-                                    PropertyType = typeof(AccountModel),
-                                    Options = Accounts.Cast<object>().ToList()
-                                },
+                                             new SelectOptionSet
+                                             {
+                                                 PropertyName = nameof(ExpenseModel.Seller),
+                                                 PropertyType = typeof(SellerModel),
+                                                 Options = Sellers.Cast<object>().ToList()
+                                             },
+                                             new SelectOptionSet
+                                             {
+                                                 PropertyName = nameof(ExpenseModel.Account),
+                                                 PropertyType = typeof(AccountModel),
+                                                 Options = Accounts.Cast<object>().ToList()
+                                             },
                                              }) />
 
         <h4>Total Spent: @cat.TotalSpent €</h4>

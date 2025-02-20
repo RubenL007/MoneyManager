@@ -15,11 +15,11 @@ namespace MoneyManager.Data.Models
 
         public List<EarningModel> Earnings { get; set; } = new();
 
-        public double TotalSpent { get; set; } = 0;
+        public double TotalSpent => Categories.Sum(c => c.TotalSpent);
         public double EstimatedSpent { get; set; } = 0;
-        public double Earned { get; set; } = 0;
+        public double Earned => Earnings.Sum(e => e.Value);
         public double EstimatedEarned { get; set; } = 0;
-        public double Balance { get; set; } = 0;
-        public double EstimatedBalance { get; set; } = 0;
+        public double Balance => Earned - TotalSpent;
+        public double EstimatedBalance => EstimatedEarned - EstimatedSpent;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
 
 namespace MoneyManager.Data.Models
 {
@@ -7,6 +6,6 @@ namespace MoneyManager.Data.Models
     {
         public List<ExpenseModel> Expenses { get; set; } = new();
 
-        public double TotalSpent { get; set; } = 0;
+        public double TotalSpent => Expenses.Sum(x => x.Spent);
     }
 }

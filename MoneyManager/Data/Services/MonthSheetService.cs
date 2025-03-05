@@ -1,19 +1,19 @@
-﻿using MoneyManager.Data.Interface;
+﻿using Microsoft.Extensions.Options;
+using MoneyManager.Data.Interface;
 using MoneyManager.Data.Models;
+using MoneyManager.Shared;
 using MongoDB.Driver;
 
 namespace MoneyManager.Data.Services
 {
     public class MonthSheetService : IMonthSheet
     {
-        private MongoClient _mongoClient = null!;
-        private IMongoDatabase _database = null!;
-        private IMongoCollection<MonthSheetModel> _MonthsCollection = null!;
-        public MonthSheetService()
+        private readonly IMongoCollection<MonthSheetModel> _MonthsCollection;
+
+        public MonthSheetService(IMongoClient mongoClient, IOptions<MongoDbSettings> settings)
         {
-            _mongoClient = new MongoClient("mongodb://localhost:27017");
-            _database = _mongoClient.GetDatabase("MoneyManager");
-            _MonthsCollection = _database.GetCollection<MonthSheetModel>("MonthsSheets");
+            var database = mongoClient.GetDatabase(settings.Value.DatabaseName);
+            _MonthsCollection = database.GetCollection<MonthSheetModel>("MonthsSheets");
         }
 
         public string CreateMonthSheet(MonthSheetModel monthSheet)

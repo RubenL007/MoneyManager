@@ -1,19 +1,19 @@
-﻿using MoneyManager.Data.Interface;
+﻿using Microsoft.Extensions.Options;
+using MoneyManager.Data.Interface;
 using MoneyManager.Data.Models;
+using MoneyManager.Shared;
 using MongoDB.Driver;
 
 namespace MoneyManager.Data.Services
 {
     public class CategoryService : ICategory
     {
-        private MongoClient _mongoClient = null!;
-        private IMongoDatabase _database = null!;
-        private IMongoCollection<CategoryBaseModel> _categoriesCollection = null!;
-        public CategoryService()
+        private readonly IMongoCollection<CategoryBaseModel> _categoriesCollection;
+
+        public CategoryService(IMongoClient mongoClient, IOptions<MongoDbSettings> settings)
         {
-            _mongoClient = new MongoClient("mongodb://localhost:27017");
-            _database = _mongoClient.GetDatabase("MoneyManager");
-            _categoriesCollection = _database.GetCollection<CategoryBaseModel>("Categories");
+            var database = mongoClient.GetDatabase(settings.Value.DatabaseName);
+            _categoriesCollection = database.GetCollection<CategoryBaseModel>("Categories");
         }
 
         public string CreateCategory(CategoryBaseModel category)

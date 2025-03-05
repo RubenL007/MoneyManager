@@ -1,19 +1,19 @@
-﻿using MoneyManager.Data.Interface;
+﻿using Microsoft.Extensions.Options;
+using MoneyManager.Data.Interface;
 using MoneyManager.Data.Models;
+using MoneyManager.Shared;
 using MongoDB.Driver;
 
 namespace MoneyManager.Data.Services
 {
     public class AccountService : IAccount
     {
-        private MongoClient _mongoClient = null!;
-        private IMongoDatabase _database = null!;
-        private IMongoCollection<AccountModel> _accountsCollection = null!;
-        public AccountService()
+        private readonly IMongoCollection<AccountModel> _accountsCollection;
+
+        public AccountService(IMongoClient mongoClient, IOptions<MongoDbSettings> settings)
         {
-            _mongoClient = new MongoClient("mongodb://localhost:27017");
-            _database = _mongoClient.GetDatabase("MoneyManager");
-            _accountsCollection = _database.GetCollection<AccountModel>("Accounts");
+            var database = mongoClient.GetDatabase(settings.Value.DatabaseName);
+            _accountsCollection = database.GetCollection<AccountModel>("Accounts");
         }
 
         public string CreateAccount(AccountModel account)

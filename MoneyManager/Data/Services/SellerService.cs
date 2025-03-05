@@ -1,19 +1,19 @@
-﻿using MoneyManager.Data.Interface;
+﻿using Microsoft.Extensions.Options;
+using MoneyManager.Data.Interface;
 using MoneyManager.Data.Models;
+using MoneyManager.Shared;
 using MongoDB.Driver;
 
 namespace MoneyManager.Data.Services
 {
     public class SellerService : ISeller
     {
-        private MongoClient _mongoClient = null!;
-        private IMongoDatabase _database = null!;
-        private IMongoCollection<SellerModel> _sellersCollection = null!;
-        public SellerService()
+        private readonly IMongoCollection<SellerModel> _sellersCollection;
+
+        public SellerService(IMongoClient mongoClient, IOptions<MongoDbSettings> settings)
         {
-            _mongoClient = new MongoClient("mongodb://localhost:27017");
-            _database = _mongoClient.GetDatabase("MoneyManager");
-            _sellersCollection = _database.GetCollection<SellerModel>("Sellers");
+            var database = mongoClient.GetDatabase(settings.Value.DatabaseName);
+            _sellersCollection = database.GetCollection<SellerModel>("Sellers");
         }
 
         public string CreateSeller(SellerModel seller)

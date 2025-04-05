@@ -10,11 +10,19 @@ using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+#region Connect Azure AD
+var azureAdSection = builder.Configuration.GetSection("AzureAd");
+var envClientId = Environment.GetEnvironmentVariable("AzureAd__ClientId");
+if (!string.IsNullOrEmpty(envClientId))
+{
+    azureAdSection["ClientId"] = envClientId;
+}
 
-builder.Services.AddControllersWithViews()
-.AddMicrosoftIdentityUI();
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApp(azureAdSection);
+
+builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI(); 
+#endregion
 
 builder.Services.AddAuthorization(options =>
 {

@@ -1,6 +1,4 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-
-namespace MoneyManager.Data.Models
+﻿namespace MoneyManager.Data.Models
 {
     public class CategoryModel : CategoryBaseModel
     {

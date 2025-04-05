@@ -1,9 +1,10 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
+using MoneyManager.Shared;
 
 namespace MoneyManager.Data.Models
 {
-    public class EarningModel
+    public class EarningModel: Tenantable
     {
         [BsonGuidRepresentation(GuidRepresentation.Standard)]
         public Guid Id { get; set; } = Guid.NewGuid();

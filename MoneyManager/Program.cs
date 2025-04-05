@@ -13,9 +13,14 @@ var builder = WebApplication.CreateBuilder(args);
 #region Connect Azure AD
 var azureAdSection = builder.Configuration.GetSection("AzureAd");
 var envClientId = Environment.GetEnvironmentVariable("AzureAd__ClientId");
+var envClientSecret = Environment.GetEnvironmentVariable("AzureAd__ClientSecret");
 if (!string.IsNullOrEmpty(envClientId))
 {
     azureAdSection["ClientId"] = envClientId;
+}
+if (!string.IsNullOrEmpty(envClientSecret))
+{
+    azureAdSection["ClientSecret"] = envClientSecret;
 }
 
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)

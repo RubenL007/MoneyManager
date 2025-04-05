@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /MoneyManager/appsettings.json
 /MoneyManager/appsettings.Development.json
+/MoneyManager/appsettings.json
+/MoneyManager/appsettings.Development.json

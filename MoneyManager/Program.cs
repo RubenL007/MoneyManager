@@ -1,18 +1,35 @@
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 using MoneyManager.Data.Interface;
 using MoneyManager.Data.Services;
 using MoneyManager.Shared;
+using MoneyManager.Shared.UserAuthentication;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+
+builder.Services.AddControllersWithViews()
+.AddMicrosoftIdentityUI();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = options.DefaultPolicy;
+});
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddMicrosoftIdentityConsentHandler();
 builder.Services.AddScoped<IMonthSheet, MonthSheetService>();
 builder.Services.AddScoped<ICategory, CategoryService>();
 builder.Services.AddScoped<ISeller, SellerService>();
 builder.Services.AddScoped<IAccount, AccountService>();
+builder.Services.AddScoped<IUserAuthentication, UserAuthenticationService>();
 
 #region Connect with DB
 // Load MongoDB settings from configuration
@@ -52,6 +69,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

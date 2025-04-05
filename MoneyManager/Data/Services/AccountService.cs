@@ -2,6 +2,7 @@
 using MoneyManager.Data.Interface;
 using MoneyManager.Data.Models;
 using MoneyManager.Shared;
+using MoneyManager.Shared.UserAuthentication;
 using MongoDB.Driver;
 
 namespace MoneyManager.Data.Services
@@ -9,18 +10,26 @@ namespace MoneyManager.Data.Services
     public class AccountService : IAccount
     {
         private readonly IMongoCollection<AccountModel> _accountsCollection;
+        private readonly IUserAuthentication _userAuthentication;
 
-        public AccountService(IMongoClient mongoClient, IOptions<MongoDbSettings> settings)
+        public AccountService(IMongoClient mongoClient, IOptions<MongoDbSettings> settings, IUserAuthentication userAuthentication)
         {
             var database = mongoClient.GetDatabase(settings.Value.DatabaseName);
             _accountsCollection = database.GetCollection<AccountModel>("Accounts");
+
+            _userAuthentication = userAuthentication;
         }
 
+        #region CreateAccount(AccountModel account)
         public string CreateAccount(AccountModel account)
         {
-            var accountObj = _accountsCollection.Find(x => x.Id == account.Id).FirstOrDefault();
+            string? userId = _userAuthentication.GetCurrentUserId();
+
+            var accountObj = _accountsCollection.Find(a => a.UserId == userId
+                                                      && a.Id == account.Id).FirstOrDefault();
             if (accountObj == null)
             {
+                account.UserId = userId!;
                 _accountsCollection.InsertOne(account);
                 return "Account saved sucessfully.";
             }
@@ -29,12 +38,18 @@ namespace MoneyManager.Data.Services
                 return "An error has ocurred.";
             }
         }
+        #endregion
 
+        #region UpdateAccount(AccountModel account)
         public string UpdateAccount(AccountModel account)
         {
-            if (_accountsCollection.Find(x => x.Id == account.Id).Any())
+            string? userId = _userAuthentication.GetCurrentUserId();
+
+            if (_accountsCollection.Find(a => a.UserId == userId
+                                         && a.Id == account.Id).Any())
             {
-                _accountsCollection.ReplaceOne(x => x.Id == account.Id, account);
+                _accountsCollection.ReplaceOne(a => a.UserId == userId 
+                                               && a.Id == account.Id, account);
                 return "Account updated sucessfully.";
             }
             else
@@ -42,28 +57,44 @@ namespace MoneyManager.Data.Services
                 return "The account could not be found.";
             }
         }
+        #endregion
 
+        #region AccountModel GetAccount(Guid id)
         public AccountModel GetAccount(Guid id)
         {
-            return _accountsCollection.Find(x => x.Id == id).FirstOrDefault();
-        }
+            string? userId = _userAuthentication.GetCurrentUserId();
 
+            return _accountsCollection.Find(a => a.UserId == userId
+                                            && a.Id == id).FirstOrDefault();
+        }
+        #endregion
+
+        #region List<AccountModel> SearchAccounts()
         public List<AccountModel> SearchAccounts()
         {
-            return _accountsCollection.Find(FilterDefinition<AccountModel>.Empty).ToList();
-        }
+            string? userId = _userAuthentication.GetCurrentUserId();
 
+            return _accountsCollection.Find(a => a.UserId == userId).ToList();
+        }
+        #endregion
+
+        #region DeleteAccount(Guid id)
         public string DeleteAccount(Guid id)
         {
-            if (_accountsCollection.Find(x => x.Id == id).Any())
+            string? userId = _userAuthentication.GetCurrentUserId();
+
+            if (_accountsCollection.Find(a => a.UserId == userId 
+                                         && a.Id == id).Any())
             {
-                _accountsCollection.DeleteOne(x => x.Id == id);
+                _accountsCollection.DeleteOne(a => a.UserId == userId 
+                                              && a.Id == id);
                 return "Deleted with success.";
             }
             else
             {
                 return "The account could not be found.";
             }
-        }
+        } 
+        #endregion
     }
 }

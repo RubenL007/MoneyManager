@@ -268,11 +268,11 @@
     #region Task OnInitializedAsync()
     protected override Task OnInitializedAsync()
     {
-        //Prevents the Guid field of being rendered on the Data Table
+        //Prevents the Guid field and the UserId of being rendered on the Data Table
         if (DataSource?.Any() == true)
         {
             Properties = typeof(TItem).GetProperties()
-                .Where(p => p.PropertyType != typeof(Guid))
+                .Where(p => p.PropertyType != typeof(Guid) && p.Name != nameof(Tenantable.UserId))
                 .ToList();
         }
 
@@ -385,7 +385,7 @@
         if (Properties != null && !Properties.Any())
         {
             Properties = typeof(TItem).GetProperties()
-                .Where(p => p.PropertyType != typeof(Guid))
+                .Where(p => p.PropertyType != typeof(Guid) && p.Name != nameof(Tenantable.UserId))
                 .ToList();
         }
         await Task.CompletedTask;

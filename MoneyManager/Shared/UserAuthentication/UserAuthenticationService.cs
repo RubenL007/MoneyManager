@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
+using System.Security.Claims;
 
 namespace MoneyManager.Shared.UserAuthentication
 {
@@ -15,11 +16,16 @@ namespace MoneyManager.Shared.UserAuthentication
         {
             try
             {
-                var authState =  _authenticationStateAsync.GetAuthenticationStateAsync();
+                var authState = _authenticationStateAsync.GetAuthenticationStateAsync();
+                var user = authState.Result.User;
 
-                if (authState.Result.User.Identity?.IsAuthenticated ?? false)
+                if (user.Identity?.IsAuthenticated ?? false)
                 {
-                    return authState.Result.User.FindFirst(u => u.Type.Contains("nameidentifier"))?.Value;
+                    //Depending on the environment, development or production, gets the oid accordingly
+                    //https://learn.microsoft.com/en-us/entra/identity-platform/id-token-claims-reference?utm_source=chatgpt.com#use-claims-to-reliably-identify-a-user
+                    string? userId = user.FindFirst("oid")?.Value
+                                     ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    return userId;
                 }
                 else
                 {

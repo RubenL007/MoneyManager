@@ -1,6 +1,13 @@
 ﻿@page "/"
+@using MoneyManager.Shared.UserAuthentication
+@inject IUserAuthentication UserAuthentication
 
 <PageTitle>Index</PageTitle>
+
+@if (!string.IsNullOrWhiteSpace(UserID))
+{
+    <h1>@UserID</h1>
+}
 
 <h1>Welcome to the Money Manager</h1>
 <p>This application is currently a work in progress.</p>
@@ -42,3 +49,12 @@ Here are a few things that I want to add to this applicaton, and will try to do 
 
 @* <h5>Last Major Update</h5>
 <p>The last major update (05/04/2025) introduced multi-tenancy, allowing multiple users to access the application while ensuring each user can only access their own data.</p> *@
+
+@code {
+    public string UserID = string.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+        UserID = UserAuthentication.GetCurrentUserId()!;
+        await Task.CompletedTask;
+    }
+}

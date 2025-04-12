@@ -11,22 +11,18 @@ using MongoDB.Driver;
 var builder = WebApplication.CreateBuilder(args);
 
 #region Connect Azure AD
-var azureAdSection = builder.Configuration.GetSection("AzureAd");
-var envClientId = Environment.GetEnvironmentVariable("AzureAd__ClientId");
-var envClientSecret = Environment.GetEnvironmentVariable("AzureAd__ClientSecret");
-if (!string.IsNullOrEmpty(envClientId))
-{
-    azureAdSection["ClientId"] = envClientId;
-}
-if (!string.IsNullOrEmpty(envClientSecret))
-{
-    azureAdSection["ClientSecret"] = envClientSecret;
-}
+// Load configuration files and environment variables
+builder.Configuration
+       .SetBasePath(Directory.GetCurrentDirectory())
+       .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+       .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+       .AddEnvironmentVariables();
 
+// Add Authentication services using the "AzureAd" section
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApp(azureAdSection);
+       .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
 
-builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI(); 
+builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI();
 #endregion
 
 builder.Services.AddAuthorization(options =>

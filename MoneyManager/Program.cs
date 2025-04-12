@@ -12,15 +12,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region Connect Azure AD
 // Load configuration files and environment variables
-builder.Configuration
-       .SetBasePath(Directory.GetCurrentDirectory())
-       .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-       .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-       .AddEnvironmentVariables();
+builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
+                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                     .AddEnvironmentVariables(); //Overrides the variables automatically if they have standardize names
 
 // Add Authentication services using the "AzureAd" section
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-       .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+                .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
 
 builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI();
 #endregion
@@ -42,23 +41,16 @@ builder.Services.AddScoped<IUserAuthentication, UserAuthenticationService>();
 
 #region Connect with DB
 // Load MongoDB settings from configuration
-builder.Configuration
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
+                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                     .AddEnvironmentVariables(); //Overrides the variables automatically if they have standardize names
 
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDB"));
 
-// Register MongoDB client as a singleton service
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
     var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
-    // Check if the environment variable is set (for production)
-    var envConn = Environment.GetEnvironmentVariable("MONGO_CLUSTER_CONNECTION_STRING");
-    if (!string.IsNullOrEmpty(envConn))
-    {
-        settings.ConnectionString = envConn;
-    }
     return new MongoClient(settings.ConnectionString);
 });
 #endregion

@@ -76,3 +76,7 @@ input, select {
     input:disabled, select:disabled {
         background-color: #FAFAFA;
     }
+
+    input[type="checkbox"] {
+        width:20px;
+    }

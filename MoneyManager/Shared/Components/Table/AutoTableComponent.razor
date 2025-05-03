@@ -81,6 +81,11 @@
                                                                 ViewMode=@ViewMode />
                                             break;
 
+                                            case bool data:
+                                                <InputCheckBoxComponent @bind-Value=@PropertyWrapperHelper.GetBoolWrapper(item!, property).Value
+                                                                        ViewMode=@ViewMode />
+                                                break;
+
                                         case double data:
                                             <InputNumberComponent Value=@PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value
                                                                   ValueExpression=@(() => PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value)
@@ -92,6 +97,7 @@
                                           await OnValueChange.InvokeAsync(null);
                                           }) />
                                             break;
+
                                         case object _ when !propertyValue.GetType().IsPrimitive && propertyValue.GetType() != typeof(string):
                                             {
                                                 if (DataForSelects.Any() && DataForSelects.Any(x => x.PropertyType == property.PropertyType && x.PropertyName == property.Name))
@@ -111,7 +117,16 @@
                         }
                         else
                         {
-                            if (property == Properties.FirstOrDefault() && OpenDetail.HasDelegate)
+                            var propertyValue = property.GetValue(item);
+                            if (propertyValue is bool data)
+                            {
+                                <td>
+                                    <EditForm Model=propertyValue>
+                                        <InputCheckBoxComponent @bind-Value=@PropertyWrapperHelper.GetBoolWrapper(item!, property).Value />
+                                    </EditForm>
+                                </td>
+                            }
+                            else if (property == Properties.FirstOrDefault() && OpenDetail.HasDelegate)
                             {
                                 <td @onclick=@(x => OpenDetail.InvokeAsync(item))
                                     style="cursor:pointer;">
@@ -126,7 +141,7 @@
                     }
                     @if (DeleteRowMethod.HasDelegate && ViewMode == ViewModeEnum.Edit)
                     {
-                        <td>
+                        <td class="td-delete">
                             <ButtonComponent OnClick=@(x => DeleteRowMethod.InvokeAsync(item))
                                              ButtonType=@ButtonTypeEnum.Delete
                                              IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
@@ -137,14 +152,15 @@
         }
         else
         {
-        <td>
-            <h5>No Recourds Found.</h5>
+        <td colspan="100%">
+            <h5>No Records Found.</h5>
         </td>
         }
     </tbody>
+</table>
+
     @if (AddNewMethod.HasDelegate || FooterTools != null)
     {
-        <tfoot>
             <div class="row d-flex align-items-center">
                 @if (AddNewMethod.HasDelegate)
                 {
@@ -161,9 +177,8 @@
                     </div>
                 }
             </div>
-        </tfoot>
     }
-</table>
+
 
 @code {
     #region Parameters
@@ -288,6 +303,7 @@
     }
     #endregion
 
+    #region Actions
     #region string ShowValue(TItem item, PropertyInfo property)
     private string ShowValue(TItem item, PropertyInfo property)
     {
@@ -390,5 +406,6 @@
         }
         await Task.CompletedTask;
     }
+    #endregion
     #endregion
 }

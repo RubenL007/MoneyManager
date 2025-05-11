@@ -1,0 +1,35 @@
+﻿@namespace MoneyManager.Shared.Components
+
+<div class="header">
+    @if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <h3>@Title</h3>
+    }
+    @if (!string.IsNullOrWhiteSpace(SubTitle))
+    {
+        <span>@SubTitle</span>
+    }
+    <div class="row justify-content-space-between">
+        @if (LeftContent != null)
+        {
+            <div class="col">
+                @LeftContent
+            </div>
+        }
+        @if (RightContent != null)
+        {
+            <div class="col d-flex justify-content-end">
+                @RightContent
+            </div>
+        }
+    </div>
+</div>
+
+
+@code {
+    [Parameter] public string Title { get; set; } = null!;
+    [Parameter] public string SubTitle { get; set; } = null!;
+
+    [Parameter] public RenderFragment LeftContent { get; set; } = null!;
+    [Parameter] public RenderFragment RightContent { get; set; } = null!;
+}

@@ -1,0 +1,34 @@
+﻿@namespace MoneyManager.Shared.Components
+
+<HeaderComponent Title=@Title>
+    <LeftContent>
+        @if (ViewMode == ViewModeEnum.View)
+        {
+            <ButtonComponent ButtonType=@ButtonTypeEnum.Edit
+            OnClick=@EditOnClick />
+        }
+        else
+        {
+            <ButtonComponent ButtonType=@ButtonTypeEnum.Save
+            OnClick=@SaveOnClick />
+        }
+    </LeftContent>
+    <RightContent>
+        @if (ViewMode == ViewModeEnum.Edit && HasDeleteButton)
+        {
+            <ButtonComponent ButtonType=@ButtonTypeEnum.Delete
+            OnClick=@DeleteOnClick />
+        }
+    </RightContent>
+</HeaderComponent>
+
+@code {
+    [Parameter] public string Title { get; set; } = null!;
+
+    [Parameter] public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.View;
+
+    [Parameter] public EventCallback<MouseEventArgs> EditOnClick { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> SaveOnClick { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> DeleteOnClick { get; set; }
+    [Parameter] public bool HasDeleteButton { get; set; } = false;
+}

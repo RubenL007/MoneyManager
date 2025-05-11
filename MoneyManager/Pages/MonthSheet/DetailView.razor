@@ -8,20 +8,10 @@
 @inject ISeller sellerService
 @inject IAccount accountService
 
-<div class="row d-flex align-items-center">
-    <div class="col-auto">
-        <h1>@MonthSheet.Date.ToString("Y")</h1>
-    </div>
-    <div class="col">
-        <ButtonComponent OnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                         ButtonType=@ButtonTypeEnum.Edit
-                         IsVisible=@(ViewMode == ViewModeEnum.View ? true : false) />
-
-        <ButtonComponent OnClick=@(x => UpdateMonthSheet())
-                         ButtonType=@ButtonTypeEnum.Save
-                         IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
-    </div>
-</div>
+<DefaultHeaderComponent Title=@MonthSheet.Date.ToString("Y")
+                        EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
+                        SaveOnClick=@(x => UpdateMonthSheet()) 
+                        ViewMode=@ViewMode/>
 
 <div class="row">
     <div class="col-5">
@@ -68,8 +58,8 @@
         </EditForm>
     </div>
     <div class="col-6 offset-md-1">
+        <HeaderComponent Title="Earnings" />
         <AutoTableComponent DataSource=@MonthSheet.Earnings
-                            Title="Earnings"
                             TItem=EarningModel
                             ViewMode=@ViewMode
                             DeleteRowMethod=@(earning => MonthSheet.Earnings.Remove(earning))
@@ -78,13 +68,13 @@
                             LimitDateInputsToThisMonth=@MonthSheet.Date
                             OnValueChange=@(x=> StateHasChanged())
                             DataForSelects=@(new List<SelectOptionSet> {
-                                             new SelectOptionSet
-                                             {
-                                                 PropertyName = nameof(EarningModel.Account),
-                                                 PropertyType = typeof(AccountModel),
-                                                 Options = Accounts.Cast<object>().ToList()
-                                             }
-                                             }) />
+                            new SelectOptionSet
+                            {
+                            PropertyName = nameof(EarningModel.Account),
+                            PropertyType = typeof(AccountModel),
+                            Options = Accounts.Cast<object>().ToList()
+                            }
+                            }) />
     </div>
 </div>
 
@@ -111,8 +101,8 @@
 {
     foreach (CategoryModel cat in MonthSheet.Categories)
     {
+        <HeaderComponent Title=@cat.Name />
         <AutoTableComponent DataSource=@cat.Expenses
-                            Title=@cat.Name
                             TItem=ExpenseModel
                             ViewMode=@ViewMode
                             DeleteRowMethod=@(expense => cat.Expenses.Remove(expense))
@@ -121,19 +111,19 @@
                             LimitDateInputsToThisMonth=@MonthSheet.Date
                             OnValueChange=@(x=> StateHasChanged())
                             DataForSelects=@(new List<SelectOptionSet> {
-                                             new SelectOptionSet
-                                             {
-                                                 PropertyName = nameof(ExpenseModel.Seller),
-                                                 PropertyType = typeof(SellerModel),
-                                                 Options = Sellers.Cast<object>().ToList()
-                                             },
-                                             new SelectOptionSet
-                                             {
-                                                 PropertyName = nameof(ExpenseModel.Account),
-                                                 PropertyType = typeof(AccountModel),
-                                                 Options = Accounts.Cast<object>().ToList()
-                                             },
-                                             }) />
+                    new SelectOptionSet
+                    {
+                    PropertyName = nameof(ExpenseModel.Seller),
+                    PropertyType = typeof(SellerModel),
+                    Options = Sellers.Cast<object>().ToList()
+                    },
+                    new SelectOptionSet
+                    {
+                    PropertyName = nameof(ExpenseModel.Account),
+                    PropertyType = typeof(AccountModel),
+                    Options = Accounts.Cast<object>().ToList()
+                    },
+                    }) />
 
         <h4>Total Spent: @cat.TotalSpent €</h4>
         <br />

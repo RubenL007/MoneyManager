@@ -5,14 +5,16 @@
 @inject ICategory categoryService
 @inject NavigationManager navigationManager
 
+<DefaultHeaderComponent Title="Categories"
+                        ViewMode=@ViewMode
+                        EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
+                        SaveOnClick=@(x => UpdateCategories()) />
+
 <AutoTableComponent DataSource=@Categories
-                TItem=CategoryBaseModel
-                Title="Categories"
-                ViewMode=@ViewMode
-                IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
-                DeleteRowMethod=@(row => DeleteCategory(row))
-                EditMethod=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                SaveMethod=@(row => UpdateCategory(row)!)>
+                    TItem=CategoryBaseModel
+                    ViewMode=@ViewMode
+                    IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
+                    DeleteRowMethod=@(row => DeleteCategory(row))>
     <FooterTools>
         <EditForm Model=@Category>
             <div class="row d-flex align-items-center">
@@ -62,10 +64,13 @@
     }
     #endregion
 
-    #region Task UpdateCategory(CategoryBaseModel category)
-    private async Task UpdateCategory(CategoryBaseModel category)
+    #region Task UpdateCategories()
+    private async Task UpdateCategories()
     {
-        categoryService.UpdateCategory(category);
+        foreach (var category in Categories)
+        {
+            categoryService.UpdateCategory(category);
+        }
         await SearchCategories();
         ViewMode = ViewModeEnum.View;
         await Task.CompletedTask;

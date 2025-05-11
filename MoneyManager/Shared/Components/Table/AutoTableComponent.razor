@@ -5,36 +5,6 @@
 
 @typeparam TItem
 
-@if (EditMethod.HasDelegate || SaveMethod.HasDelegate || !string.IsNullOrWhiteSpace(Title))
-{
-    <div class="row d-flex align-items-center">
-        @if (!string.IsNullOrWhiteSpace(Title))
-        {
-            <div class="col-auto">
-                <h1>@Title</h1>
-            </div>
-        }
-        @if (EditMethod.HasDelegate)
-        {
-            <div class="col-auto">
-                <ButtonComponent OnClick=@(x => EditMethod.InvokeAsync())
-                                 ButtonType=@ButtonTypeEnum.Edit
-                                 IsVisible=true
-                                 ViewMode=@(ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View) />
-            </div>
-        }
-        @if (SaveMethod.HasDelegate)
-        {
-            <div class="col-auto">
-                <ButtonComponent OnClick=@(x => SaveAllAsync())
-                                 ButtonType=@ButtonTypeEnum.Save
-                                 IsVisible=true
-                                 ViewMode=@ViewMode />
-            </div>
-        }
-    </div>
-}
-
 <table class="table">
     <thead>
         <tr>
@@ -81,10 +51,10 @@
                                                                 ViewMode=@ViewMode />
                                             break;
 
-                                            case bool data:
-                                                <InputCheckBoxComponent @bind-Value=@PropertyWrapperHelper.GetBoolWrapper(item!, property).Value
-                                                                        ViewMode=@ViewMode />
-                                                break;
+                                        case bool data:
+                                            <InputCheckBoxComponent @bind-Value=@PropertyWrapperHelper.GetBoolWrapper(item!, property).Value
+                                                                    ViewMode=@ViewMode />
+                                            break;
 
                                         case double data:
                                             <InputNumberComponent Value=@PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value
@@ -159,25 +129,25 @@
     </tbody>
 </table>
 
-    @if (AddNewMethod.HasDelegate || FooterTools != null)
-    {
-            <div class="row d-flex align-items-center">
-                @if (AddNewMethod.HasDelegate)
-                {
-                    <div class="col-auto">
-                        <ButtonComponent OnClick=@(async () => await AddNewMethod.InvokeAsync())
-                                         ButtonType=@ButtonTypeEnum.Add
-                                         ViewMode=@ViewMode />
-                    </div>
-                }
-                @if (FooterTools != null)
-                {
-                    <div class="col">
-                        @FooterTools
-                    </div>
-                }
+@if (AddNewMethod.HasDelegate || FooterTools != null)
+{
+    <div class="row d-flex align-items-center">
+        @if (AddNewMethod.HasDelegate)
+        {
+            <div class="col-auto">
+                <ButtonComponent OnClick=@(async () => await AddNewMethod.InvokeAsync())
+                                 ButtonType=@ButtonTypeEnum.Add
+                                 ViewMode=@ViewMode />
             </div>
-    }
+        }
+        @if (FooterTools != null)
+        {
+            <div class="col">
+                @FooterTools
+            </div>
+        }
+    </div>
+}
 
 
 @code {
@@ -219,21 +189,6 @@
     [Parameter]
     public EventCallback<TItem> AddNewMethod { get; set; } = new();
 
-
-    /// <summary>
-    /// Not showing by default.
-    /// If any method is passed, it will show the button and be executed when the Edit button is clicked.
-    /// </summary>
-    [Parameter]
-    public EventCallback EditMethod { get; set; } = new();
-
-    /// <summary>
-    /// Not showing by default.
-    /// If any method is passed, it will show the button and be executed when the Save button is clicked.
-    /// </summary>
-    [Parameter]
-    public EventCallback<TItem> SaveMethod { get; set; } = new();
-
     /// <summary>
     /// Not active by default.
     /// If any method is passed, it will execute when user clicks on the first column of each row
@@ -247,12 +202,6 @@
     /// </summary>
     [Parameter]
     public EventCallback OnValueChange { get; set; }
-
-    /// <summary>
-    /// Title defines the name that will be displayed on the top left of the table, giving context to the data presented.
-    /// </summary>
-    [Parameter]
-    public string Title { get; set; } = string.Empty;
 
     /// <summary>
     /// Defines if the table will be used to only show data, or if it also be used to edit data.
@@ -381,17 +330,6 @@
         }
 
         return result.ToString();
-    }
-    #endregion
-
-    #region void SaveAllAsync()
-    public async void SaveAllAsync()
-    {
-        foreach (var item in DataSource)
-        {
-            await SaveMethod.InvokeAsync(item);
-        }
-        await Task.CompletedTask;
     }
     #endregion
 

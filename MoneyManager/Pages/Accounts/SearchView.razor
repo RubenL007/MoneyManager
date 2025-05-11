@@ -5,16 +5,18 @@
 @inject IAccount accountService
 @inject NavigationManager navigationManager
 
+<DefaultHeaderComponent Title="Accounts"
+                        ViewMode=@ViewMode
+                        EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
+                        SaveOnClick=@(x => UpdateAccounts()) />
+
 <AutoTableComponent DataSource=@Accounts
-                TItem=AccountModel
-                Title="Accounts"
-                ViewMode=@ViewMode
-                IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
-                DeleteRowMethod=@(row => DeleteAccount(row))
-                EditMethod=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                SaveMethod=@(row => UpdateAccount(row)!)>
+                    TItem=AccountModel
+                    ViewMode=@ViewMode
+                    IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
+                    DeleteRowMethod=@(row => DeleteAccount(row))>
     <FooterTools>
-        <EditForm Model=@Account>             
+        <EditForm Model=@Account>
             <div class="row d-flex align-items-center">
                 <div class="col-2">
                     <InputText @bind-Value=@Account.Name />
@@ -62,10 +64,13 @@
     }
     #endregion
 
-    #region Task UpdateAccount(AccountModel account)
-    private async Task UpdateAccount(AccountModel account)
+    #region Task UpdateAccounts()
+    private async Task UpdateAccounts()
     {
-        accountService.UpdateAccount(account);
+        foreach (var account in Accounts)
+        {
+            accountService.UpdateAccount(account);
+        }
         await SearchAccounts();
         ViewMode = ViewModeEnum.View;
         await Task.CompletedTask;

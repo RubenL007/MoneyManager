@@ -7,11 +7,8 @@
 @inject IMonthSheet monthSheetService
 @inject NavigationManager navigationManager
 
-<PageTitle>Month Sheets</PageTitle>
-
-<h1>Month Sheets</h1>
-
-<p>This table provides a clear summary of your income and expenses across different months. Use it to track patterns, compare financial performance, and maintain a well-organized view of your finances at a glance. Keep your budgeting simple and effective!</p>
+<HeaderComponent Title="Month Sheets"
+                 SubTitle="This table provides a clear summary of your income and expenses across different months. Use it to track patterns, compare financial performance, and maintain a well-organized view of your finances at a glance. Keep your budgeting simple and effective!" />
 
 <AutoTableComponent DataSource=@MonthSheets
                     TItem=MonthSheetModel

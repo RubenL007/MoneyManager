@@ -5,14 +5,16 @@
 @inject ISeller sellerService
 @inject NavigationManager navigationManager
 
+<DefaultHeaderComponent Title="Sellers"
+                        ViewMode=@ViewMode
+                        EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
+                        SaveOnClick=@(x => UpdateSellers()) />
+
 <AutoTableComponent DataSource=@Sellers
                 TItem=SellerModel
-                Title="Sellers"
                 ViewMode=@ViewMode
                 IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
-                DeleteRowMethod=@(row => DeleteSeller(row))
-                EditMethod=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                SaveMethod=@(row => UpdateSeller(row)!)>
+                DeleteRowMethod=@(row => DeleteSeller(row))>
     <FooterTools>
         <EditForm Model=@Seller>
             <div class="row d-flex align-items-center">
@@ -62,10 +64,13 @@
     }
     #endregion
 
-    #region Task UpdateSeller(SellerModel seller)
-    private async Task UpdateSeller(SellerModel seller)
+    #region Task UpdateSellers()
+    private async Task UpdateSellers()
     {
-        sellerService.UpdateSeller(seller);
+        foreach (var seller in Sellers)
+        {
+            sellerService.UpdateSeller(seller);
+        }
         await SearchSellers();
         ViewMode = ViewModeEnum.View;
         await Task.CompletedTask;

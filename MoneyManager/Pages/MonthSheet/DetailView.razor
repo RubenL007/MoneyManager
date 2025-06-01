@@ -10,8 +10,8 @@
 
 <DefaultHeaderComponent Title=@MonthSheet.Date.ToString("Y")
                         EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                        SaveOnClick=@(x => UpdateMonthSheet()) 
-                        ViewMode=@ViewMode/>
+                        SaveOnClick=@(x => UpdateMonthSheet())
+                        ViewMode=@ViewMode />
 
 <div class="row">
     <div class="col-5">
@@ -78,30 +78,34 @@
     </div>
 </div>
 
-@if (ViewMode == ViewModeEnum.Edit)
-{
-    <div class="row mt-4 mb-4 d-flex align-items-center">
-        <div class="col-auto">
-            <InputSelectComponent @bind-SelectedItem=@NewCategory
-                                  DisplayName="New Category"
-                                  TValue=CategoryBaseModel
-                                  Items=@Categories
-                                  ViewMode=@ViewMode />
-        </div>
-        <div class="col mt-4">
-            <ButtonComponent OnClick=@(x=> AddNewCategory(NewCategory))
-                             ButtonType=@ButtonTypeEnum.Add
-                             ViewMode=@((string.IsNullOrWhiteSpace(NewCategory.Name) || MonthSheet.Categories.Any(x => x.Id == NewCategory.Id)) ? ViewModeEnum.View : ViewModeEnum.Edit)
-                             IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
-        </div>
-    </div>
-}
+<HeaderComponent Title="Categories">
+    <LeftContent>
+        @if (ViewMode == ViewModeEnum.Edit)
+        {
+            <div class="row d-flex align-items-center">
+                <div class="col-auto">
+                    <InputSelectComponent @bind-SelectedItem=@NewCategory
+                                          TValue=CategoryBaseModel
+                                          Items=@Categories
+                                          ViewMode=@ViewMode />
+                </div>
+                <div class="col">
+                    <ButtonComponent OnClick=@(x=> AddNewCategory(NewCategory))
+                                     ButtonType=@ButtonTypeEnum.Add
+                                     ViewMode=@((string.IsNullOrWhiteSpace(NewCategory.Name) || MonthSheet.Categories.Any(x => x.Id == NewCategory.Id)) ? ViewModeEnum.View : ViewModeEnum.Edit)
+                                     IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
+                </div>
+            </div>
+        }
+    </LeftContent>
+</HeaderComponent>
 
 @if (MonthSheet.Categories.Any())
 {
     foreach (CategoryModel cat in MonthSheet.Categories)
     {
-        <HeaderComponent Title=@cat.Name />
+        <HeaderComponent Title=@cat.Name
+                         TitleFontSize="fs-4"/>
         <AutoTableComponent DataSource=@cat.Expenses
                             TItem=ExpenseModel
                             ViewMode=@ViewMode

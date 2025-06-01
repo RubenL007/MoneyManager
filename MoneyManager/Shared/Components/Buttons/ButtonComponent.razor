@@ -9,7 +9,7 @@
     {
         <span class=@(IconClass + " pe-2") aria-hidden="true" />
     }
-    @DisplayName
+    <span>@DisplayName</span>
 </button>
 
 @code {
@@ -53,7 +53,7 @@
                 break;
 
             case ButtonTypeEnum.Edit:
-                Color = ColorsEnum.secondary;
+                Color = ColorsEnum.normal;
                 DisplayName = "Edit";
                 IconClass = "oi oi-pencil";
                 break;

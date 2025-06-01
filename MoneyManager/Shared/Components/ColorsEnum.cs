@@ -2,6 +2,7 @@
 {
     public enum ColorsEnum
     {
+        normal,
         primary,
         secondary,
         warning,

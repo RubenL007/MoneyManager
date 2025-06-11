@@ -5,6 +5,7 @@
     --primary: #00aa6c;
     --primary-300: #5ac397;
     --primary-50: #e3f4ec;
+    --primary-10: #fcfdfd;
     --danger: #bd4a73;
     --danger-300: #cc719a;
 }
@@ -84,3 +85,11 @@ input, select {
     input[type="checkbox"] {
         width:20px;
     }
+
+.card {
+    background-color: var(--primary-10);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}

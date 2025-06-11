@@ -8,11 +8,11 @@
 @inject ISeller sellerService
 @inject IAccount accountService
 
+<CardComponent>
 <DefaultHeaderComponent Title=@MonthSheet.Date.ToString("Y")
                         EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
                         SaveOnClick=@(x => UpdateMonthSheet())
                         ViewMode=@ViewMode />
-
 <div class="row">
     <div class="col-5">
         <EditForm Model=MonthSheet>
@@ -77,6 +77,7 @@
                             }) />
     </div>
 </div>
+</CardComponent>
 
 <HeaderComponent Title="Categories">
     <LeftContent>
@@ -105,7 +106,7 @@
     foreach (CategoryModel cat in MonthSheet.Categories)
     {
         <HeaderComponent Title=@cat.Name
-                         TitleFontSize="fs-4"/>
+                         TitleFontSize="fs-4" />
         <AutoTableComponent DataSource=@cat.Expenses
                             TItem=ExpenseModel
                             ViewMode=@ViewMode

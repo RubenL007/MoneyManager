@@ -1,17 +1,45 @@
 ﻿@namespace MoneyManager.Shared.Components
 @inherits InputCheckbox
 
-@if (!string.IsNullOrWhiteSpace(DisplayName))
+@if (InlineMode)
 {
-    <label>@DisplayName</label>
+    if (!string.IsNullOrWhiteSpace(DisplayName))
+    {
+        <div class="row">
+            <div class="col">
+                <label>@DisplayName</label>
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="col">
+            <input @bind=@CurrentValue
+                   type="checkbox"
+                   disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)>
+        </div>
+    </div>
 }
-
-<input @bind=@CurrentValue
-       type="checkbox"
-       disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)>
-
+else
+{
+    <div class="row d-flex align-items-center">
+        <div class="col-auto pe-0">
+            <input @bind=@CurrentValue
+                   type="checkbox"
+                   disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(DisplayName))
+        {
+            <div class="col">
+                <label>@DisplayName</label>
+            </div>
+        }
+    </div>
+}
 
 @code {
     [Parameter]
     public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.View;
+
+    [Parameter]
+    public bool InlineMode { get; set; } = false;
 }

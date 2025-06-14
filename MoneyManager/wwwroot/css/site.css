@@ -1,13 +1,57 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+/* Website where I grab the color shades and  using the #5ac397 color as main color https://m2.material.io/inline-tools/color/ */
 :root {
     --default-color: #e6e6e6;
-    --primary: #00aa6c;
-    --primary-300: #5ac397;
-    --primary-50: #e3f4ec;
+
     --primary-10: #fcfdfd;
-    --danger: #bd4a73;
+    --primary-50: #e3f4ec;
+    --primary-100: #bbe5d1;
+    --primary-200: #8ed3b4;
+    --primary-300: #5ac397;
+    --primary-400: #26b682;
+    --primary: #00aa6c;
+    --primary-500: #00aa6c;
+    --primary-600: #009b61;
+    --primary-700: #008954;
+    --primary-800: #007848;
+    --primary-900: #005832;
+
+    --secondary-50: #e7f6e8;
+    --secondary-100: #b7e7e9;
+    --secondary-200: #8cd7db;
+    --secondary-300: #6ac6cd;
+    --secondary-400: #5abac3;
+    --secondary: #54afba;
+    --secondary-500: #54afba;
+    --secondary-600: #4f9fa8;
+    --secondary-700: #498a90;
+    --secondary-800: #43767a;
+    --secondary-900: #345453;
+
+    --warning-50: #f0e8f6;
+    --warning-100: #d9c6ea;
+    --warning-200: #c1a1dc;
+    --warning-300: #aa79ce;
+    --warning-400: #975ac3;
+    --warning: #853bb8;
+    --warning-500: #853bb8;
+    --warning-600: #7d35b2;
+    --warning-700: #712ca8;
+    --warning-800: #6626a1;
+    --warning-900: #551893;
+
+    --danger-50: #f4e5ed;
+    --danger-100: #e6bed3;
+    --danger-200: #d996b6;
     --danger-300: #cc719a;
+    --danger-400: #c35a86;
+    --danger: #bd4a73;
+    --danger-500: #bd4a73;
+    --danger-600: #ac466d;
+    --danger-700: #964164;
+    --danger-800: #803d5c;
+    --danger-900: #5d324b;
 }
 
 html, body {
@@ -83,7 +127,7 @@ input, select {
     }
 
     input[type="checkbox"] {
-        width:20px;
+        width: 20px;
     }
 
 .card {

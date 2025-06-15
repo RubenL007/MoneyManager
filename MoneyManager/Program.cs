@@ -7,6 +7,7 @@ using MoneyManager.Data.Services;
 using MoneyManager.Shared;
 using MoneyManager.Shared.UserAuthentication;
 using MongoDB.Driver;
+using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,9 @@ builder.Services.AddScoped<ICategory, CategoryService>();
 builder.Services.AddScoped<ISeller, SellerService>();
 builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IUserAuthentication, UserAuthenticationService>();
+
+builder.Services.AddScoped<TooltipService>();
+builder.Services.AddRadzenComponents();
 
 #region Connect with DB
 // Load MongoDB settings from configuration

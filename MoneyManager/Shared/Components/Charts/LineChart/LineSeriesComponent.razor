@@ -1,0 +1,129 @@
+﻿@namespace MoneyManager.Shared.Components
+@using MoneyManager.Shared.Components.Charts.Helpers
+@typeparam TItem
+
+<RadzenLineSeries Smooth=true
+                  Data=@Data
+                  CategoryProperty=@CategoryPropertyXaxis
+                  Title=@SeriesTitle
+                  LineType=@LineTypeConv
+                  ValueProperty=@ValuePropertyYaxis
+                  Stroke=@HexColor>
+    <RadzenMarkers Visible=true MarkerType="MarkerType.Circle" />
+    <RadzenSeriesDataLabels Visible=true />
+    @* <RadzenSeriesAnnotation Visible=true TItem=@TItem Data=@Data.First() OffsetY="15" Text="IPO" Fill="var(--bs-yellow)"  /> *@
+
+    <RadzenSeriesTrendLine Visible=@IsTrendVisible
+                           Stroke=@TrendHexColor />
+    <RadzenSeriesMedianLine Visible=@IsMedianVisible
+                            Stroke=@MedianHexColor />
+    <RadzenSeriesMeanLine Visible=@IsMeanVisible
+                          Stroke=@MeanHexColor />
+    <RadzenSeriesModeLine Visible=@IsModeVisible
+                          Stroke=@ModeHexColor />
+</RadzenLineSeries>
+
+<EditForm Model=@this>
+    @if (AllowMeanVisible || AllowMedianVisible || AllowModeVisible || AllowTrendVisible)
+    {
+        <div class="row">
+            @if (AllowTrendVisible)
+            {
+                <div class="col">
+                    <InputCheckBoxComponent @bind-Value=@IsTrendVisible
+                                            DisplayName=@($"Trend for {SeriesTitle}")
+                                            ViewMode=ViewModeEnum.Edit
+                                            InlineMode=true />
+                </div>
+            }
+            @if (AllowMedianVisible)
+            {
+                <div class="col">
+                    <InputCheckBoxComponent @bind-Value=@IsMedianVisible
+                                            DisplayName=@($"Median for {SeriesTitle}")
+                                            ViewMode=ViewModeEnum.Edit
+                                            InlineMode=true />
+                </div>
+            }
+            @if (AllowMeanVisible)
+            {
+                <div class="col">
+                    <InputCheckBoxComponent @bind-Value=@IsMeanVisible
+                                            DisplayName=@($"Mean for {SeriesTitle}")
+                                            ViewMode=ViewModeEnum.Edit
+                                            InlineMode=true />
+                </div>
+            }
+            @if (AllowModeVisible)
+            {
+                <div class="col">
+                    <InputCheckBoxComponent @bind-Value=@IsModeVisible
+                                            DisplayName=@($"Mode for {SeriesTitle}")
+                                            ViewMode=ViewModeEnum.Edit
+                                            InlineMode=true />
+                </div>
+            }
+        </div>
+    }
+</EditForm>
+
+@code {
+    #region Parameters
+    [Parameter] public IEnumerable<TItem> Data { get; set; } = null!;
+    [Parameter] public string CategoryPropertyXaxis { get; set; } = string.Empty;
+    [Parameter] public string ValuePropertyYaxis { get; set; } = string.Empty;
+
+    [Parameter] public string SeriesTitle { get; set; } = string.Empty;
+
+    [Parameter] public string TooltipLabel { get; set; } = string.Empty;
+
+    [Parameter] public ColorsEnum Color { get; set; } = ColorsEnum.normal;
+
+    [Parameter] public LineTypeEnum LineType { get; set; } = LineTypeEnum.Solid;
+
+    [Parameter] public bool AllowTrendVisible { get; set; } = true;
+    [Parameter] public bool AllowMedianVisible { get; set; } = true;
+    [Parameter] public bool AllowMeanVisible { get; set; } = true;
+    [Parameter] public bool AllowModeVisible { get; set; } = true;
+    #endregion
+
+    #region Properties
+    private LineType LineTypeConv = Radzen.Blazor.LineType.Dotted;
+    private string HexColor = string.Empty;
+    private string TrendHexColor = string.Empty;
+    private string MedianHexColor = string.Empty;
+    private string MeanHexColor = string.Empty;
+    private string ModeHexColor = string.Empty;
+
+    private bool IsTrendVisible { get; set; } = false;
+    private bool IsMedianVisible { get; set; } = false;
+    private bool IsMeanVisible { get; set; } = false;
+    private bool IsModeVisible { get; set; } = false;
+    #endregion
+
+    #region Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
+    {
+        switch (LineType)
+        {
+            case LineTypeEnum.Dashed:
+                LineTypeConv = Radzen.Blazor.LineType.Dashed;
+                break;
+            case LineTypeEnum.Dotted:
+                LineTypeConv = Radzen.Blazor.LineType.Dotted;
+                break;
+            default:
+                LineTypeConv = Radzen.Blazor.LineType.Solid;
+                break;
+        }
+
+        HexColor = ColorHelper.ColorEnumToHTML(Color);
+        TrendHexColor = ColorHelper.ColorEnumToHTML(Color, Colors.ColorsPercentageEnum.Per400);
+        MedianHexColor = ColorHelper.ColorEnumToHTML(Color, Colors.ColorsPercentageEnum.Per300);
+        MeanHexColor = ColorHelper.ColorEnumToHTML(Color, Colors.ColorsPercentageEnum.Per200);
+        ModeHexColor = ColorHelper.ColorEnumToHTML(Color, Colors.ColorsPercentageEnum.Per100);
+
+        return base.OnInitializedAsync();
+    }
+    #endregion
+}

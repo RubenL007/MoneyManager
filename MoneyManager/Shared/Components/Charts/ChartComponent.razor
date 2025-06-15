@@ -1,0 +1,12 @@
+﻿@namespace MoneyManager.Shared.Components
+
+@if (ChildContent != null)
+{
+    <RadzenChart>
+        @ChildContent
+    </RadzenChart>
+}
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = null!;
+}

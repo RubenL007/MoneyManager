@@ -1,0 +1,35 @@
+﻿@namespace MoneyManager.Shared.Components
+@using System.Globalization
+
+@if (!string.IsNullOrWhiteSpace(ChartTitle))
+{
+    <span class="d-flex justify-content-center fs-@TitleSize">@ChartTitle</span>
+}
+
+<RadzenChartTooltipOptions Shared=true />
+
+@ChildContent
+
+<RadzenCategoryAxis Padding="30" />
+<RadzenValueAxis Formatter=@FormatValue>
+    <RadzenGridLines Visible=true />
+</RadzenValueAxis>
+
+@code {
+    #region Parameters
+    [Parameter] public RenderFragment ChildContent { get; set; } = null!;
+
+    /// <summary>
+    /// Default value is 5, for "fs-5"
+    /// </summary>
+    [Parameter] public int TitleSize { get; set; } = 5;
+    [Parameter] public string ChartTitle { get; set; } = string.Empty;
+    #endregion
+
+    #region FormatValue(object value)
+    string FormatValue(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("pt-PT"));
+    }
+    #endregion
+}

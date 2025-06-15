@@ -13,9 +13,9 @@
 <AutoTableComponent DataSource=@MonthSheets
                     TItem=MonthSheetModel
                     CustomTableHeadNames=@(new List<FieldNameConvertedModel>
-                                         {
-                                             new() { FieldName = nameof(MonthSheetModel.Date), Label = "Month" }
-                                         })
+                    {
+                    new() { FieldName = nameof(MonthSheetModel.Date), Label = "Month" }
+                    })
                     ViewMode=@ViewModeEnum.Edit
                     DeleteRowMethod=@(monthsheet => DeleteMonthSheet(monthsheet))
                     OpenDetail=@(monthsheet => OpenDetail(monthsheet))>
@@ -35,6 +35,26 @@
         </EditForm>
     </FooterTools>
 </AutoTableComponent>
+
+<CardComponent>
+    <ChartComponent >
+        <LineChartComponent ChartTitle="Earnings and Spendings Overview">
+            <LineSeriesComponent Data=@MonthSheets
+                                 CategoryPropertyXaxis=@nameof(MonthSheetModel.Date)
+                                 ValuePropertyYaxis=@nameof(MonthSheetModel.Earned)
+                                 SeriesTitle="Total Earned"
+                                 LineType=@Shared.Components.Charts.Helpers.LineTypeEnum.Solid
+                                 Color=@ColorsEnum.primary />
+
+            <LineSeriesComponent Data=@MonthSheets
+                                 CategoryPropertyXaxis=@nameof(MonthSheetModel.Date)
+                                 ValuePropertyYaxis=@nameof(MonthSheetModel.TotalSpent)
+                                 SeriesTitle="Total Spent"
+                                 LineType=@Shared.Components.Charts.Helpers.LineTypeEnum.Dashed
+                                 Color=@ColorsEnum.danger />
+        </LineChartComponent>
+    </ChartComponent>
+</CardComponent>
 
 @code {
     #region Properties

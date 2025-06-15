@@ -9,74 +9,101 @@
 @inject IAccount accountService
 
 <CardComponent>
-<DefaultHeaderComponent Title=@MonthSheet.Date.ToString("Y")
-                        EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                        SaveOnClick=@(x => UpdateMonthSheet())
-                        ViewMode=@ViewMode />
-<div class="row">
-    <div class="col-5">
-        <EditForm Model=MonthSheet>
-            <div class="row mb-2 mt-2">
-                <div class="col">
-                    <InputNumberComponent @bind-Value=@MonthSheet.EstimatedEarned
-                                          DisplayName="Estimated Earned"
-                                          ViewMode=@ViewMode />
+    <DefaultHeaderComponent Title=@MonthSheet.Date.ToString("Y")
+                            EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
+                            SaveOnClick=@(x => UpdateMonthSheet())
+                            ViewMode=@ViewMode />
+    <div class="row">
+        <div class="col-5">
+            <EditForm Model=MonthSheet>
+                <div class="row mb-2 mt-2">
+                    <div class="col">
+                        <InputNumberComponent @bind-Value=@MonthSheet.EstimatedEarned
+                                              DisplayName="Estimated Earned"
+                                              ViewMode=@ViewMode />
+                    </div>
+                    <div class="col">
+                        <InputNumberComponent @bind-Value=@MonthSheet.EstimatedSpent
+                                              DisplayName="Estimated Spent"
+                                              ViewMode=@ViewMode />
+                    </div>
+                    <div class="col">
+                        <!--To show the values on inputs without binding because they are pointers-->
+                        <label>Estimated Balance</label>
+                        <input value=@MonthSheet.EstimatedBalance
+                               type="number"
+                               disabled=@true>
+                    </div>
                 </div>
-                <div class="col">
-                    <InputNumberComponent @bind-Value=@MonthSheet.EstimatedSpent
-                                          DisplayName="Estimated Spent"
-                                          ViewMode=@ViewMode />
+                <div class="row mb-2 mt-2">
+                    <div class="col">
+                        <label>Total Earned</label>
+                        <input value=@MonthSheet.Earned
+                               type="number"
+                               disabled=@true>
+                    </div>
+                    <div class="col">
+                        <label>Total Spent</label>
+                        <input value=@MonthSheet.TotalSpent
+                               type="number"
+                               disabled=@true>
+                    </div>
+                    <div class="col">
+                        <label>Balance</label>
+                        <input value=@MonthSheet.Balance
+                               type="number"
+                               disabled=@true>
+                    </div>
                 </div>
-                <div class="col">
-                    <!--To show the values on inputs without binding because they are pointers-->
-                    <label>Estimated Balance</label>
-                    <input value=@MonthSheet.EstimatedBalance
-                           type="number"
-                           disabled=true>
-                </div>
-            </div>
-            <div class="row mb-2 mt-2">
-                <div class="col">
-                    <label>Total Earned</label>
-                    <input value=@MonthSheet.Earned
-                           type="number"
-                           disabled=true>
-                </div>
-                <div class="col">
-                    <label>Total Spent</label>
-                    <input value=@MonthSheet.TotalSpent
-                           type="number"
-                           disabled=true>
-                </div>
-                <div class="col">
-                    <label>Balance</label>
-                    <input value=@MonthSheet.Balance
-                           type="number"
-                           disabled=true>
-                </div>
-            </div>
-        </EditForm>
+            </EditForm>
+        </div>
+        <div class="col-6 offset-md-1">
+            <HeaderComponent Title="Earnings" />
+            <AutoTableComponent DataSource=@MonthSheet.Earnings
+                                TItem=EarningModel
+                                ViewMode=@ViewMode
+                                DeleteRowMethod=@(earning => MonthSheet.Earnings.Remove(earning))
+                                AddNewMethod=@(x=> MonthSheet.Earnings.Add(new()))
+                                IsEditableTable=true
+                                LimitDateInputsToThisMonth=@MonthSheet.Date
+                                OnValueChange=@(x=> StateHasChanged())
+                                DataForSelects=@(new List<SelectOptionSet> {
+                                new SelectOptionSet
+                                {
+                                PropertyName = nameof(EarningModel.Account),
+                                PropertyType = typeof(AccountModel),
+                                Options = Accounts.Cast<object>().ToList()
+                                }
+                                }) />
+        </div>
     </div>
-    <div class="col-6 offset-md-1">
-        <HeaderComponent Title="Earnings" />
-        <AutoTableComponent DataSource=@MonthSheet.Earnings
-                            TItem=EarningModel
-                            ViewMode=@ViewMode
-                            DeleteRowMethod=@(earning => MonthSheet.Earnings.Remove(earning))
-                            AddNewMethod=@(x=> MonthSheet.Earnings.Add(new()))
-                            IsEditableTable=true
-                            LimitDateInputsToThisMonth=@MonthSheet.Date
-                            OnValueChange=@(x=> StateHasChanged())
-                            DataForSelects=@(new List<SelectOptionSet> {
-                            new SelectOptionSet
-                            {
-                            PropertyName = nameof(EarningModel.Account),
-                            PropertyType = typeof(AccountModel),
-                            Options = Accounts.Cast<object>().ToList()
-                            }
-                            }) />
+    <div class="row">
+       @*  <div class="col-2 col-xs-12 col-sm-6">
+            <RadzenChart>
+                <RadzenDonutSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue" TotalAngle="180" StartAngle="180">
+                    <ChildContent>
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </ChildContent>
+                    <TitleTemplate>
+                        <div class="rz-donut-content">
+                            <div>Balance</div>
+                            <div>for 2024</div>
+                        </div>
+                    </TitleTemplate>
+                </RadzenDonutSeries>
+            </RadzenChart>
+
+            TOOD: Need to do model to pass on the data and properties
+
+        </div> *@
+        <div class="col-md-12 col-lg-6 col-xxl-4">
+            <PieChartComponent Data=@MonthSheet.Categories
+                               CategoryPropertyXaxis=@nameof(CategoryModel.Name)
+                               ValuePropertyYaxis=@nameof(CategoryModel.TotalSpent)
+                               ChartTitle="Spent by Category"
+                               TooltipLabel="Total Spent" />
+        </div>
     </div>
-</div>
 </CardComponent>
 
 <HeaderComponent Title="Categories">

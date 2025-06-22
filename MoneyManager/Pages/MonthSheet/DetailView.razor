@@ -11,7 +11,7 @@
 <CardComponent>
     <DefaultHeaderComponent Title=@MonthSheet.Date.ToString("Y")
                             EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                            SaveOnClick=@(x => UpdateMonthSheet())
+                            SaveOnClick=@(x => UpdateMonthSheetAsync())
                             ViewMode=@ViewMode />
     <div class="row">
         <div class="col-5">
@@ -68,35 +68,27 @@
                                 LimitDateInputsToThisMonth=@MonthSheet.Date
                                 OnValueChange=@(x=> StateHasChanged())
                                 DataForSelects=@(new List<SelectOptionSet> {
-                                new SelectOptionSet
-                                {
-                                PropertyName = nameof(EarningModel.Account),
-                                PropertyType = typeof(AccountModel),
-                                Options = Accounts.Cast<object>().ToList()
-                                }
+                                    new SelectOptionSet
+                                    {
+                                        PropertyName = nameof(EarningModel.Account),
+                                        PropertyType = typeof(AccountModel),
+                                        Options = Accounts.Cast<object>().ToList()
+                                    }
                                 }) />
         </div>
     </div>
     <div class="row">
-       @*  <div class="col-2 col-xs-12 col-sm-6">
-            <RadzenChart>
-                <RadzenDonutSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue" TotalAngle="180" StartAngle="180">
-                    <ChildContent>
-                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                    </ChildContent>
-                    <TitleTemplate>
-                        <div class="rz-donut-content">
-                            <div>Balance</div>
-                            <div>for 2024</div>
-                        </div>
-                    </TitleTemplate>
-                </RadzenDonutSeries>
-            </RadzenChart>
-
-            TOOD: Need to do model to pass on the data and properties
-
-        </div> *@
-        <div class="col-md-12 col-lg-6 col-xxl-4">
+        <div class="col-md-12 col-lg-6 col-xl-4 col-xxl-3">
+            <DonutChartComponent Data=@DonutEarnedData
+                                 Title="Earned"
+                                 TotalValue=@MonthSheet.Earned.ToString() />
+        </div>
+        <div class="col-md-12 col-lg-6 col-xl-4 col-xxl-3">
+            <DonutChartComponent Data=@DonutSpentData
+                                 Title="Spent"
+                                 TotalValue=@MonthSheet.TotalSpent.ToString() />
+        </div>
+        <div class="col-md-12 col-lg-6 col-xl-4 col-xxl-6">
             <PieChartComponent Data=@MonthSheet.Categories
                                CategoryPropertyXaxis=@nameof(CategoryModel.Name)
                                ValuePropertyYaxis=@nameof(CategoryModel.TotalSpent)
@@ -188,6 +180,9 @@ else
     public List<AccountModel> Accounts = null!;
     public CategoryBaseModel NewCategory = new();
 
+    public List<DonutChartDataModel> DonutEarnedData = new();
+    public List<DonutChartDataModel> DonutSpentData = new();
+
     public ViewModeEnum ViewMode = ViewModeEnum.View;
     #endregion
 
@@ -195,6 +190,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await GetDataAsync(MonthSheetId);
+        await FillDonutChartData();
         await SearchCategories();
         await SearchSellers();
         await SearchAccounts();
@@ -232,11 +228,14 @@ else
     }
     #endregion
 
-    #region UpdateMonthSheet()
-    private void UpdateMonthSheet()
+    #region UpdateMonthSheetAsync()
+    private async Task UpdateMonthSheetAsync()
     {
         monthSheetService.UpdateMonthSheet(MonthSheet);
+        await FillDonutChartData();
+        StateHasChanged();
         ViewMode = ViewModeEnum.View;
+        await Task.CompletedTask;
     }
     #endregion
 
@@ -262,5 +261,100 @@ else
         Accounts = accountService.SearchAccounts();
         await Task.CompletedTask;
     }
+    #endregion
+
+
+    #region Fill Charts
+    private async Task FillDonutChartData()
+    {
+        await FillEarnedData();
+        await FillSpentData();
+    }
+
+    #region Task FillEarnedData()
+    private async Task FillEarnedData()
+    {
+        if (MonthSheet.Earned > MonthSheet.EstimatedEarned)
+        {
+            DonutEarnedData = new()
+            {
+                 new ()
+                 {
+                    Value = MonthSheet.EstimatedEarned,
+                    Label = "Estimated Earned",
+                    ColorFill = ColorHelper.ColorEnumToHTML(ColorsEnum.primary, ColorsPercentageEnum.Per50)
+                 },
+                 new()
+                {
+                    Value = MonthSheet.Earned - MonthSheet.EstimatedEarned,
+                    Label = "Extra Earned",
+                    ColorFill = ColorHelper.ColorEnumToHTML(ColorsEnum.primary, ColorsPercentageEnum.Per300)
+                }
+            };
+        }
+        else
+        {
+            DonutEarnedData = new()
+            {
+                new()
+                {
+                    Value = MonthSheet.Earned,
+                    Label = "Earned",
+                    ColorFill = ColorHelper.ColorEnumToHTML(ColorsEnum.primary, ColorsPercentageEnum.Per300)
+                },
+                new ()
+                 {
+                    Value = MonthSheet.EstimatedEarned - MonthSheet.Earned,
+                    Label = "Missing",
+                    ColorFill = ColorHelper.ColorEnumToHTML(ColorsEnum.danger, ColorsPercentageEnum.Per50)
+                 }
+            };
+        }
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task FillSpentData()
+    private async Task FillSpentData()
+    {
+        if (MonthSheet.TotalSpent > MonthSheet.EstimatedSpent)
+        {
+            DonutSpentData = new()
+            {
+                 new ()
+                 {
+                    Value = MonthSheet.EstimatedSpent,
+                    Label = "Estimated Spent",
+                    ColorFill = ColorHelper.ColorEnumToHTML(ColorsEnum.danger, ColorsPercentageEnum.Per50)
+                 },
+                 new()
+                {
+                    Value = MonthSheet.TotalSpent - MonthSheet.EstimatedSpent,
+                    Label = "Over Spent",
+                    ColorFill = ColorHelper.ColorEnumToHTML(ColorsEnum.danger, ColorsPercentageEnum.Per300)
+                }
+            };
+        }
+        else
+        {
+            DonutSpentData = new()
+            {
+                new()
+                {
+                    Value = MonthSheet.TotalSpent,
+                    Label = "Spent",
+                    ColorFill = ColorHelper.ColorEnumToHTML(ColorsEnum.danger, ColorsPercentageEnum.Per300)
+                },
+                new ()
+                 {
+                    Value = MonthSheet.EstimatedSpent - MonthSheet.TotalSpent,
+                    Label = "Saved",
+                    ColorFill = ColorHelper.ColorEnumToHTML(ColorsEnum.primary, ColorsPercentageEnum.Per100)
+                 }
+            };
+        }
+        await Task.CompletedTask;
+    }
+    #endregion
     #endregion
 }

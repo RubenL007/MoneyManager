@@ -8,10 +8,10 @@
 
 <ChartComponent>
     <RadzenPieSeries Data=@Data
-    CategoryProperty=@CategoryPropertyXaxis
-    ValueProperty=@ValuePropertyYaxis
-    Title=@TooltipLabel
-    Fills=@SliceColors />
+                     CategoryProperty=@CategoryPropertyXaxis
+                     ValueProperty=@ValuePropertyYaxis
+                     Title=@TooltipLabel
+                     Fills=@SliceColors />
 </ChartComponent>
 
 @code {
@@ -40,14 +40,14 @@
     {
         if (SliceColors.Count == 0)
         {
-            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.primary, Colors.ColorsPercentageEnum.Per400));
-            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.secondary, Colors.ColorsPercentageEnum.Per200));
-            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.warning, Colors.ColorsPercentageEnum.Per200));
-            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.danger, Colors.ColorsPercentageEnum.Per300));
-            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.primary, Colors.ColorsPercentageEnum.Per100));
-            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.secondary, Colors.ColorsPercentageEnum.Per300));
+            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.primary, ColorsPercentageEnum.Per400));
+            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.secondary, ColorsPercentageEnum.Per200));
+            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.warning, ColorsPercentageEnum.Per200));
+            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.danger, ColorsPercentageEnum.Per300));
+            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.primary, ColorsPercentageEnum.Per100));
+            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.secondary, ColorsPercentageEnum.Per300));
             SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.warning));
-            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.danger, Colors.ColorsPercentageEnum.Per600));
+            SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.danger, ColorsPercentageEnum.Per600));
         }
         for (int i = 8; i < Data.Count(); i++)
         {

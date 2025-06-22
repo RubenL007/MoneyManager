@@ -1,4 +1,4 @@
-﻿namespace MoneyManager.Shared.Components.Colors
+﻿namespace MoneyManager.Shared.Components
 {
     public enum ColorsPercentageEnum
     {

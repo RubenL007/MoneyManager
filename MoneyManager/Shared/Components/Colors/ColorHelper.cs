@@ -1,6 +1,4 @@
-﻿using MoneyManager.Shared.Components.Colors;
-
-namespace MoneyManager.Shared.Components
+﻿namespace MoneyManager.Shared.Components
 {
     public class ColorHelper
     {

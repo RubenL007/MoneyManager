@@ -1,0 +1,47 @@
+﻿@namespace MoneyManager.Shared.Components
+
+<ChartComponent>
+    <RadzenDonutSeries Data=@Data
+                       CategoryProperty=@nameof(DonutChartDataModel.Label)
+                       ValueProperty=@nameof(DonutChartDataModel.Value)
+                       Fills=@ColorsFill
+                       TotalAngle="180"
+                       StartAngle="180">
+        <ChildContent>
+            <RadzenSeriesDataLabels Visible=true />
+        </ChildContent>
+        <TitleTemplate>
+            <div class="rz-donut-content">
+                <div>@Title</div>
+                <div class="fw-bold">@TotalValue</div>
+            </div>
+        </TitleTemplate>
+    </RadzenDonutSeries>
+</ChartComponent>
+
+@code {
+    #region Parameters
+    [Parameter] public IEnumerable<DonutChartDataModel> Data { get; set; } = null!;
+    [Parameter] public string CategoryPropertyXaxis { get; set; } = string.Empty;
+    [Parameter] public string ValuePropertyYaxis { get; set; } = string.Empty;
+    [Parameter] public string TotalValue { get; set; } = string.Empty;
+
+    [Parameter] public string SeriesTitle { get; set; } = string.Empty;
+    [Parameter] public string Title { get; set; } = string.Empty;
+    #endregion
+
+    private IEnumerable<string> ColorsFill { get; set; } = null!;
+
+    protected override Task OnInitializedAsync()
+    {
+        ColorsFill = Data.Select(c => c.ColorFill).ToArray();
+        return base.OnInitializedAsync();
+    }
+
+    //TODO: OnValueChange event, to update colors
+    protected override Task OnParametersSetAsync()
+    {
+        ColorsFill = Data.Select(c => c.ColorFill).ToArray();
+        return base.OnParametersSetAsync();
+    }
+}

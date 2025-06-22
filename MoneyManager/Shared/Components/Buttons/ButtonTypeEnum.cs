@@ -6,6 +6,7 @@
         Add,
         Edit,
         Save,
+        Cancel,
         Delete,
     }
 }

@@ -44,6 +44,7 @@
 
     protected override void OnInitialized()
     {
+        //icon website: https://kordamp.org/ikonli/cheat-sheet-openiconic.html
         switch (ButtonType)
         {
             case ButtonTypeEnum.Add:
@@ -62,6 +63,12 @@
                 Color = ColorsEnum.primary;
                 DisplayName = "Save";
                 IconClass = "oi oi-check";
+                break;
+
+            case ButtonTypeEnum.Cancel:
+                Color = ColorsEnum.warning;
+                DisplayName = "Cancel";
+                IconClass = "oi oi-action-undo";
                 break;
 
             case ButtonTypeEnum.Delete:

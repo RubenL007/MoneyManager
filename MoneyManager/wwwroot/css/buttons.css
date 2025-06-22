@@ -47,6 +47,16 @@
             color: var(--danger-300);
         }
 
+    .btn.btn-warning {
+        border-color: var(--warning);
+        color: var(--warning);
+        background-color: transparent;
+    }
+
+        .btn.btn-warning:hover span {
+            color: var(--warning-300);
+        }
+
 
 .text-primary {
     color: var(--primary);

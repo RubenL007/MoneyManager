@@ -5,19 +5,27 @@
         @if (ViewMode == ViewModeEnum.View)
         {
             <ButtonComponent ButtonType=@ButtonTypeEnum.Edit
-            OnClick=@EditOnClick />
+                             OnClick=@EditOnClick
+                             IsVisible=@EditOnClick.HasDelegate />
         }
         else
         {
             <ButtonComponent ButtonType=@ButtonTypeEnum.Save
-            OnClick=@SaveOnClick />
+                             OnClick=@SaveOnClick
+                             IsVisible=@SaveOnClick.HasDelegate />
+
+            <ButtonComponent ButtonType=@ButtonTypeEnum.Cancel
+                             OnClick=@CancelOnClick
+                             IsVisible=@CancelOnClick.HasDelegate />
+
         }
     </LeftContent>
     <RightContent>
         @if (ViewMode == ViewModeEnum.Edit && HasDeleteButton)
         {
             <ButtonComponent ButtonType=@ButtonTypeEnum.Delete
-            OnClick=@DeleteOnClick />
+                             OnClick=@DeleteOnClick
+                             IsVisible=@DeleteOnClick.HasDelegate />
         }
     </RightContent>
 </HeaderComponent>
@@ -30,5 +38,6 @@
     [Parameter] public EventCallback<MouseEventArgs> EditOnClick { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> SaveOnClick { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> DeleteOnClick { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> CancelOnClick { get; set; }
     [Parameter] public bool HasDeleteButton { get; set; } = false;
 }

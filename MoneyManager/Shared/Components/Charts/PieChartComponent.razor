@@ -38,6 +38,21 @@
     #region Task OnInitializedAsync()
     protected override Task OnInitializedAsync()
     {
+        UpdateColors();
+        return base.OnInitializedAsync();
+    }
+    #endregion
+
+    //TODO: OnValueChange event, to update colors
+    protected override Task OnParametersSetAsync()
+    {
+        UpdateColors();
+        return base.OnParametersSetAsync();
+    }
+
+    private void UpdateColors()
+    {
+        SliceColors.Clear();
         if (SliceColors.Count == 0)
         {
             SliceColors.Add(ColorHelper.ColorEnumToHTML(ColorsEnum.primary, ColorsPercentageEnum.Per400));
@@ -53,7 +68,5 @@
         {
             SliceColors.Add(ColorHelper.RandomHexColor());
         }
-        return base.OnInitializedAsync();
     }
-    #endregion
 }

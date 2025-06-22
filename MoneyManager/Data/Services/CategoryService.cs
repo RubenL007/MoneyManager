@@ -27,7 +27,7 @@ namespace MoneyManager.Data.Services
 
             var categoryObj = _categoriesCollection.Find(c => c.UserId == userId
                                                          && c.Id == category.Id).FirstOrDefault();
-            if (categoryObj == null)
+            if (categoryObj == null && !string.IsNullOrWhiteSpace(category.Name))
             {
                 category.UserId = userId!;
                 _categoriesCollection.InsertOne(category);

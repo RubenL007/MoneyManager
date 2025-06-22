@@ -27,7 +27,7 @@ namespace MoneyManager.Data.Services
 
             var accountObj = _accountsCollection.Find(a => a.UserId == userId
                                                       && a.Id == account.Id).FirstOrDefault();
-            if (accountObj == null)
+            if (accountObj == null && !string.IsNullOrWhiteSpace(account.Name))
             {
                 account.UserId = userId!;
                 _accountsCollection.InsertOne(account);

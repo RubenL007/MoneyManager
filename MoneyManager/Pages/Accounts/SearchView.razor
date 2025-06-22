@@ -57,9 +57,12 @@
     #region Task CreateAccount()
     private async Task CreateAccount()
     {
-        accountService.CreateAccount(Account);
-        Account = new();
-        await SearchAccounts();
+        if (!string.IsNullOrWhiteSpace(Account.Name))
+        {
+            accountService.CreateAccount(Account);
+            Account = new();
+            await SearchAccounts();
+        }
         await Task.CompletedTask;
     }
     #endregion

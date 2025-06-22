@@ -11,10 +11,10 @@
                         SaveOnClick=@(x => UpdateSellers()) />
 
 <AutoTableComponent DataSource=@Sellers
-                TItem=SellerModel
-                ViewMode=@ViewMode
-                IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
-                DeleteRowMethod=@(row => DeleteSeller(row))>
+                    TItem=SellerModel
+                    ViewMode=@ViewMode
+                    IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
+                    DeleteRowMethod=@(row => DeleteSeller(row))>
     <FooterTools>
         <EditForm Model=@Seller>
             <div class="row d-flex align-items-center">
@@ -57,9 +57,12 @@
     #region Task CreateSeller()
     private async Task CreateSeller()
     {
-        sellerService.CreateSeller(Seller);
-        Seller = new();
-        await SearchSellers();
+        if (!string.IsNullOrWhiteSpace(Seller.Name))
+        {
+            sellerService.CreateSeller(Seller);
+            Seller = new();
+            await SearchSellers();
+        }
         await Task.CompletedTask;
     }
     #endregion

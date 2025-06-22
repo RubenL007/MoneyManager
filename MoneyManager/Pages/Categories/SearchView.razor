@@ -57,9 +57,12 @@
     #region Task AddNewCategory()
     private async Task AddNewCategory()
     {
-        categoryService.CreateCategory(Category);
-        Category = new();
-        await SearchCategories();
+        if (!string.IsNullOrWhiteSpace(Category.Name))
+        {
+            categoryService.CreateCategory(Category);
+            Category = new();
+            await SearchCategories();
+        }
         await Task.CompletedTask;
     }
     #endregion

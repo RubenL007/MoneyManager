@@ -27,7 +27,7 @@ namespace MoneyManager.Data.Services
 
             var sellerObj = _sellersCollection.Find(s => s.UserId == userId
                                                     && s.Id == seller.Id).FirstOrDefault();
-            if (sellerObj == null)
+            if (sellerObj == null && !string.IsNullOrWhiteSpace(seller.Name))
             {
                 seller.UserId = userId!;
                 _sellersCollection.InsertOne(seller);

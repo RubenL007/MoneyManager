@@ -7,11 +7,13 @@
 @inject ICategory categoryService
 @inject ISeller sellerService
 @inject IAccount accountService
+@inject NavigationManager navigationManager
 
 <CardComponent>
     <DefaultHeaderComponent Title=@MonthSheet.Date.ToString("Y")
                             EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
                             SaveOnClick=@(x => UpdateMonthSheetAsync())
+                            DeleteOnClick=@(x => DeleteMonthSheetAsync())
                             ViewMode=@ViewMode />
     <div class="row">
         <div class="col-5">
@@ -235,6 +237,15 @@ else
         await FillDonutChartData();
         StateHasChanged();
         ViewMode = ViewModeEnum.View;
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region DeleteMonthSheetAsync()
+    private async Task DeleteMonthSheetAsync()
+    {
+        monthSheetService.DeleteMonthSheet(MonthSheet.Id);
+        navigationManager.NavigateTo("/Monthsheets");
         await Task.CompletedTask;
     }
     #endregion

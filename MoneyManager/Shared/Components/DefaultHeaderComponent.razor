@@ -21,7 +21,7 @@
         }
     </LeftContent>
     <RightContent>
-        @if (ViewMode == ViewModeEnum.Edit && HasDeleteButton)
+        @if (ViewMode == ViewModeEnum.Edit && DeleteOnClick.HasDelegate)
         {
             <ButtonComponent ButtonType=@ButtonTypeEnum.Delete
                              OnClick=@DeleteOnClick
@@ -39,5 +39,4 @@
     [Parameter] public EventCallback<MouseEventArgs> SaveOnClick { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> DeleteOnClick { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> CancelOnClick { get; set; }
-    [Parameter] public bool HasDeleteButton { get; set; } = false;
 }

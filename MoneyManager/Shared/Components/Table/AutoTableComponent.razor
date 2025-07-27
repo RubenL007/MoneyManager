@@ -99,7 +99,7 @@
                             else if (property == Properties.FirstOrDefault() && OpenDetail.HasDelegate)
                             {
                                 <td @onclick=@(x => OpenDetail.InvokeAsync(item))
-                                    style="cursor:pointer;">
+                                    style="cursor:pointer; color: var(--primary);">
                                     @ShowValue(item, property)
                                 </td>
                             }

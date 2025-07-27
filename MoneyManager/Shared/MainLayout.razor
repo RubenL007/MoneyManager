@@ -1,4 +1,5 @@
 @inherits LayoutComponentBase
+@inject NavigationManager navigationManager
 
 <PageTitle>MoneyManager</PageTitle>
 
@@ -9,10 +10,17 @@
 
     <main>
         <div class="top-row px-4 auth">
-            <LoginDisplay />
-            <a href="https://www.linkedin.com/in/ruben-lopes-dev/" target="_blank">LinkedIn</a>
-            <a href="https://github.com/RubenL007" target="_blank">GitHub</a>
-            <a href="https://codepen.io/Ruben-Lopes" target="_blank">CodePen</a>
+            <div class="col justify-content-start">
+                <ButtonComponent DisplayName="Demo Mode"
+                                 Color=@ColorsEnum.warning
+                                 OnClick=@OpenDemoPage />
+            </div>
+            <div class="col-auto justify-content-end">
+                <LoginDisplay />
+                <a href="https://www.linkedin.com/in/ruben-lopes-dev/" target="_blank">LinkedIn</a>
+                <a href="https://github.com/RubenL007" target="_blank">GitHub</a>
+                <a href="https://codepen.io/Ruben-Lopes" target="_blank">CodePen</a>
+            </div>
         </div>
 
         <article class="content px-4">
@@ -22,3 +30,10 @@
 </div>
 
 <RadzenComponents />
+
+@code {
+    private void OpenDemoPage()
+    {
+        navigationManager.NavigateTo("/Demo");
+    }
+}

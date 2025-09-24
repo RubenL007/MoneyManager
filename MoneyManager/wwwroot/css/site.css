@@ -52,6 +52,15 @@
     --danger-700: #964164;
     --danger-800: #803d5c;
     --danger-900: #5d324b;
+
+    /*btn-3d variables*/
+    --btn-transition-time: 0.25s;
+    --btn-bg: #fff;
+    --btn-top-shadow-color: #808080;
+    --btn-bottom-shadow-color: #f2f2f2;
+    --btn-hovor-bottom-shadow-color: #e6e6e6;
+    --btn-active-color: #333333;
+    --btn-text-shadow: #cccccc;
 }
 
 html, body {

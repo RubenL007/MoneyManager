@@ -8,54 +8,134 @@
     color: #404040;
 }
 
-    .btn:disabled {
-        color: #333333;
-    }
-    .btn:focus, .btn:active:focus {
-        box-shadow:none;
-    }
+.btn:disabled {
+    color: #333333;
+}
+.btn:focus, .btn:active:focus {
+    box-shadow:none;
+}
 
-    .btn:hover {
-        box-shadow: inset 0px 0px 8px var(--default-color) !important;
-    }
-        .btn:hover span {
-            transform: scale(0.98);
-            color: #333333;
-        }
+.btn:hover {
+    box-shadow: inset 0px 0px 8px var(--default-color) !important;
+}
+.btn:hover span {
+    transform: scale(0.98);
+    color: #333333;
+}
+
+.btn span {
+    display: inline-block;
+    transition: transform 0.15s, color 0.15s;
+}
+
+.btn.btn-primary {
+    border-color: var(--primary);
+    color: var(--primary);
+    background-color: transparent;
+}
+.btn.btn-primary:hover span {
+    color: var(--primary-300);
+}
+
+.btn.btn-danger {
+    border-color: var(--danger);
+    color: var(--danger);
+    background-color: transparent;
+}
+.btn.btn-danger:hover span {
+    color: var(--danger-300);
+}
+
+.btn.btn-warning {
+    border-color: var(--warning);
+    color: var(--warning);
+    background-color: transparent;
+}
+
+.btn.btn-warning:hover span {
+    color: var(--warning-300);
+}
+.btn-warning:focus, btn-warning:active:focus{
+        box-shadow: 0 0 0 .25rem var(--warning-300);
+}
+.btn-primary:focus, btn-primary:active:focus {
+    box-shadow: 0 0 0 .25rem var(--primary-300);
+}
+.btn-danger:focus, btn-danger:active:focus {
+    box-shadow: 0 0 0 .25rem var(--danger-300);
+}
 
 
-    .btn span {
-        display: inline-block;
-        transition: transform 0.15s, color 0.15s;
-    }
+        /*3D buttons*/
+.btn-3d {
+    color: var(--btn-active-color);
+    border: none;
+    border-radius: 50px;
+    background-color: var(--btn-bg);
+    font-size: 16px;
+    /*text-shadow: 0px 3px 3px rgba(255, 255, 255, 0.5);*/
+    padding: 8px 12px;
+    box-shadow: inset 0px 2px 2px var(--btn-top-shadow-color), inset 0px -2px 2px var(--btn-bottom-shadow-color);
+    transition: box-shadow var(--btn-transition-time);
+}
+.btn-3d span {
+    display: inline-block;
+    transition: transform var(--btn-transition-time), color var(--btn-transition-time);
+  }
+.btn-3d:hover:enabled {
+    cursor: pointer;
+    box-shadow: inset 0px 4px 3px var(--btn-top-shadow-color), inset 0px -2px 2px var(--btn-hovor-bottom-shadow-color);
+    color: var(--btn-active-color);
+}
+.btn-3d:hover span {
+    transform: scale(0.98);
+}
+.btn-3d:active:enabled {
+    box-shadow: inset 0px 5px 3px var(--btn-top-shadow-color), inset 0px -3px 2px var(--btn-hovor-bottom-shadow-color);
+    color: var(--btn-active-color);
+}
+.btn-3d:active span {
+    transform: scale(0.95);
+}
+.btn-3d:disabled {
+    color: white;
+    transition: none;
+    cursor: default;
+}
 
-    .btn.btn-primary {
-        border-color: var(--primary);
-        color: var(--primary);
-        background-color: transparent;
-    }
-        .btn.btn-primary:hover span {
-            color: var(--primary-300);
-        }
+   /*----------*/
 
-    .btn.btn-danger {
-        border-color: var(--danger);
-        color: var(--danger);
-        background-color: transparent;
-    }
-        .btn.btn-danger:hover span {
-            color: var(--danger-300);
-        }
+   /*seamless buttons*/
+.btn-seamless {
+    background-color: transparent;
+    box-shadow: inset 0px 2px 2px var(--btn-top-shadow-color);
+}
+.btn-seamless span {
+    color: transparent;
+    background: var(--btn-top-shadow-color);
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    background-clip: text;
+    text-shadow: 0px 3px 3px rgba(255, 255, 255, 0.5);
+}
+.btn-seamless:hover {
+    box-shadow: inset 0px 4px 3px var(--btn-top-shadow-color);
+}
 
-    .btn.btn-warning {
-        border-color: var(--warning);
-        color: var(--warning);
-        background-color: transparent;
-    }
+.btn-3d.btn-primary {
+    background-color: #bbe5d1;
+}
 
-        .btn.btn-warning:hover span {
-            color: var(--warning-300);
-        }
+.btn-3d.btn-danger {
+    background-color: #d996b6;
+}
+
+.btn-3d.btn-warning {
+    border-color: var(--warning);
+    color: var(--warning);
+    background-color: transparent;
+}
+   /*----------*/
 
 
 .text-primary {

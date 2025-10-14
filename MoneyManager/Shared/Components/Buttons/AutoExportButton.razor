@@ -1,0 +1,265 @@
+﻿@namespace MoneyManager.Shared.Components
+
+@using System.Reflection
+@using System.Text
+@using ClosedXML.Excel
+@inject IJSRuntime js
+@typeparam TItem
+
+<ButtonComponent ButtonType=@ButtonTypeEnum.Export
+                 OnClick=@(() => GenerateDocumentAsync(js, "export.xlsx"))
+                 Tooltip=@Tooltip/>
+
+@code {
+    #region Parameters
+    [Parameter] public List<TItem> Data { get; set; } = new();
+    [Parameter] public List<FieldNameConvertedModel> CustomTableHeadNames { get; set; } = new();
+    [Parameter] public string Tooltip { get; set; } = string.Empty;
+    #endregion
+
+    #region Properties
+    private List<PropertyInfo> Properties = new();
+    private int ListLevel = 0;
+    private int row = 1;
+    #endregion
+
+    #region Task GenerateDocumentAsync(IJSRuntime js, string filename)
+    public async Task GenerateDocumentAsync(IJSRuntime js, string filename)
+    {
+        var XLSStream = FillingDocument(Data, "Weather Forecast");
+        await js.InvokeVoidAsync("BlazorDownloadFile", filename, XLSStream);
+    }
+    #endregion
+
+    #region byte[] FillingDocument(List<TValue> data, string bookTitle)
+    public byte[] FillingDocument(List<TItem> data, string bookTitle)
+    {
+        //https://closedxml.io/ClosedXML.Report/docs/en/Basic-concepts
+
+        var wb = new XLWorkbook();
+        #region Excel file properties
+        wb.Properties.Author = "the Author";
+        wb.Properties.Title = "the Title";
+        wb.Properties.Subject = "the Subject";
+        wb.Properties.Category = "the Category";
+        wb.Properties.Keywords = "the Keywords";
+        wb.Properties.Comments = "the Comments";
+        wb.Properties.Status = "the Status";
+        wb.Properties.LastModifiedBy = "the Last Modified By";
+        wb.Properties.Company = "the Company";
+        wb.Properties.Manager = "the Manager";
+        #endregion
+
+        IXLWorksheet ws = wb.Worksheets.Add(bookTitle);
+
+        #region Table Header
+        for (int i = 0; i < Properties.Count; i++)
+        {
+            var propType = Properties[i].PropertyType;
+            //only shows values and not lists
+            if (!typeof(System.Collections.IEnumerable).IsAssignableFrom(propType) || propType == typeof(string))
+            {
+                ws.Cell(row, 1 + i)
+                  .SetValue(GetFieldName(Properties[i]))
+                  .Style.Font.SetBold();
+            }
+        }
+        row++;
+        #endregion
+        // Fill a cell with a date
+        //var cellDateTime = ws.Cell(1, 2);
+        //cellDateTime.Value = new DateTime(2010, 9, 2);
+        //cellDateTime.Style.DateFormat.Format = "yyyy-MMM-dd";
+
+        //Get data using reflection and assigning it to the right row/column
+        if (data.Any())
+        {
+            for (int itemCount = 0; itemCount < data.Count; itemCount++)
+            {
+                for (int propertyCount = 0; propertyCount < Properties.Count; propertyCount++)
+                {
+                    ws.Cell(row, 1 + propertyCount).Value = ShowValue(data[itemCount], Properties[propertyCount]);
+                    ExportingLists(Data, itemCount, Properties, propertyCount, ws);
+                }
+                row++;
+            }
+        }
+        else
+        {
+            ws.Cell(2, 1).Value = "No records to show.";
+        }
+
+        MemoryStream XLSStream = new();
+        wb.SaveAs(XLSStream);
+
+        return XLSStream.ToArray();
+    }
+    #endregion
+
+
+    public void ExportingLists(List<TItem> data, int itemCount, List<PropertyInfo> properties, int propertyCount, IXLWorksheet ws)
+    {
+        ListLevel = 1;
+        var value = Properties[propertyCount].GetValue(data[itemCount]);
+        //checks if value is a list
+        if (value is System.Collections.IEnumerable enumerable && value is not string)
+        {
+            //adds this list property to keep track of the number of lists inside
+            var elementType = value.GetType().GetGenericArguments().FirstOrDefault() ?? value.GetType().GetElementType();
+            int colOffset = ListLevel + 1;
+
+            #region Header cell
+            //prints the type name
+            row++;
+            ws.Cell(row, colOffset)
+              .SetValue(GetFieldName(properties[propertyCount]))
+              .Style.Font.SetBold();
+            #endregion
+
+            #region sub header cells
+            row++;
+            var innerListProperties = elementType.GetProperties(); // get PropertyInfo for element type
+            for (int i = 0; i < innerListProperties.Length; i++)
+            {
+                ws.Cell(row, colOffset + i)
+                  .SetValue(GetFieldName(innerListProperties[i]))
+                  .Style.Font.SetBold();
+            }
+            #endregion
+
+            #region loop items and print values
+            //for each item in the list
+            foreach (var item in enumerable)
+            {
+                row++;
+                var subProps = item.GetType().GetProperties();
+                //for each property of the item, prints
+                for (int i = 0; i < subProps.Length; i++)
+                {
+                    var val = subProps[i].GetValue(item);
+                    ws.Cell(row, colOffset + i).Value = val?.ToString() ?? string.Empty;
+                }
+
+                //check if its list and call himself recursively
+            }
+            #endregion
+        }
+    }
+
+    #region Reflection
+    #region string GetFieldName(PropertyInfo property)
+    private string GetFieldName(PropertyInfo property)
+    {
+        var match = CustomTableHeadNames.FirstOrDefault(x => x.FieldName == property.Name && !string.IsNullOrWhiteSpace(x.Label));
+
+        return match?.Label ?? FormatStringWithSpaces(property.Name);
+    }
+    #endregion
+    #region string FormatStringWithSpaces(string input)
+    private string FormatStringWithSpaces(string input)
+    {
+        // Return as is, if fewer than 2 uppercase letters
+        if (input.Count(char.IsUpper) < 2) return input;
+
+        var result = new StringBuilder();
+        bool firstUpperFound = false;
+
+        foreach (char c in input)
+        {
+            if (char.IsUpper(c))
+            {
+                // Add space before uppercase letters except the first one
+                if (firstUpperFound) result.Append(' ');
+
+                firstUpperFound = true;
+            }
+            result.Append(c);
+        }
+
+        return result.ToString();
+    }
+    #endregion
+
+    #region string ShowValue(TValue item, PropertyInfo property)
+    private string ShowValue(TItem item, PropertyInfo property)
+    {
+        var value = property.GetValue(item);
+
+        // Handle Lists
+        if (value is System.Collections.IEnumerable enumerable && value is not string)
+        {
+            string propertyToExtract = "Name";
+            List<string> listItems = new();
+
+            foreach (var obj in enumerable)
+            {
+                var extractedValue = obj?.GetType().GetProperty(propertyToExtract)?.GetValue(obj)?.ToString();
+                if (extractedValue != null)
+                {
+                    listItems.Add(extractedValue);
+                }
+            }
+
+            return listItems.Any() ? string.Join(", ", listItems) : string.Empty;
+        }
+        else if (value is DateTime data)
+        {
+            return data.ToString("d");
+        }
+        // If it's a complex object and not a string, try to extract a "Name" property
+        else if (value != null && !(value is string) && !value.GetType().IsPrimitive)
+        {
+            var nameProp = value.GetType().GetProperty("Name");
+            if (nameProp != null)
+            {
+                var nameValue = nameProp.GetValue(value);
+                if (nameValue != null)
+                {
+                    return nameValue.ToString()!;
+                }
+            }
+        }
+
+        return value?.ToString() ?? string.Empty;
+    }
+    #endregion
+    #endregion
+
+    #region Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
+    {
+        //Prevents the Guid field and the UserId of being rendered on the Data Table
+        if (Data?.Any() == true)
+        {
+            Properties = typeof(TItem).GetProperties()
+                .Where(p => p.PropertyType != typeof(Guid) && p.Name != nameof(Tenantable.UserId))
+                .ToList();
+        }
+
+        if (string.IsNullOrWhiteSpace(Tooltip)) Tooltip = "Export as a new Excel Document";
+
+        return base.OnInitializedAsync();
+    }
+    #endregion
+
+    #region Task OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
+    {
+        await UpdateProperties();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region UpdateProperties()
+    private async Task UpdateProperties()
+    {
+        if (Properties != null && !Properties.Any())
+        {
+            Properties = typeof(TItem).GetProperties()
+                .Where(p => p.PropertyType != typeof(Guid) && p.Name != nameof(Tenantable.UserId))
+                .ToList();
+        }
+        await Task.CompletedTask;
+    }
+    #endregion
+}

@@ -4,7 +4,8 @@
         class="btn-3d btn-@Color"
         type="button"
         hidden=@(!IsVisible)
-        disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)>
+        disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)
+        title=@Tooltip>
     @if (!string.IsNullOrWhiteSpace(IconClass))
     {
         <span class=@(IconClass + " pe-2") aria-hidden="true" />
@@ -15,6 +16,9 @@
 @code {
     [Parameter]
     public string DisplayName { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Tooltip { get; set; } = string.Empty;
 
     /// <summary>
     /// Executes the method given when clicked
@@ -75,6 +79,12 @@
                 Color = ColorsEnum.danger;
                 DisplayName = "Delete";
                 IconClass = "oi oi-trash";
+                break;
+
+            case ButtonTypeEnum.Export:
+                Color = ColorsEnum.normal;
+                DisplayName = "Export";
+                IconClass = "oi oi-data-transfer-download";
                 break;
 
             default:

@@ -14,7 +14,12 @@
                             EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
                             SaveOnClick=@(x => UpdateMonthSheetAsync())
                             DeleteOnClick=@(x => DeleteMonthSheetAsync())
-                            ViewMode=@ViewMode />
+                            ViewMode=@ViewMode>
+        <ExtraRightContent>
+            <AutoExportButton Data=@(new List<MonthSheetModel> { MonthSheet } ) />
+        </ExtraRightContent>
+    </DefaultHeaderComponent>
+
     <div class="row">
         <div class="col-5">
             <EditForm Model=MonthSheet>
@@ -60,7 +65,11 @@
             </EditForm>
         </div>
         <div class="col-6 offset-md-1">
-            <HeaderComponent Title="Earnings" />
+            <HeaderComponent Title="Earnings">
+                <RightContent>
+                    <ExportButton Data=@MonthSheet.Earnings />
+                </RightContent>
+            </HeaderComponent>
             <AutoTableComponent DataSource=@MonthSheet.Earnings
                                 TItem=EarningModel
                                 ViewMode=@ViewMode
@@ -70,12 +79,12 @@
                                 LimitDateInputsToThisMonth=@MonthSheet.Date
                                 OnValueChange=@(x=> StateHasChanged())
                                 DataForSelects=@(new List<SelectOptionSet> {
-                                    new SelectOptionSet
-                                    {
-                                        PropertyName = nameof(EarningModel.Account),
-                                        PropertyType = typeof(AccountModel),
-                                        Options = Accounts.Cast<object>().ToList()
-                                    }
+                                new SelectOptionSet
+                                {
+                                PropertyName = nameof(EarningModel.Account),
+                                PropertyType = typeof(AccountModel),
+                                Options = Accounts.Cast<object>().ToList()
+                                }
                                 }) />
         </div>
     </div>
@@ -127,7 +136,11 @@
     foreach (CategoryModel cat in MonthSheet.Categories)
     {
         <HeaderComponent Title=@cat.Name
-                         TitleFontSize="fs-4" />
+                         TitleFontSize="fs-4">
+            <RightContent>
+                <ExportButton Data=@cat.Expenses />
+            </RightContent>
+        </HeaderComponent>
         <AutoTableComponent DataSource=@cat.Expenses
                             TItem=ExpenseModel
                             ViewMode=@ViewMode

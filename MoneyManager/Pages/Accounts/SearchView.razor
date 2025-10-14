@@ -8,7 +8,11 @@
 <DefaultHeaderComponent Title="Accounts"
                         ViewMode=@ViewMode
                         EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                        SaveOnClick=@(x => UpdateAccounts()) />
+                        SaveOnClick=@(x => UpdateAccounts())>
+    <ExtraRightContent>
+        <AutoExportButton Data=@Accounts />
+    </ExtraRightContent>
+</DefaultHeaderComponent>
 
 <AutoTableComponent DataSource=@Accounts
                     TItem=AccountModel

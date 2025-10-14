@@ -27,6 +27,10 @@
                              OnClick=@DeleteOnClick
                              IsVisible=@DeleteOnClick.HasDelegate />
         }
+        @if (ExtraRightContent !=null)
+        {
+            @ExtraRightContent
+        }
     </RightContent>
 </HeaderComponent>
 
@@ -39,4 +43,6 @@
     [Parameter] public EventCallback<MouseEventArgs> SaveOnClick { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> DeleteOnClick { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> CancelOnClick { get; set; }
+
+    [Parameter] public RenderFragment ExtraRightContent { get; set; } = null!;
 }

@@ -38,6 +38,7 @@ builder.Services.AddScoped<IMonthSheet, MonthSheetService>();
 builder.Services.AddScoped<ICategory, CategoryService>();
 builder.Services.AddScoped<ISeller, SellerService>();
 builder.Services.AddScoped<IAccount, AccountService>();
+builder.Services.AddScoped<IConfiguration, ConfigurationService>();
 builder.Services.AddScoped<IUserAuthentication, UserAuthenticationService>();
 
 builder.Services.AddScoped<TooltipService>();

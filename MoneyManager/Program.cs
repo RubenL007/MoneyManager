@@ -8,6 +8,7 @@ using MoneyManager.Shared;
 using MoneyManager.Shared.UserAuthentication;
 using MongoDB.Driver;
 using Radzen;
+using IConfiguration = MoneyManager.Data.Interface.IConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,7 @@ builder.Services.AddScoped<ICategory, CategoryService>();
 builder.Services.AddScoped<ISeller, SellerService>();
 builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IConfiguration, ConfigurationService>();
+builder.Services.AddScoped<IBalance, BalanceService>();
 builder.Services.AddScoped<IUserAuthentication, UserAuthenticationService>();
 
 builder.Services.AddScoped<TooltipService>();

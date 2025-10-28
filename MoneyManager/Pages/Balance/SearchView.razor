@@ -1,0 +1,134 @@
+﻿@page "/Balance"
+@using MoneyManager.Data.Interface
+@using MoneyManager.Data.Models
+@using MoneyManager.Data.Models.Balance
+
+@inject IBalance BalanceService
+@inject NavigationManager navigationManager
+
+<DefaultHeaderComponent Title="Balance"
+                        ViewMode=@ViewMode
+                        EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
+                        SaveOnClick=@(x => UpdateBalances())>
+</DefaultHeaderComponent>
+
+@if (ViewMode == ViewModeEnum.Edit)
+{
+    <div class="row d-flex align-items-center mt-2">
+        <div class="col-auto">
+            <ButtonComponent OnClick=@(x => AddNewBalance())
+                             ButtonType=@ButtonTypeEnum.Add
+                             DisplayName="Add New Balance"
+                             ViewMode=@(Balances.Any(b => b.Date.Year == Balance.Date.Year && b.Date.Month == Balance.Date.Month) ? ViewModeEnum.View : ViewMode) />
+        </div>
+        <div class="col-auto">
+            <EditForm Model=@Balance>
+                <InputDateComponent @bind-Value=@Balance.Date
+                                    ViewMode=@ViewMode />
+            </EditForm>
+        </div>
+    </div>
+}
+
+
+<div class="row row-cols-lg-4 row-cols-md-6 row-cols">
+    @foreach (var balance in Balances)
+    {
+        <div class="col">
+            <CardComponent>
+                <div class="row">
+                    <div class="col">
+                        <span>@balance.Date.ToString("Y")</span>
+                    </div>
+                    <div class="col-auto">
+                        <ButtonComponent OnClick=@(() => DeleteBalance(balance))
+                                         Color=@ColorsEnum.danger
+                                         IconClass="oi oi-trash"
+                                         Tooltip="Delete this Balance"
+                                         IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false ) />
+                    </div>
+                </div>
+                @foreach (var account in balance.Accounts)
+                {
+                    <EditForm Model=@account>
+                        @if (ViewMode == ViewModeEnum.View)
+                        {
+                            <div class="row">
+                                <div class="col ms-1">
+                                    @account.Name
+                                </div>
+                                <span class="col-auto align-self-end">@account.Value</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <InputNumberComponent @bind-Value=@account.Value
+                                                  ViewMode=@ViewMode
+                                                  DisplayName=@account.Name />
+                        }
+                    </EditForm>
+                }
+                <span class="align-self-end">Total @balance.TotalValue</span>
+            </CardComponent>
+        </div>
+    }
+</div>
+
+@code {
+    #region Properties
+    BalanceModel Balance = new();
+    List<BalanceModel> Balances = new();
+    ViewModeEnum ViewMode = ViewModeEnum.View;
+    #endregion
+
+    #region Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        await SearchBalances();
+        await base.OnInitializedAsync();
+    }
+    #endregion
+
+    #region Task SearchBalances()
+    private async Task SearchBalances()
+    {
+        Balances = BalanceService.SearchBalances();
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task AddNewBalance()
+    private async Task AddNewBalance()
+    {
+        if (Balance != null)
+        {
+            BalanceService.CreateBalance(Balance);
+            await SearchBalances();
+        }
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task UpdateBalances()
+    private async Task UpdateBalances()
+    {
+        foreach (var balance in Balances)
+        {
+            BalanceService.UpdateBalance(balance);
+        }
+        await SearchBalances();
+        ViewMode = ViewModeEnum.View;
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task DeleteBalance(BalanceModel balance)
+    private async Task DeleteBalance(BalanceModel balance)
+    {
+        BalanceService.DeleteBalance(balance.Id);
+        await SearchBalances();
+        await Task.CompletedTask;
+    }
+    #endregion
+}

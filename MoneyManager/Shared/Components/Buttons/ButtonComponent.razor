@@ -8,7 +8,7 @@
         title=@Tooltip>
     @if (!string.IsNullOrWhiteSpace(IconClass))
     {
-        <span class=@(IconClass + " pe-2") aria-hidden="true" />
+        <span class=@(IconClass + $"{(string.IsNullOrWhiteSpace(DisplayName) ? string.Empty : " pe-2")}") aria-hidden="true" />
     }
     <span>@DisplayName</span>
 </button>
@@ -49,6 +49,8 @@
     protected override void OnInitialized()
     {
         //icon website: https://kordamp.org/ikonli/cheat-sheet-openiconic.html
+
+        string displayNameBackup = DisplayName;
         switch (ButtonType)
         {
             case ButtonTypeEnum.Add:
@@ -91,6 +93,8 @@
 
                 break;
         }
+        if (!string.IsNullOrWhiteSpace(displayNameBackup)) DisplayName = displayNameBackup;
+
         base.OnInitialized();
     }
 }

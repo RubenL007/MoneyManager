@@ -72,8 +72,8 @@
                 col = 1;
                 #region Basic Fields
                 ws.Cell(row, col++).Value = monthsheet.Date.ToString("Y");
-                ws.Cell(row, col++).SetValue(monthsheet.Earned).Style.NumberFormat.SetFormat("#,##0.00 €");
                 ws.Cell(row, col++).SetValue(monthsheet.Balance).Style.NumberFormat.SetFormat("#,##0.00 €");
+                ws.Cell(row, col++).SetValue(monthsheet.Earned).Style.NumberFormat.SetFormat("#,##0.00 €");
                 ws.Cell(row, col++).SetValue(monthsheet.TotalSpent).Style.NumberFormat.SetFormat("#,##0.00 €");
                 ws.Cell(row, col++).SetValue(monthsheet.EstimatedBalance).Style.NumberFormat.SetFormat("#,##0.00 €");
                 ws.Cell(row, col++).SetValue(monthsheet.EstimatedEarned).Style.NumberFormat.SetFormat("#,##0.00 €");

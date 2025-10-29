@@ -25,6 +25,13 @@
             <EditForm Model=MonthSheet>
                 <div class="row mb-2 mt-2">
                     <div class="col">
+                        <!--To show the values on inputs without binding because they are pointers-->
+                        <label>Estimated Balance</label>
+                        <input value=@MonthSheet.EstimatedBalance.ToString()
+                               type="text"
+                               disabled=@true>
+                    </div>
+                    <div class="col">
                         <InputNumberComponent @bind-Value=@MonthSheet.EstimatedEarned
                                               DisplayName="Estimated Earned"
                                               ViewMode=@ViewMode />
@@ -34,31 +41,24 @@
                                               DisplayName="Estimated Spent"
                                               ViewMode=@ViewMode />
                     </div>
-                    <div class="col">
-                        <!--To show the values on inputs without binding because they are pointers-->
-                        <label>Estimated Balance</label>
-                        <input value=@MonthSheet.EstimatedBalance
-                               type="number"
-                               disabled=@true>
-                    </div>
                 </div>
                 <div class="row mb-2 mt-2">
                     <div class="col">
+                        <label>Balance</label>
+                        <input value=@MonthSheet.Balance.ToString()
+                               type="text"
+                               disabled=@true>
+                    </div>
+                    <div class="col">
                         <label>Total Earned</label>
-                        <input value=@MonthSheet.Earned
-                               type="number"
+                        <input value=@MonthSheet.Earned.ToString()
+                               type="text"
                                disabled=@true>
                     </div>
                     <div class="col">
                         <label>Total Spent</label>
-                        <input value=@MonthSheet.TotalSpent
-                               type="number"
-                               disabled=@true>
-                    </div>
-                    <div class="col">
-                        <label>Balance</label>
-                        <input value=@MonthSheet.Balance
-                               type="number"
+                        <input value=@MonthSheet.TotalSpent.ToString()
+                               type="text"
                                disabled=@true>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
         <div class="col-6 offset-md-1">
             <HeaderComponent Title="Earnings">
                 <RightContent>
-                    <ExportButton Data=@MonthSheet.Earnings />
+                    @* <ExportButton Data=@MonthSheet.Earnings /> *@
                 </RightContent>
             </HeaderComponent>
             <AutoTableComponent DataSource=@MonthSheet.Earnings
@@ -138,7 +138,7 @@
         <HeaderComponent Title=@cat.Name
                          TitleFontSize="fs-4">
             <RightContent>
-                <ExportButton Data=@cat.Expenses />
+                @* <ExportButton Data=@cat.Expenses /> *@
             </RightContent>
         </HeaderComponent>
         <AutoTableComponent DataSource=@cat.Expenses

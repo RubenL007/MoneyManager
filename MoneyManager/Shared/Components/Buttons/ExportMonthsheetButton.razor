@@ -1,0 +1,172 @@
+﻿@namespace MoneyManager.Shared.Components
+
+@using ClosedXML.Excel
+@using System.Text
+@using MoneyManager.Data.Models
+
+@inject IJSRuntime js
+
+<ButtonComponent OnClick=@GenerateDocumentAsync
+                 ButtonType=@ButtonTypeEnum.Export
+                 DisplayName="Export To Excel"/>
+
+@code {
+    #region Parameters
+    [Parameter] public List<MonthSheetModel> Data { get; set; } = new();
+    #endregion
+
+    #region Properties
+    private int ListLevel = 0;
+    private int row = 1;
+    private string ExcelBookName = "Month Sheets";
+    private string FileName => Data.Count == 1 ? $"Month Sheet {(Data.OrderBy(x => x.Date).First().Date.ToString("Y"))}.xlsx"
+                                      : $"Month Sheets - {(Data.OrderBy(x => x.Date).First().Date.ToString("Y"))} - {(Data.OrderBy(x => x.Date).Last().Date.ToString("Y"))}.xlsx";
+    #endregion
+
+    #region Task GenerateDocumentAsync()
+    public async Task GenerateDocumentAsync()
+    {
+        var XLSStream = FillingDocument(Data);
+        await js.InvokeVoidAsync("BlazorDownloadFile", FileName, XLSStream);
+    }
+    #endregion
+
+    #region byte[] FillingDocument(List<MonthSheetModel> data)
+    public byte[] FillingDocument(List<MonthSheetModel> data)
+    {
+        //DOCS https://closedxml.io/ClosedXML.Report/docs/en/Basic-concepts
+
+        var wb = new XLWorkbook();
+        #region Excel file properties
+        wb.Properties.Author = "the Author";
+        wb.Properties.Title = "the Title";
+        wb.Properties.Subject = "the Subject";
+        wb.Properties.Category = "the Category";
+        wb.Properties.Keywords = "the Keywords";
+        wb.Properties.Comments = "the Comments";
+        wb.Properties.Status = "the Status";
+        wb.Properties.LastModifiedBy = "the Last Modified By";
+        wb.Properties.Company = "the Company";
+        wb.Properties.Manager = "the Manager";
+        #endregion
+
+        IXLWorksheet ws = wb.Worksheets.Add(ExcelBookName);
+        int row = 1;
+        int col = 1;
+
+        #region Table Header
+        ws.Cell(row, col++).SetValue("Date").Style.Font.SetBold();
+        ws.Cell(row, col++).SetValue("Balance").Style.Font.SetBold();
+        ws.Cell(row, col++).SetValue("Earned").Style.Font.SetBold();
+        ws.Cell(row, col++).SetValue("Total Spent").Style.Font.SetBold();
+        ws.Cell(row, col++).SetValue("Estimated Balance").Style.Font.SetBold();
+        ws.Cell(row, col++).SetValue("Estimated Earned").Style.Font.SetBold();
+        ws.Cell(row, col++).SetValue("Estimated Spent").Style.Font.SetBold();
+        row++;
+        #endregion
+
+        if (data.Any())
+        {
+            foreach (MonthSheetModel monthsheet in data.OrderBy(x => x.Date))
+            {
+                col = 1;
+                #region Basic Fields
+                ws.Cell(row, col++).Value = monthsheet.Date.ToString("Y");
+                ws.Cell(row, col++).SetValue(monthsheet.Earned).Style.NumberFormat.SetFormat("#,##0.00 €");
+                ws.Cell(row, col++).SetValue(monthsheet.Balance).Style.NumberFormat.SetFormat("#,##0.00 €");
+                ws.Cell(row, col++).SetValue(monthsheet.TotalSpent).Style.NumberFormat.SetFormat("#,##0.00 €");
+                ws.Cell(row, col++).SetValue(monthsheet.EstimatedBalance).Style.NumberFormat.SetFormat("#,##0.00 €");
+                ws.Cell(row, col++).SetValue(monthsheet.EstimatedEarned).Style.NumberFormat.SetFormat("#,##0.00 €");
+                ws.Cell(row, col++).SetValue(monthsheet.EstimatedSpent).Style.NumberFormat.SetFormat("#,##0.00 €");
+                #endregion
+
+                #region Earnings
+                col = 2;
+                row++;
+                ws.Cell(row, col).SetValue("Earnings").Style.Font.SetBold();
+                col = 3;
+                row++;
+                ws.Cell(row, col++).SetValue("Name").Style.Font.SetBold();
+                ws.Cell(row, col++).SetValue("Value").Style.Font.SetBold();
+                ws.Cell(row, col++).SetValue("Account").Style.Font.SetBold();
+                ws.Cell(row, col++).SetValue("Date").Style.Font.SetBold();
+                row++;
+                if (monthsheet.Earnings.Any())
+                {
+                    foreach (var earning in monthsheet.Earnings.OrderBy(e => e.Date))
+                    {
+                        col = 3;
+                        ws.Cell(row, col++).Value = earning.Name;
+                        ws.Cell(row, col++).SetValue(earning.Value).Style.NumberFormat.SetFormat("#,##0.00 €");
+                        ws.Cell(row, col++).Value = earning.Account.Name;
+                        ws.Cell(row, col++).SetValue(earning.Date).Style.DateFormat.SetFormat("dd-MMM");
+                        row++;
+                    }
+                }
+                else
+                {
+                    ws.Cell(row, 2).Value = "No Earnings to show.";
+                    row++;
+                }
+                #endregion
+
+                #region Categories
+                col = 2;
+                ws.Cell(row++, col).SetValue("Categories").Style.Font.SetBold();
+                if (monthsheet.Categories.Any())
+                {
+                    foreach (var category in monthsheet.Categories.OrderBy(c => c.Name))
+                    {
+                        ws.Cell(row, col++).Value = category.Name;
+                        row++;
+
+                        col = 3;
+                        ws.Cell(row, col++).SetValue("Name").Style.Font.SetBold();
+                        ws.Cell(row, col++).SetValue("Spent").Style.Font.SetBold();
+                        ws.Cell(row, col++).SetValue("Seller").Style.Font.SetBold();
+                        ws.Cell(row, col++).SetValue("Account").Style.Font.SetBold();
+                        ws.Cell(row, col++).SetValue("Expense Date").Style.Font.SetBold();
+
+                        if (category.Expenses.Any())
+                        {
+                            foreach (var expense in category.Expenses.OrderBy(e => e.BuyDate))
+                            {
+                                row++;
+                                col = 3;
+                                ws.Cell(row, col++).Value = expense.Name;
+                                ws.Cell(row, col++).SetValue(expense.Spent).Style.NumberFormat.SetFormat("#,##0.00 €");
+                                ws.Cell(row, col++).Value = expense.Seller.Name;
+                                ws.Cell(row, col++).Value = expense.Account.Name;
+                                ws.Cell(row, col++).SetValue(expense.BuyDate).Style.DateFormat.SetFormat("dd-MMM");
+                            }
+                            col = 2;
+                            row++;
+                        }
+                        else
+                        {
+                            row++;
+                            ws.Cell(row++, 3).Value = $"Without '{category.Name}' Expenses to show.";
+                            col = 2;
+                        }
+                    }
+                }
+                else
+                {
+                    ws.Cell(row, col).Value = "No Categories to show.";
+                }
+                #endregion
+                row++;
+            }
+        }
+        else
+        {
+            ws.Cell(2, 1).Value = "There is no exported records to show.";
+        }
+
+        MemoryStream XLSStream = new();
+        wb.SaveAs(XLSStream);
+
+        return XLSStream.ToArray();
+    }
+    #endregion
+}

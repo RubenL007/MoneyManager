@@ -116,7 +116,7 @@
             <div class="row d-flex align-items-center">
                 <div class="col-auto">
                     <InputSelectComponent @bind-SelectedItem=@NewCategory
-                                          TValue=CategoryBaseModel
+                                          TValue=CategoryModel
                                           Items=@Categories
                                           ViewMode=@ViewMode />
                 </div>
@@ -190,10 +190,10 @@ else
 
     #region Properties
     public MonthSheetModel MonthSheet = null!;
-    public List<CategoryBaseModel> Categories = null!;
+    public List<CategoryModel> Categories = null!;
     public List<SellerModel> Sellers = null!;
     public List<AccountModel> Accounts = null!;
-    public CategoryBaseModel NewCategory = new();
+    public CategoryModel NewCategory = new();
 
     public List<DonutChartDataModel> DonutEarnedData = new();
     public List<DonutChartDataModel> DonutSpentData = new();
@@ -229,8 +229,8 @@ else
     }
     #endregion
 
-    #region AddNewCategory(CategoryBaseModel categoryToAdd)
-    private void AddNewCategory(CategoryBaseModel categoryToAdd)
+    #region AddNewCategory(CategoryModel categoryToAdd)
+    private void AddNewCategory(CategoryModel categoryToAdd)
     {
         CategoryModel categoryParsed = new()
             {

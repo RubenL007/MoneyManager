@@ -15,7 +15,7 @@
 </DefaultHeaderComponent>
 
 <AutoTableComponent DataSource=@Categories
-                    TItem=CategoryBaseModel
+                    TItem=CategoryModel
                     ViewMode=@ViewMode
                     IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
                     DeleteRowMethod=@(row => DeleteCategory(row))>
@@ -36,8 +36,8 @@
 
 @code {
     #region Properties
-    CategoryBaseModel Category = new();
-    List<CategoryBaseModel> Categories = new();
+    CategoryModel Category = new();
+    List<CategoryModel> Categories = new();
     ViewModeEnum ViewMode = ViewModeEnum.View;
     #endregion
 
@@ -84,8 +84,8 @@
     }
     #endregion
 
-    #region Task DeleteCategory(CategoryBaseModel category)
-    private async Task DeleteCategory(CategoryBaseModel category)
+    #region Task DeleteCategory(CategoryModel category)
+    private async Task DeleteCategory(CategoryModel category)
     {
         categoryService.DeleteCategory(category.Id);
         await SearchCategories();

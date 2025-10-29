@@ -9,19 +9,19 @@ namespace MoneyManager.Data.Services
 {
     public class CategoryService : ICategory
     {
-        private readonly IMongoCollection<CategoryBaseModel> _categoriesCollection;
+        private readonly IMongoCollection<CategoryModel> _categoriesCollection;
         private readonly IUserAuthentication _userAuthentication;
 
         public CategoryService(IMongoClient mongoClient, IOptions<MongoDbSettings> settings, IUserAuthentication userAuthentication)
         {
             var database = mongoClient.GetDatabase(settings.Value.DatabaseName);
-            _categoriesCollection = database.GetCollection<CategoryBaseModel>("Categories");
+            _categoriesCollection = database.GetCollection<CategoryModel>("Categories");
 
             _userAuthentication = userAuthentication;
         }
 
-        #region CreateCategory(CategoryBaseModel category)
-        public string CreateCategory(CategoryBaseModel category)
+        #region CreateCategory(CategoryModel category)
+        public string CreateCategory(CategoryModel category)
         {
             string? userId = _userAuthentication.GetCurrentUserId();
 
@@ -40,8 +40,8 @@ namespace MoneyManager.Data.Services
         }
         #endregion
 
-        #region UpdateCategory(CategoryBaseModel category)
-        public string UpdateCategory(CategoryBaseModel category)
+        #region UpdateCategory(CategoryModel category)
+        public string UpdateCategory(CategoryModel category)
         {
             string? userId = _userAuthentication.GetCurrentUserId();
 
@@ -59,8 +59,8 @@ namespace MoneyManager.Data.Services
         }
         #endregion
 
-        #region CategoryBaseModel GetCategory(Guid id)
-        public CategoryBaseModel GetCategory(Guid id)
+        #region CategoryModel GetCategory(Guid id)
+        public CategoryModel GetCategory(Guid id)
         {
             string? userId = _userAuthentication.GetCurrentUserId();
 
@@ -69,13 +69,14 @@ namespace MoneyManager.Data.Services
         }
         #endregion
 
-        #region List<CategoryBaseModel> SearchCategories()
-        public List<CategoryBaseModel> SearchCategories()
+        #region List<CategoryModel> SearchCategories()
+        public List<CategoryModel> SearchCategories()
         {
             string? userId = _userAuthentication.GetCurrentUserId();
 
-            return _categoriesCollection.Find(c => c.UserId == userId)
+            var cenas =  _categoriesCollection.Find(c => c.UserId == userId)
                                         .ToList();
+            return cenas;
         }
         #endregion
 

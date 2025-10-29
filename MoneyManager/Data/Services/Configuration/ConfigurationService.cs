@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
-using MoneyManager.Data.Models;
-using MoneyManager.Shared;
+using MoneyManager.Data.Models.Configuration;
 using MoneyManager.Shared.UserAuthentication;
+using MoneyManager.Shared;
 using MongoDB.Driver;
-using IConfiguration = MoneyManager.Data.Interface.IConfiguration;
+using IConfiguration = MoneyManager.Data.Interface.Configuration.IConfiguration;
 
-namespace MoneyManager.Data.Services
+namespace MoneyManager.Data.Services.Configuration
 {
     public class ConfigurationService : IConfiguration
     {
@@ -42,11 +42,21 @@ namespace MoneyManager.Data.Services
         }
         #endregion
 
-        #region List<ConfigurationModel> SearchConfiguration()
-        public List<ConfigurationModel> SearchConfiguration()
+        #region ConfigurationModel GetConfiguration()
+        public ConfigurationModel GetConfiguration()
         {
             string? userId = _userAuthentication.GetCurrentUserId();
-            return _configurationsCollection.Find(a => a.UserId == userId).ToList();
+            var response = _configurationsCollection.Find(a => a.UserId == userId).FirstOrDefault();
+            if (response == null)
+            {
+                UpdateConfiguration(new());
+                response = _configurationsCollection.Find(a => a.UserId == userId).FirstOrDefault();
+                return response;
+            }
+            else
+            {
+                return response;
+            }
         }
         #endregion
     }

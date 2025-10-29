@@ -1,8 +1,8 @@
 ﻿using MoneyManager.Shared;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
 
-namespace MoneyManager.Data.Models
+namespace MoneyManager.Data.Models.Configuration
 {
     public class ConfigurationModel : Tenantable
     {
@@ -12,6 +12,6 @@ namespace MoneyManager.Data.Models
         public List<CategoryModel> DefaultCategories { get; set; } = new();
         public double DefaultEstimatedSpent { get; set; } = 0;
         public double DefaultEstimatedEarned { get; set; } = 0;
-        public double DefaultEstimatedBalance { get; set; } = 0;  
+        public double DefaultEstimatedBalance { get; set; } = 0;
     }
 }

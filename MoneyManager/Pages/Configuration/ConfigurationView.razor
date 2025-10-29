@@ -1,9 +1,12 @@
 ﻿@page "/Configuration"
+@using MoneyManager.Data.Interface
 @using MoneyManager.Data.Models
+@using MoneyManager.Data.Models.Configuration
 
-@inject MoneyManager.Data.Interface.IConfiguration configurationService
+@inject MoneyManager.Data.Interface.Configuration.IConfiguration configurationService
+@inject ICategory categoryService
 
-<EditForm Model=Configuration>
+<EditForm Model=@Configuration>
     <CardComponent>
         <DefaultHeaderComponent Title="Define default values to be defined on the creation of Month Sheets"
                                 EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
@@ -11,24 +14,29 @@
                                 ViewMode=@ViewMode />
         <div class="row">
             <div class="col">
+                @* falta suportar listas *@
                 <InputSelectComponent @bind-SelectedItem=@NewCategory
-                                      Items=@Configuration.DefaultCategories
+                                      Items=@Categories
                                       TValue=CategoryModel
-                                      DisplayName="Categories" />
+                                      DisplayName="Categories"
+                                      ViewMode=@ViewMode/>
             </div>
         </div>
         <div class="row">
             <div class="col-4">
                 <InputNumberComponent @bind-Value=@Configuration.DefaultEstimatedEarned
-                                      DisplayName="Estimated Earned" />
+                                      DisplayName="Estimated Earned"
+                                      ViewMode=@ViewMode />
             </div>
             <div class="col-4">
                 <InputNumberComponent @bind-Value=@Configuration.DefaultEstimatedSpent
-                                      DisplayName="Estimated Spent" />
+                                      DisplayName="Estimated Spent"
+                                      ViewMode=@ViewMode />
             </div>
             <div class="col-4">
                 <InputNumberComponent @bind-Value=@Configuration.DefaultEstimatedBalance
-                                      DisplayName="Estimated Balance" />
+                                      DisplayName="Estimated Balance"
+                                      ViewMode=@ViewMode />
             </div>
         </div>
     </CardComponent>
@@ -36,9 +44,9 @@
 
 
 @code {
-    //mising categories request
     #region Properties
-    public ConfigurationModel? Configuration { get; set; } = null!;
+    public ConfigurationModel Configuration { get; set; } = new();
+    public List<CategoryModel> Categories = new();
     public CategoryModel NewCategory = new();
     ViewModeEnum ViewMode = ViewModeEnum.View;
     #endregion
@@ -46,15 +54,16 @@
     #region Task OnInitializedAsync()
     protected override async Task OnInitializedAsync()
     {
-        await SearchConfiguration();
+        await GetConfiguration();
+        await SearchCategories();
         await base.OnInitializedAsync();
     }
     #endregion
 
-    #region Task SearchConfiguration()
-    private async Task SearchConfiguration()
+    #region Task GetConfiguration()
+    private async Task GetConfiguration()
     {
-        Configuration = configurationService.SearchConfiguration().FirstOrDefault();
+        Configuration = configurationService.GetConfiguration();
         StateHasChanged();
         await Task.CompletedTask;
     }
@@ -66,7 +75,25 @@
         if (Configuration != null)
         {
             configurationService.UpdateConfiguration(Configuration);
-            await SearchConfiguration();
+            await GetConfiguration();
+        }
+        await Task.CompletedTask;
+    }
+    #endregion
+
+
+    #region Task SearchCategories()
+    private async Task SearchCategories()
+    {
+        List<CategoryModel> categoriesBase = categoryService.SearchCategories();
+        Categories.Clear();
+        foreach (var catBase in categoriesBase)
+        {
+            Categories.Add(new()
+                {
+                    Id = catBase.Id,
+                    Name = catBase.Name,
+                });
         }
         await Task.CompletedTask;
     }

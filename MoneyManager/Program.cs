@@ -4,11 +4,12 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using MoneyManager.Data.Interface;
 using MoneyManager.Data.Services;
+using MoneyManager.Data.Services.Configuration;
 using MoneyManager.Shared;
 using MoneyManager.Shared.UserAuthentication;
 using MongoDB.Driver;
 using Radzen;
-using IConfiguration = MoneyManager.Data.Interface.IConfiguration;
+using IConfiguration = MoneyManager.Data.Interface.Configuration.IConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
 

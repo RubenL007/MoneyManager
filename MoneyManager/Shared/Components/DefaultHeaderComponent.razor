@@ -1,6 +1,7 @@
 ﻿@namespace MoneyManager.Shared.Components
 
-<HeaderComponent Title=@Title>
+<HeaderComponent Title=@Title
+                 SubTitle=@SubTitle>
     <LeftContent>
         @if (ViewMode == ViewModeEnum.View)
         {
@@ -36,6 +37,7 @@
 
 @code {
     [Parameter] public string Title { get; set; } = null!;
+    [Parameter] public string SubTitle { get; set; } = null!;
 
     [Parameter] public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.View;
 

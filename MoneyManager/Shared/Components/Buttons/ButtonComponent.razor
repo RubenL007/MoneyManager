@@ -8,14 +8,23 @@
         title=@Tooltip>
     @if (!string.IsNullOrWhiteSpace(IconClass))
     {
-        <span class=@(IconClass + $"{(string.IsNullOrWhiteSpace(DisplayName) ? string.Empty : " pe-2")}") aria-hidden="true" />
+        <span class=@(IconClass + $"{(string.IsNullOrWhiteSpace(DisplayName) || NoDisplayName ? string.Empty : " pe-2")}") aria-hidden="true" />
     }
-    <span>@DisplayName</span>
+    @if (!NoDisplayName)
+    {
+        <span>@DisplayName</span>
+    }
 </button>
 
 @code {
     [Parameter]
     public string DisplayName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// For when used with a type, but doesnt need DisplayName
+    /// </summary>
+    [Parameter]
+    public bool NoDisplayName { get; set; } = false;
 
     [Parameter]
     public string Tooltip { get; set; } = string.Empty;

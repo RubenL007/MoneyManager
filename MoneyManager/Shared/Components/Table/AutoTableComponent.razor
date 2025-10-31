@@ -124,7 +124,9 @@
                         <td class="td-delete">
                             <ButtonComponent OnClick=@(x => DeleteRowMethod.InvokeAsync(item))
                                              ButtonType=@ButtonTypeEnum.Delete
-                                             IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false) />
+                                             IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false)
+                                             NoDisplayName=true
+                                             Tooltip="Delete this row"/>
                         </td>
                     }
                 </tr>

@@ -3,8 +3,10 @@ using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using MoneyManager.Data.Interface;
+using MoneyManager.Data.Interface.Investments;
 using MoneyManager.Data.Services;
 using MoneyManager.Data.Services.Configuration;
+using MoneyManager.Data.Services.Investments;
 using MoneyManager.Shared;
 using MoneyManager.Shared.UserAuthentication;
 using MongoDB.Driver;
@@ -42,6 +44,7 @@ builder.Services.AddScoped<ISeller, SellerService>();
 builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IConfiguration, ConfigurationService>();
 builder.Services.AddScoped<IBalance, BalanceService>();
+builder.Services.AddScoped<IInvestment, InvestmentService>();
 builder.Services.AddScoped<IUserAuthentication, UserAuthenticationService>();
 
 builder.Services.AddScoped<TooltipService>();

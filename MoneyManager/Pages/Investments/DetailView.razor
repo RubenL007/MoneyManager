@@ -1,0 +1,175 @@
+﻿@page "/Investments/{InvestmentName}/{InvestmentId:guid}"
+
+@using MoneyManager.Data.Interface
+@using MoneyManager.Data.Interface.Investments
+@using MoneyManager.Data.Models
+@using MoneyManager.Data.Models.Investment
+@using MoneyManager.Data.Models.Investments
+
+@inject IInvestment investmentService
+@inject IAccount accountService
+@inject NavigationManager navigationManager
+
+<DefaultHeaderComponent Title="@Investment.Name"
+                        ViewMode=@ViewMode
+                        EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
+                        SaveOnClick=@(x => UpdateInvestment())
+                        DeleteOnClick=@(x => DeleteInvestment())>
+    <ExtraRightContent>
+        <AutoExportButton Data=@Investment.Transactions />
+    </ExtraRightContent>
+</DefaultHeaderComponent>
+
+@if (ViewMode == ViewModeEnum.Edit)
+{
+    <EditForm Model=@Investment>
+        <InputText @bind-Value=@Investment.Name
+                   DisplayName="Investment Name" />
+    </EditForm>
+}
+
+<CardComponent>
+    <EditForm Model=@Investment>
+        <div class="row">
+            <div class="col">
+                <InputSelectComponent @bind-SelectedItem=@Investment.Account
+                                      Items=@Accounts
+                                      ViewMode=@ViewMode
+                                      DisplayName="Account" />
+            </div>
+            <div class="col">
+                <InputSelectEnumComponent @bind-SelectedItem=@Investment.InvestmentType
+                                          ViewMode=@ViewMode
+                                          DisplayName="Investment Type" />
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col">
+                <label>Transactions Made</label>
+                <input value=@Investment.Transactions.Count.ToString()
+                       type="text"
+                       disabled=@true>
+            </div>
+            <div class="col">
+                <label>Total Tax Paid</label>
+                <input value=@Investment.TotalTaxPayed.ToString()
+                       type="text"
+                       disabled=@true>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>Current Balance</label>
+                <input value=@Investment.CurrentBalance.ToString()
+                       type="text"
+                       disabled=@true>
+            </div>
+            <div class="col">
+                <label>Total Invested</label>
+                <input value=@Investment.TotalInvested.ToString()
+                       type="text"
+                       disabled=@true>
+            </div>
+            <div class="col">
+                <label>Total Sold</label>
+                <input value=@Investment.TotalSold.ToString()
+                       type="text"
+                       disabled=@true>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Current Units Balance</label>
+                    <input value=@Investment.CurrentUnitsBalance.ToString()
+                           type="text"
+                           disabled=@true>
+                </div>
+                <div class="col">
+                    <label>Total Units Bought</label>
+                    <input value=@Investment.TotalUnitsBought.ToString()
+                           type="text"
+                           disabled=@true>
+                </div>
+                <div class="col">
+                    <label>Total Units Sold</label>
+                    <input value=@Investment.TotalUnitsSold.ToString()
+                           type="text"
+                           disabled=@true>
+                </div>
+            </div>
+        </div>
+
+    </EditForm>
+</CardComponent>
+
+<AutoTableComponent DataSource=@Investment.Transactions
+                    TItem=TransactionModel
+                    ViewMode=@ViewMode
+                    IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
+                    DeleteRowMethod=@(row => Investment.Transactions.RemoveAll(x => x.Id == row.Id))
+                    AddNewMethod=@(() => Investment.Transactions.Add(new()))
+                    CustomTableHeadNames=@(new List<FieldNameConvertedModel>
+                                        {
+                                        new() { FieldName = nameof(TransactionModel.TransactionID), Label = "Transaction ID" },
+                                        new() { FieldName = nameof(TransactionModel.IsBuyOperation), Label = "Bought Operation" },
+                                        })>
+</AutoTableComponent>
+
+@code {
+    #region Parameters
+    [Parameter] public string? InvestmentName { get; set; }
+    [Parameter] public Guid InvestmentId { get; set; }
+    #endregion
+
+    #region Properties
+    public InvestmentModel Investment = null!;
+    public List<AccountModel> Accounts = new();
+    ViewModeEnum ViewMode = ViewModeEnum.View;
+    #endregion
+
+    #region GetUri(string investmentName, Guid investmentId)
+    public static string GetUri(string investmentName, Guid investmentId)
+    {
+        return $"/Investments/{investmentName}/{investmentId}";
+    }
+    #endregion
+
+    #region Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        await GetDataAsync(InvestmentId);
+        await base.OnInitializedAsync();
+    }
+    #endregion
+
+    #region Investment
+    #region Task GetDataAsync()
+    private async Task GetDataAsync(Guid investmentId)
+    {
+        Investment = investmentService.GetInvestment(investmentId);
+        Accounts = accountService.SearchAccounts();
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task UpdateInvestment()
+    private async Task UpdateInvestment()
+    {
+        investmentService.UpdateInvestment(Investment);
+        await GetDataAsync(Investment.Id);
+        ViewMode = ViewModeEnum.View;
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task DeleteInvestment(InvestmentModel investment)
+    private async Task DeleteInvestment()
+    {
+        investmentService.DeleteInvestment(Investment.Id);
+        navigationManager.NavigateTo("/Investments");
+        await Task.CompletedTask;
+    }
+    #endregion
+    #endregion
+}

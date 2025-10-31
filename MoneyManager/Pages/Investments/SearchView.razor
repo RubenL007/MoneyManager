@@ -1,0 +1,76 @@
+﻿@page "/Investments"
+
+@using MoneyManager.Data.Interface.Investments
+@using MoneyManager.Data.Models.Investments 
+
+@inject IInvestment investmentService
+@inject NavigationManager navigationManager
+
+<DefaultHeaderComponent Title="Investments">
+    <ExtraRightContent>
+        <AutoExportButton Data=@Investments />
+    </ExtraRightContent>
+</DefaultHeaderComponent>
+
+<AutoTableComponent DataSource=@Investments
+                    TItem=InvestmentModel 
+                    OpenDetail=@((investment) => OpenDetail(investment))>
+    <FooterTools>
+        <EditForm Model=@NewInvestment>
+            <div class="row d-flex align-items-center">
+                <div class="col-2">
+                    <InputText @bind-Value=@NewInvestment.Name />
+                </div>
+                <div class="col">
+                    <ButtonComponent OnClick=@(x => CreateInvestment())
+                                     ButtonType=@ButtonTypeEnum.Add />
+                </div>
+            </div>
+        </EditForm>
+    </FooterTools>
+</AutoTableComponent>
+
+@code {
+    #region Properties
+    InvestmentModel NewInvestment = new();
+    List<InvestmentModel> Investments = new();
+    ViewModeEnum ViewMode = ViewModeEnum.View;
+    #endregion
+
+    #region Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        await SearchInvestments();
+        await base.OnInitializedAsync();
+    }
+    #endregion
+
+    #region Task SearchInvestments()
+    private async Task SearchInvestments()
+    {
+        Investments = investmentService.SearchInvestments();
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task CreateInvestment()
+    private async Task CreateInvestment()
+    {
+        if (!string.IsNullOrWhiteSpace(NewInvestment.Name))
+        {
+            investmentService.CreateInvestment(NewInvestment);
+            NewInvestment = new();
+            await SearchInvestments();
+        }
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region OpenDetail(InvestmentModel investment)
+    private void OpenDetail(InvestmentModel investment)
+    {
+        navigationManager.NavigateTo(DetailView.GetUri(investment.Name, investment.Id));
+    }
+    #endregion
+}

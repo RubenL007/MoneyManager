@@ -1,0 +1,57 @@
+﻿@namespace MoneyManager.Shared.Components
+@typeparam TValue
+
+@if (!string.IsNullOrWhiteSpace(DisplayName))
+{
+    <label>@DisplayName</label>
+}
+
+<select @onchange=@ChangeSelectedItem
+        id=@Id
+        disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)>
+
+    @if (IsNullableEnum)
+    {
+        <option value=""></option>
+    }
+    @foreach (var value in Enum.GetValues(EnumType))
+    {
+        <option value=@value selected=@(value.Equals(SelectedItem)) >
+            @value
+        </option>
+    }
+</select>
+
+
+@code {
+    #region Parameters
+    [Parameter] public TValue SelectedItem { get; set; } = default!;
+    [Parameter] public EventCallback<TValue> SelectedItemChanged { get; set; }
+    [Parameter] public string DisplayName { get; set; } = string.Empty;
+    [Parameter] public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.View;
+    #endregion
+
+    #region Internal Properties
+    private string Id = Guid.NewGuid().ToString();
+
+    private Type EnumType => Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
+    private bool IsNullableEnum => Nullable.GetUnderlyingType(typeof(TValue)) != null;
+    #endregion
+
+    #region Task ChangeSelectedItem(ChangeEventArgs e)
+    private async Task ChangeSelectedItem(ChangeEventArgs e)
+    {
+        if (string.IsNullOrEmpty(e.Value?.ToString()))
+        {
+            SelectedItem = default!;
+        }
+        else
+        {
+            var parsedValue = Enum.Parse(EnumType, e.Value!.ToString()!);
+            SelectedItem = (TValue)parsedValue;
+        }
+
+        await SelectedItemChanged.InvokeAsync(SelectedItem);
+    }
+    #endregion
+}

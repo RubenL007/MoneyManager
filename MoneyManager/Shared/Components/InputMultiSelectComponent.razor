@@ -1,0 +1,128 @@
+﻿@namespace MoneyManager.Shared.Components
+@typeparam TItem
+
+<div class=@($"multiselect-dropdown{(ViewMode == ViewModeEnum.View ? " disabled" : string.Empty)}")>
+    @if (!string.IsNullOrWhiteSpace(DisplayName))
+    {
+        <label>@DisplayName</label>
+    }
+
+    <div class="dropdown-header" @onclick=@ToggleDropdown>
+        @if (SelectedItems?.Any() == true)
+        {
+            <span class="text-truncate" title=@SelectedItemsText>
+                @SelectedItemsText
+            </span>
+        }
+        else
+        {
+            <span></span>
+        }
+        <span class=@((IsOpen ? "oi oi-caret-top" : "oi oi-caret-bottom"))></span>
+    </div>
+
+    @if (IsOpen)
+    {
+        <div class="dropdown-list">
+            <div class="dropdown-item select-all" @onclick=@(() => SelectDeselectAll())>
+                <input value=@SelectAll
+                       checked=@SelectAll
+                       type="checkbox" />
+            <span>Select All</span>
+        </div>
+        @foreach (var item in Items)
+        {
+            if (item != null)
+            {
+                var id = item.GetType().GetProperty("Id")?.GetValue(item, null)?.ToString() ?? string.Empty;
+                var name = item.GetType().GetProperty("Name")?.GetValue(item, null)?.ToString() ?? string.Empty;
+                bool selected = SelectedItems != null ? SelectedItems.Any(x => x?.GetType().GetProperty("Id")?.GetValue(x, null)?.ToString() == id)
+                : false;
+
+                <div class="dropdown-item" @onclick=@(() => ToggleItem(item))>
+
+                    <InputCheckBoxComponent @bind-Value=@selected ViewMode=@ViewMode />
+
+                    <span class="text-truncate" title=@name>
+                        @name
+                    </span>
+                </div>
+            }
+        }
+    </div>
+    }
+</div>
+
+@code {
+
+    #region Parameters
+    [Parameter] public string DisplayName { get; set; } = string.Empty;
+    [Parameter] public List<TItem> Items { get; set; } = new();
+    [Parameter] public List<TItem> SelectedItems { get; set; } = new();
+    [Parameter] public EventCallback<List<TItem>> SelectedItemsChanged { get; set; }
+    [Parameter] public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.View;
+    #endregion
+
+    #region Properties
+    private string Id = Guid.NewGuid().ToString();
+    private string SelectedItemsText => string.Join(", ", SelectedItems.Select(i => i?.GetType().GetProperty("Name")?.GetValue(i, null)?.ToString()));
+    private bool IsOpen;
+    private bool SelectAll => SelectedItems?.Count == Items.Count;
+    #endregion
+
+    #region Task OnParametersSetAsync()
+    protected override Task OnParametersSetAsync()
+    {
+        if (ViewMode == ViewModeEnum.View)
+        {
+            IsOpen = false;
+        }
+        return base.OnParametersSetAsync();
+    }
+    #endregion
+
+    #region ToggleDropdown()
+    private void ToggleDropdown()
+    {
+        if (ViewMode == ViewModeEnum.Edit)
+        {
+            IsOpen = !IsOpen;
+        }
+    }
+    #endregion
+
+    #region Task ToggleItem(TItem item)
+    private async Task ToggleItem(TItem? item)
+    {
+        var id = item!.GetType().GetProperty("Id")?.GetValue(item, null)?.ToString();
+        bool alreadySelected = SelectedItems.Any(x => x?.GetType().GetProperty("Id")?.GetValue(x, null)?.ToString() == id);
+
+        if (alreadySelected)
+        {
+            SelectedItems.RemoveAll(x => x?.GetType().GetProperty("Id")?.GetValue(x, null)?.ToString() == id);
+        }
+        else
+        {
+            SelectedItems.Add(item);
+        }
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+    }
+    #endregion
+
+    #region SelectDeselectAll()
+    private void SelectDeselectAll()
+    {
+        if (SelectedItems == null) return;
+        if (SelectedItems.Count == Items.Count)
+        {
+            SelectedItems.Clear();
+        }
+        else
+        {
+            SelectedItems.Clear();
+            SelectedItems.AddRange(Items);
+        }
+        StateHasChanged();
+    }
+    #endregion
+}

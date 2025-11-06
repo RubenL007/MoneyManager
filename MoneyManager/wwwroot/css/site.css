@@ -3,7 +3,6 @@
 /* Website where I grab the color shades and  using the #5ac397 color as main color https://m2.material.io/inline-tools/color/ */
 :root {
     --default-color: #e6e6e6;
-
     --primary-10: #fcfdfd;
     --primary-50: #e3f4ec;
     --primary-100: #bbe5d1;
@@ -61,6 +60,10 @@
     --btn-hovor-bottom-shadow-color: #e6e6e6;
     --btn-active-color: #333333;
     --btn-text-shadow: #cccccc;
+
+    /*inputs*/
+    --input-text-color: #424242;
+    --input-disabled-text-color: #6c757d;
 }
 
 html, body {
@@ -121,8 +124,7 @@ a, .btn-link {
         content: "An error has occurred."
     }
 
-
-input, select {
+input, select, .multiselect-dropdown .dropdown-header {
     width: 100%;
     padding: 6px 10px;
     margin: 4px;
@@ -131,13 +133,23 @@ input, select {
     min-height: 38px;
 }
 
-    input:disabled, select:disabled {
-        background-color: #FAFAFA;
-    }
+input:enabled:hover, select:enabled:hover, .multiselect-dropdown:not(.disabled) .dropdown-header:hover {
+    background: var(--primary-10);
+}
 
-    input[type="checkbox"] {
-        width: 20px;
-    }
+input:disabled, select:disabled, .multiselect-dropdown.disabled .dropdown-header {
+    background-color: #FAFAFA;
+    color: var(--input-disabled-text-color);
+}
+input, select, .multiselect-dropdown .dropdown-header {
+    color: var(--input-text-color);
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    accent-color: var(--primary-100);
+    cursor: pointer;
+}
 
 .card {
     background-color: var(--primary-10);

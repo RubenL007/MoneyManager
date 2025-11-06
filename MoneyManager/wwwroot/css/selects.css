@@ -1,0 +1,49 @@
+﻿select:enabled:hover, .multiselect-dropdown:not(.disabled) {
+    cursor: pointer;
+}
+
+.multiselect-dropdown {
+    position: relative;
+}
+
+    .multiselect-dropdown .dropdown-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .multiselect-dropdown .dropdown-list {
+        position: absolute;
+        z-index: 1000;
+        background: var(--primary-10);
+        border: 1px solid #cdcfd1;
+        border-radius: 4px;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .multiselect-dropdown .dropdown-item {
+        padding: 0;
+        padding-inline-start: 12px;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+    }
+
+.dropdown-item.active, .dropdown-item:active {
+    color: inherit !important;
+}
+
+.multiselect-dropdown .dropdown-item:hover,
+.multiselect-dropdown .dropdown-list .dropdown-item.select-all:hover {
+    background: var(--primary-50);
+}
+
+.multiselect-dropdown .dropdown-list .dropdown-item.select-all {
+    background: var(--primary-10);
+    position: sticky;
+    top: 0;
+}

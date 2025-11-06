@@ -12,6 +12,6 @@ namespace MoneyManager.Data.Models.Configuration
         public List<CategoryModel> DefaultCategories { get; set; } = new();
         public double DefaultEstimatedSpent { get; set; } = 0;
         public double DefaultEstimatedEarned { get; set; } = 0;
-        public double DefaultEstimatedBalance { get; set; } = 0;
+        public double DefaultEstimatedBalance => DefaultEstimatedEarned - DefaultEstimatedSpent;
     }
 }

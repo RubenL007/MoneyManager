@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
 using MoneyManager.Data.Interface;
 using MoneyManager.Data.Models;
+using MoneyManager.Data.Models.Configuration;
 using MoneyManager.Shared;
 using MoneyManager.Shared.UserAuthentication;
 using MongoDB.Driver;
+using IConfiguration = MoneyManager.Data.Interface.Configuration.IConfiguration;
 
 namespace MoneyManager.Data.Services
 {
@@ -11,13 +13,14 @@ namespace MoneyManager.Data.Services
     {
         private readonly IMongoCollection<MonthSheetModel> _monthsCollection;
         private readonly IUserAuthentication _userAuthentication;
+        private IConfiguration _configurationService;
 
-        public MonthSheetService(IMongoClient mongoClient, IOptions<MongoDbSettings> settings, IUserAuthentication userAuthentication)
+        public MonthSheetService(IMongoClient mongoClient, IOptions<MongoDbSettings> settings, IUserAuthentication userAuthentication, IConfiguration configurationService)
         {
             var database = mongoClient.GetDatabase(settings.Value.DatabaseName);
             _monthsCollection = database.GetCollection<MonthSheetModel>("MonthsSheets");
-
             _userAuthentication = userAuthentication;
+            _configurationService = configurationService;
         }
 
         #region CreateMonthSheet(MonthSheetModel monthSheet)
@@ -32,7 +35,12 @@ namespace MoneyManager.Data.Services
                                                             && m.Date.Month == monthSheet.Date.Month)).FirstOrDefault();
             if (monthSheetObj == null)
             {
+                ConfigurationModel configurationResponse = _configurationService.GetConfiguration();
+
                 monthSheet.UserId = userId!;
+                if (configurationResponse.DefaultCategories.Any()) monthSheet.Categories = configurationResponse.DefaultCategories;
+                monthSheet.EstimatedEarned = configurationResponse.DefaultEstimatedEarned;
+                monthSheet.EstimatedSpent = configurationResponse.DefaultEstimatedSpent;
                 _monthsCollection.InsertOne(monthSheet);
                 return "Month Sheet saved sucessfully.";
             }

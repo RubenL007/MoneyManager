@@ -1,18 +1,20 @@
 ﻿@namespace MoneyManager.Shared.Components
-@inherits InputDate<DateTime>
+@typeparam TItem
+@inherits InputDate<TItem>
 
 @if (!string.IsNullOrWhiteSpace(DisplayName))
 {
     <label>@DisplayName</label>
 }
 
-<input @bind=@CurrentValue
-       type="date"
+<input type="date"
+       value="@BindConverter.FormatValue(CurrentValueAsString)"
+       @onchange=@OnInputChanged
        disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)
-       min=@MinimumDate
-       max=@MaximumDate />
-
+       min="@MinimumDate"
+       max="@MaximumDate" />
 @code {
+    #region Parameters
     [Parameter]
     public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.View;
 
@@ -33,6 +35,7 @@
     /// </summary>
     [Parameter]
     public string MaximumDate { get; set; } = string.Empty;
+    #endregion
 
     #region void OnInitialized()
     protected override void OnInitialized()
@@ -53,11 +56,39 @@
 
             MinimumDate = $"{yearLimit}-{monthLimit}-01";
             MaximumDate = $"{yearLimit}-{monthLimit}-{lastDayOfTheMonth}";
-            if (Value == default)
+
+            if (Value == null || Value.Equals(default(TItem)))
             {
-                Value = new DateTime(int.Parse(yearLimit), int.Parse(monthLimit), DateTime.Today.Day);
+                // handle nullable and non-nullable generically
+                var today = new DateTime(LimitToThisDateMonth.Value.Year, LimitToThisDateMonth.Value.Month, DateTime.Today.Day);
+                if (typeof(TItem) == typeof(DateTime))
+                    Value = (TItem)(object)today;
+                else if (typeof(TItem) == typeof(DateTime?))
+                    Value = (TItem)(object)(DateTime?)today;
             }
         }
+    }
+    #endregion
+
+    #region Task OnInputChanged(ChangeEventArgs e)
+    private async Task OnInputChanged(ChangeEventArgs e)
+    {
+        var newValue = e.Value?.ToString();
+
+        if (string.IsNullOrWhiteSpace(newValue))
+        {
+            // Handle clearing
+            if (typeof(TItem) == typeof(DateTime?))
+                Value = (TItem)(object?)null!;
+            else if (typeof(TItem) == typeof(DateTime))
+                Value = default!;
+        }
+        else
+        {
+            CurrentValueAsString = newValue;
+        }
+
+        await ValueChanged.InvokeAsync(Value);
     }
     #endregion
 }

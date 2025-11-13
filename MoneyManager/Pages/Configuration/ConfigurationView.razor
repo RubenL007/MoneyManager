@@ -1,16 +1,21 @@
 ﻿@page "/Configuration"
 @using MoneyManager.Data.Interface
+@using MoneyManager.Data.Interface.Subscriptions
 @using MoneyManager.Data.Models
 @using MoneyManager.Data.Models.Configuration
+@using MoneyManager.Data.Models.Subscriptions
 
 @inject MoneyManager.Data.Interface.Configuration.IConfiguration configurationService
 @inject ICategory categoryService
+@inject ISubscription subscriptionService
+@inject IAccount accountService
+@inject ISeller sellerService
 
 <EditForm Model=@Configuration>
     <CardComponent>
         <DefaultHeaderComponent Title="Define the values that new Month Sheets will be created with"
                                 EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                                SaveOnClick=@(x => UpdateConfiguration())
+                                SaveOnClick=@(x => UpdateAllAsync())
                                 ViewMode=@ViewMode />
         <div class="row">
             <div class="col">
@@ -40,13 +45,40 @@
         </div>
     </CardComponent>
 </EditForm>
+ 
+<HeaderComponent Title="Subscriptions" />
 
+<AutoTableComponent DataSource=@Subscriptions.OrderBy(s => s.IsTerminated == true).ThenBy(s => s.Value).ToList()
+                    TItem=@SubscriptionModel
+                    IsEditableTable=@(ViewMode == ViewModeEnum.Edit)
+                    AddNewMethod=@(() => Subscriptions.Add(new()))
+                    IsDateInputLimitedToDate=false
+                    ViewMode=@ViewMode
+                    DataForSelects=@(new List<SelectOptionSet> 
+                        {
+                            new SelectOptionSet
+                            {
+                                PropertyName = nameof(SubscriptionModel.PaymentAccount),
+                                PropertyType = typeof(AccountModel),
+                                Options = Accounts.Cast<object>().ToList()
+                            },
+                            new SelectOptionSet
+                            {
+                                PropertyName = nameof(SubscriptionModel.Seller),
+                                PropertyType = typeof(SellerModel),
+                                Options = Sellers.Cast<object>().ToList()
+                            }
+                        }) />
 
 @code {
     #region Properties
     public ConfigurationModel Configuration { get; set; } = new();
+    public List<SubscriptionModel> Subscriptions { get; set; } = new();
+    public List<SubscriptionModel> SubscriptionsBackup { get; set; } = new();
     public List<CategoryModel> Categories = new();
     public CategoryModel NewCategory = new();
+    public List<AccountModel> Accounts = new();
+    public List<SellerModel> Sellers = new();
     ViewModeEnum ViewMode = ViewModeEnum.View;
     #endregion
 
@@ -55,10 +87,14 @@
     {
         await GetConfiguration();
         await SearchCategories();
+        await SearchSubscriptionsAsync();
+        await SearchAccounts();
+        await SearchSellers();
         await base.OnInitializedAsync();
     }
     #endregion
 
+    #region Configuration
     #region Task GetConfiguration()
     private async Task GetConfiguration()
     {
@@ -71,17 +107,12 @@
     #region Task UpdateConfiguration()
     private async Task UpdateConfiguration()
     {
-        if (Configuration != null)
-        {
-            configurationService.UpdateConfiguration(Configuration);
-            await GetConfiguration();
-            ViewMode = ViewModeEnum.View;
-
-        }
+        configurationService.UpdateConfiguration(Configuration);
+        await GetConfiguration();
+        ViewMode = ViewModeEnum.View;
         await Task.CompletedTask;
     }
     #endregion
-
 
     #region Task SearchCategories()
     private async Task SearchCategories()
@@ -97,6 +128,63 @@
             });
         }
         await Task.CompletedTask;
+    }
+    #endregion
+    #endregion
+
+    #region Subscriptions
+    #region Task SearchAccounts()
+    private async Task SearchAccounts()
+    {
+        Accounts = accountService.SearchAccounts();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task SearchSellers()
+    private async Task SearchSellers()
+    {
+        Sellers = sellerService.SearchSellers();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task SearchSubscriptionsAsync()
+    public async Task SearchSubscriptionsAsync()
+    {
+        Subscriptions = subscriptionService.SearchSubscriptions();
+        SubscriptionsBackup = Subscriptions.ToList();
+        await Task.CompletedTask;
+    }
+    #endregion
+
+    #region Task UpdateSubscriptions()
+    private async Task UpdateSubscriptions()
+    {
+        foreach (var sub in Subscriptions)
+        {
+            Console.WriteLine(sub.EndDate);
+            if (SubscriptionsBackup.Any(x => x.Id == sub.Id))
+            {
+                subscriptionService.UpdateSubscription(sub);
+            }
+            else
+            {
+                subscriptionService.CreateSubscription(sub);   
+            }
+        }
+        await SearchSubscriptionsAsync();
+        ViewMode = ViewModeEnum.View;
+        await Task.CompletedTask;
+    }
+    #endregion
+    #endregion
+
+    #region Task UpdateAllAsync()
+    public async Task UpdateAllAsync()
+    {
+        await UpdateConfiguration();
+        await UpdateSubscriptions();
     }
     #endregion
 }

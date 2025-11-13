@@ -76,7 +76,7 @@
                                 DeleteRowMethod=@(earning => MonthSheet.Earnings.Remove(earning))
                                 AddNewMethod=@(x=> MonthSheet.Earnings.Add(new()))
                                 IsEditableTable=true
-                                LimitDateInputsToThisMonth=@MonthSheet.Date
+                                LimitDateInputsToThisDate=@MonthSheet.Date
                                 OnValueChange=@(x=> StateHasChanged())
                                 DataForSelects=@(new List<SelectOptionSet> {
                                 new SelectOptionSet
@@ -147,7 +147,7 @@
                             DeleteRowMethod=@(expense => cat.Expenses.Remove(expense))
                             AddNewMethod=@(x => AddNewExpense(cat))
                             IsEditableTable=true
-                            LimitDateInputsToThisMonth=@MonthSheet.Date
+                            LimitDateInputsToThisDate=@MonthSheet.Date
                             OnValueChange=@(x=> StateHasChanged())
                             DataForSelects=@(new List<SelectOptionSet> {
                     new SelectOptionSet

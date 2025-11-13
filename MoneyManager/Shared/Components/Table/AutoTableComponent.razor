@@ -262,7 +262,9 @@
     public bool IsEditableTable { get; set; } = false;
 
     [Parameter]
-    public DateTime LimitDateInputsToThisMonth { get; set; } = DateTime.Now;
+    public DateTime LimitDateInputsToThisDate { get; set; } = DateTime.Now;
+    [Parameter]
+    public bool IsDateInputLimitedToDate { get; set; } = true;
 
     /// <summary>
     /// Defines the Viewmode of the table.

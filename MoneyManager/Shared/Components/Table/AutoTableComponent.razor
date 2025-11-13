@@ -99,6 +99,25 @@
                                           }) />
                                             break;
 
+                                        case object _ when typeof(System.Collections.IEnumerable).IsAssignableFrom(property.PropertyType)
+                                                           && property.PropertyType != typeof(string)
+                                                           && property.PropertyType.IsGenericType:
+                                            {
+                                                @foreach (var item in DataForSelects)
+                                                {
+                                                    <span>A: @item.PropertyName</span>
+                                                }
+                                                var innerType = property.PropertyType.GetGenericArguments().First();
+                                                if (DataForSelects.Any(x => x.PropertyType == innerType && x.PropertyName == property.Name))
+                                                {
+                                                    <InputMultiSelectComponent TItem="object"
+                                                                               @bind-SelectedItems="PropertyWrapperHelper.GetListWrapper(item!, property).Value"
+                                                                               Items="DataForSelects.First(x => x.PropertyType == innerType && x.PropertyName == property.Name).Options"
+                                                                               ViewMode="@ViewMode" />
+                                                }
+                                                break;
+                                            }
+
                                         case object _ when !propertyValue.GetType().IsPrimitive && propertyValue.GetType() != typeof(string):
                                             {
                                                 if (DataForSelects.Any() && DataForSelects.Any(x => x.PropertyType == property.PropertyType && x.PropertyName == property.Name))

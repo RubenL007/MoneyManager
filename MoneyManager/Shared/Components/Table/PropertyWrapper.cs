@@ -39,6 +39,10 @@ namespace MoneyManager.Shared.Components
         {
             return new PropertyWrapper<DateTime>(item, property);
         }
+        public static PropertyWrapper<DateTime?> GetDateTimeWrapperNullable(object item, PropertyInfo property)
+        {
+            return new PropertyWrapper<DateTime?>(item, property);
+        }   
         public static PropertyWrapper<object> GetObjectWrapper(object item, PropertyInfo property)
         {
             return new PropertyWrapper<object>(item, property);

@@ -47,14 +47,35 @@
                         {
                             var propertyValue = property.GetValue(item);
                             <td>
-                                <EditForm Model=propertyValue>
+                                <EditForm Model=property>
                                     @switch (propertyValue)
                                     {
                                         case DateTime data:
-                                            <InputDateComponent @bind-Value=@PropertyWrapperHelper.GetDateTimeWrapper(item!, property).Value
+                                            <InputDateComponent Value=@PropertyWrapperHelper.GetDateTimeWrapper(item!, property).Value
+                                                                ValueExpression=@(() => PropertyWrapperHelper.GetDateTimeWrapper(item!, property).Value)
                                                                 ViewMode=@ViewMode
-                                                                LimitToThisDateMonth=@LimitDateInputsToThisMonth />
+                                                                LimitToThisDateMonth=@(IsDateInputLimitedToDate? LimitDateInputsToThisDate : null) 
+                                                                ValueChanged=@(async (DateTime newValue) =>
+                                                                {
+                                                                  // To update and notify the parent view about the change
+                                                                    PropertyWrapperHelper.GetDateTimeWrapper(item!, property).Value = newValue;
+                                                                    await OnValueChange.InvokeAsync(null);
+                                                                }) />
                                             break;
+
+                                      @*   case null when property.PropertyType == typeof(DateTime?):
+                                            <InputDateComponent Value=@PropertyWrapperHelper.GetDateTimeWrapperNullable(item!, property).Value
+                                                                ValueExpression=@(() => PropertyWrapperHelper.GetDateTimeWrapperNullable(item!, property).Value)
+                                                                ViewMode=@ViewMode
+                                                                LimitToThisDateMonth=@(IsDateInputLimitedToDate? LimitDateInputsToThisDate : null)
+                                                                ValueChanged=@(async (DateTime? newValue) =>
+                                                                {
+                                                                  // To update and notify the parent view about the change
+                                                                    PropertyWrapperHelper.GetDateTimeWrapperNullable(item!, property).Value = newValue;
+                                                                    await OnValueChange.InvokeAsync(null);
+                                                                }) />
+
+                                            break; *@
 
                                         case string data:
                                             <InputTextComponent @bind-Value=@PropertyWrapperHelper.GetStringWrapper(item!, property).Value

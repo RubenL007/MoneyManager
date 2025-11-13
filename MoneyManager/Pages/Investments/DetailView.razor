@@ -15,21 +15,20 @@
                         EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
                         SaveOnClick=@(x => UpdateInvestment())
                         DeleteOnClick=@(x => DeleteInvestment())>
-    <ExtraRightContent>
-        <AutoExportButton Data=@Investment.Transactions />
-    </ExtraRightContent>
 </DefaultHeaderComponent>
-
-@if (ViewMode == ViewModeEnum.Edit)
-{
-    <EditForm Model=@Investment>
-        <InputText @bind-Value=@Investment.Name
-                   DisplayName="Investment Name" />
-    </EditForm>
-}
 
 <CardComponent>
     <EditForm Model=@Investment>
+        @if (ViewMode == ViewModeEnum.Edit)
+        {
+            <div class="row">
+                <div class="col">
+                    <InputTextComponent @bind-Value=@Investment.Name 
+                                        DisplayName="Investment Name"
+                                        ViewMode=@ViewMode />
+                </div>
+            </div>
+        }
         <div class="row">
             <div class="col">
                 <InputSelectComponent @bind-SelectedItem=@Investment.Account
@@ -44,7 +43,6 @@
             </div>
         </div>
         <div class="row">
-
             <div class="col">
                 <label>Transactions Made</label>
                 <input value=@Investment.Transactions.Count.ToString()
@@ -98,7 +96,6 @@
                 </div>
             </div>
         </div>
-
     </EditForm>
 </CardComponent>
 
@@ -112,7 +109,7 @@
                                         {
                                         new() { FieldName = nameof(TransactionModel.TransactionID), Label = "Transaction ID" },
                                         new() { FieldName = nameof(TransactionModel.IsBuyOperation), Label = "Bought Operation" },
-                                        })>
+                                        }) >
 </AutoTableComponent>
 
 @code {

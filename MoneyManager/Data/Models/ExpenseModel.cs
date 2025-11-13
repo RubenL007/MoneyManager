@@ -13,7 +13,7 @@ namespace MoneyManager.Data.Models
 
         public SellerModel Seller { get; set; } = new();
 
-        public DateTime BuyDate { get; set; } = DateTime.Today;
+        public DateTime? BuyDate { get; set; } = null!;
 
         public AccountModel Account { get; set; } = new();
 

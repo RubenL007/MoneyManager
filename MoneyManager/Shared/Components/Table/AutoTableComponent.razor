@@ -45,92 +45,84 @@
                     {
                         if (IsEditableTable && ViewMode == ViewModeEnum.Edit)
                         {
-                            var propertyValue = property.GetValue(item);
+                            var propType = property.PropertyType;
                             <td>
                                 <EditForm Model=property>
-                                    @switch (propertyValue)
+                                    @if (propType == typeof(DateTimeOffset))
                                     {
-                                        case DateTimeOffset data:
-                                            <InputDateComponent Value =@PropertyWrapperHelper.GetDateTimeOffsetWrapper(item!, property).Value
-                                                                ValueExpression=@(() => PropertyWrapperHelper.GetDateTimeOffsetWrapper(item!, property).Value)
-                                                                ViewMode=@ViewMode
-                                                                LimitToThisDateMonth=@(IsDateInputLimitedToDate? LimitDateInputsToThisDate : null) 
-                                                                ValueChanged=@(async (DateTimeOffset newValue) =>
-                                                                {
-                                                                  // To update and notify the parent view about the change
-                                                                    PropertyWrapperHelper.GetDateTimeOffsetWrapper(item!, property).Value = newValue;
-                                                                    await OnValueChange.InvokeAsync(null);
-                                                                }) />
-                                            break;
-
-                                        @*   case null when property.PropertyType == typeof(DateTimeOffset?):
-                                            <InputDateComponent Value=@PropertyWrapperHelper.GetDateTimeWrapperNullable(item!, property).Value
-                                                                ValueExpression=@(() => PropertyWrapperHelper.GetDateTimeOffsetWrapperNullable(item!, property).Value)
-                                                                ViewMode=@ViewMode
-                                                                LimitToThisDateMonth=@(IsDateInputLimitedToDate? LimitDateInputsToThisDate : null)
-                                                                ValueChanged=@(async (DateTimeOffset? newValue) =>
-                                                                {
-                                                                  // To update and notify the parent view about the change
-                                                                    PropertyWrapperHelper.GeDateTimeOffsetNullableWrapperNullable(item!, property).Value = newValue;
-                                                                    await OnValueChange.InvokeAsync(null);
-                                                                }) />
-
-                                            break; *@
-
-                                        case string data:
-                                            <InputTextComponent @bind-Value=@PropertyWrapperHelper.GetStringWrapper(item!, property).Value
-                                                                ViewMode=@ViewMode />
-                                            break;
-
-                                        case bool data:
-                                            <InputCheckBoxComponent @bind-Value=@PropertyWrapperHelper.GetBoolWrapper(item!, property).Value
-                                                                    ViewMode=@ViewMode />
-                                            break;
-
-                                        case double data:
-                                            <InputNumberComponent Value=@PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value
-                                                                  ValueExpression=@(() => PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value)
-                                                                  ViewMode=@ViewMode
-                                                                  ValueChanged=@(async (double newValue) =>
-                                          {
-                                          // To update and notify the parent view about the change
-                                          PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value = newValue;
-                                          await OnValueChange.InvokeAsync(null);
-                                          }) />
-                                            break;
-
-                                        case object _ when typeof(System.Collections.IEnumerable).IsAssignableFrom(property.PropertyType)
-                                                           && property.PropertyType != typeof(string)
-                                                           && property.PropertyType.IsGenericType:
-                                            {
-                                                @foreach (var item in DataForSelects)
-                                                {
-                                                    <span>A: @item.PropertyName</span>
-                                                }
-                                                var innerType = property.PropertyType.GetGenericArguments().First();
-                                                if (DataForSelects.Any(x => x.PropertyType == innerType && x.PropertyName == property.Name))
-                                                {
-                                                    <InputMultiSelectComponent TItem="object"
-                                                                               @bind-SelectedItems="PropertyWrapperHelper.GetListWrapper(item!, property).Value"
-                                                                               Items="DataForSelects.First(x => x.PropertyType == innerType && x.PropertyName == property.Name).Options"
-                                                                               ViewMode="@ViewMode" />
-                                                }
-                                                break;
-                                            }
-
-                                        case object _ when !propertyValue.GetType().IsPrimitive && propertyValue.GetType() != typeof(string):
-                                            {
-                                                if (DataForSelects.Any() && DataForSelects.Any(x => x.PropertyType == property.PropertyType && x.PropertyName == property.Name))
-                                                {
-                                                    <InputSelectComponent @bind-SelectedItem=@(PropertyWrapperHelper.GetObjectWrapper(item!, property).Value)
-                                                                          Items=@DataForSelects.First(x => x.PropertyType == property.PropertyType && x.PropertyName == property.Name).Options
-                                                                          ViewMode=@ViewMode />
-                                                }
-                                                break;
-                                            }
-                                        default:
-                                            @ShowValue(item, property)
-                                            break;
+                                        <InputDateComponent Value=@PropertyWrapperHelper.GetDateTimeOffsetWrapper(item!, property).Value
+                                                            ValueExpression=@(() => PropertyWrapperHelper.GetDateTimeOffsetWrapper(item!, property).Value)
+                                                            ViewMode=@ViewMode
+                                                            LimitToThisDateMonth=@(IsDateInputLimitedToDate? LimitDateInputsToThisDate : null)
+                                                            ValueChanged=@(async (DateTimeOffset newValue) =>
+                                                            {
+                                                                // To update and notify the parent view about the change
+                                                                PropertyWrapperHelper.GetDateTimeOffsetWrapper(item!, property).Value = newValue;
+                                                                await OnValueChange.InvokeAsync(null);
+                                                            }) />
+                                    }
+                                    else if (propType == typeof(DateTimeOffset?))
+                                    {
+                                        <InputDateComponent Value=@PropertyWrapperHelper.GetDateTimeOffsetWrapperNullable(item!, property).Value
+                                                            ValueExpression=@(() => PropertyWrapperHelper.GetDateTimeOffsetWrapperNullable(item!, property).Value)
+                                                            ViewMode=@ViewMode
+                                                            LimitToThisDateMonth=@(IsDateInputLimitedToDate? LimitDateInputsToThisDate : null)
+                                                            ValueChanged=@(async (DateTimeOffset? newValue) =>
+                                                            {
+                                                                // To update and notify the parent view about the change
+                                                                PropertyWrapperHelper.GetDateTimeOffsetWrapperNullable(item!, property).Value = newValue;
+                                                                await OnValueChange.InvokeAsync(null);
+                                                            }) />
+                                    }
+                                    else if (propType == typeof(string))
+                                    {
+                                        <InputTextComponent @bind-Value=@PropertyWrapperHelper.GetStringWrapper(item!, property).Value
+                                        ViewMode=@ViewMode />
+                                    }
+                                    else if (propType == typeof(bool))
+                                    {
+                                        <InputCheckBoxComponent @bind-Value=@PropertyWrapperHelper.GetBoolWrapper(item!, property).Value
+                                        ViewMode=@ViewMode />
+                                    }
+                                    else if (propType == typeof(double))
+                                    {
+                                        <InputNumberComponent Value=@PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value
+                                                              ValueExpression=@(() => PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value)
+                                                              ViewMode=@ViewMode
+                                                              ValueChanged=@(async (double newValue) =>
+                                                              {
+                                                                // To update and notify the parent view about the change
+                                                                  PropertyWrapperHelper.GetDoubleWrapper(item!, property).Value = newValue;
+                                                                  await OnValueChange.InvokeAsync(null);
+                                                              }) />
+                                    }
+                                    else if (typeof(System.Collections.IEnumerable).IsAssignableFrom(propType) && propType != typeof(string) && propType.IsGenericType)
+                                    {
+                                        @foreach (var item in DataForSelects)
+                                        {
+                                            <span>A: @item.PropertyName</span>
+                                        }
+                                        var innerType = property.PropertyType.GetGenericArguments().First();
+                                        if (DataForSelects.Any(x => x.PropertyType == innerType && x.PropertyName == property.Name))
+                                        {
+                                            <InputMultiSelectComponent TItem="object"
+                                                                       @bind-SelectedItems="PropertyWrapperHelper.GetListWrapper(item!, property).Value"
+                                                                       Items="DataForSelects.First(x => x.PropertyType == innerType && x.PropertyName == property.Name).Options"
+                                                                       ViewMode="@ViewMode" />
+                                        }
+                                    }
+                                    else if (propType.IsClass && propType != typeof(string))
+                                    {
+                                        if (DataForSelects.Any(x => x.PropertyType == propType && x.PropertyName == property.Name))
+                                        {
+                                            <InputSelectComponent @bind-SelectedItem=@(PropertyWrapperHelper.GetObjectWrapper(item!, property).Value)
+                                                                  Items=@DataForSelects.First(x => x.PropertyType == propType && x.PropertyName == property.Name).Options
+                                                                  ViewMode=@ViewMode />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @ShowValue(item, property)
                                     }
                                 </EditForm>
                             </td>

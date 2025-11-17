@@ -10,7 +10,9 @@ namespace MoneyManager.Data.Models
         [BsonGuidRepresentation(GuidRepresentation.Standard)]
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        public DateTime Date { get; set; } = DateTime.Now;
+        public DateTimeOffset Date { get; set; } = DateTime.Now;
+        //Because Radzen charts don't support DateTimeOffset, this way I can bind a property
+        public DateTime ChartDate => Date.DateTime;
 
         public List<CategoryModel> Categories { get; set; } = new();
 

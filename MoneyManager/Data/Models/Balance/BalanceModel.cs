@@ -9,7 +9,7 @@ namespace MoneyManager.Data.Models.Balance
         [BsonGuidRepresentation(GuidRepresentation.Standard)]
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        public DateTime Date { get; set; } = DateTime.Now;
+        public DateTimeOffset Date { get; set; } = DateTime.Now;
 
         public List<AccountModel> Accounts { get; set; } = new List<AccountModel>();
 

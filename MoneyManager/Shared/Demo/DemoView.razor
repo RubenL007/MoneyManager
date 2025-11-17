@@ -92,7 +92,7 @@
         #region Create MonthSheets
         monthSheet1 = new MonthSheetModel()
             {
-                Date = DateTime.Now.AddMonths(-3),
+                Date = DateTimeOffset.Now.AddMonths(-3),
                 Categories = new()
                 {
                    new CategoryModel()
@@ -103,7 +103,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[0],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Consulta de Rotina",
                                 Seller = Sellers[0],
                                 Spent = 70
@@ -118,7 +118,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Relva sintética para o terraço",
                                 Seller = Sellers[5],
                                 Spent = 225.90
@@ -126,7 +126,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Conjunto de sofás de exterior",
                                 Seller = Sellers[5],
                                 Spent = 399.90
@@ -141,7 +141,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Compras da casa do mês",
                                 Seller = Sellers[1],
                                 Spent = 315.80
@@ -149,7 +149,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Águas em promoção",
                                 Seller = Sellers[2],
                                 Spent = 13.90
@@ -164,7 +164,7 @@
                     new EarningModel()
                     {
                         Account = Accounts[1],
-                        Date = DateTime.Now.AddMonths(-3),
+                        Date = DateTimeOffset.Now.AddMonths(-3),
                         Name = "Salário",
                         Value = 1500
                     },
@@ -174,7 +174,7 @@
 
         monthSheet2 = new MonthSheetModel()
             {
-                Date = DateTime.Now.AddMonths(-2),
+                Date = DateTimeOffset.Now.AddMonths(-2),
                 Categories = new()
                 {
                    new CategoryModel()
@@ -185,7 +185,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[0],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Raio X Perna",
                                 Seller = Sellers[3],
                                 Spent = 140
@@ -200,7 +200,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Luzes solares de exterior",
                                 Seller = Sellers[5],
                                 Spent = 35.40
@@ -215,7 +215,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Compras da casa do mês",
                                 Seller = Sellers[1],
                                 Spent = 315.80
@@ -223,7 +223,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Águas em promoção",
                                 Seller = Sellers[2],
                                 Spent = 13.90
@@ -238,14 +238,14 @@
                     new EarningModel()
                     {
                         Account = Accounts[1],
-                        Date = DateTime.Now.AddMonths(-3),
+                        Date = DateTimeOffset.Now.AddMonths(-3),
                         Name = "Salário",
                         Value = 1500
                     },
                     new EarningModel()
                     {
                         Account = Accounts[1],
-                        Date = DateTime.Now.AddMonths(-3),
+                        Date = DateTimeOffset.Now.AddMonths(-3),
                         Name = "Bónus funcionario do mês",
                         Value = 300
                     }
@@ -255,7 +255,7 @@
 
         monthSheet3 = new MonthSheetModel()
             {
-                Date = DateTime.Now.AddMonths(-1),
+                Date = DateTimeOffset.Now.AddMonths(-1),
                 Categories = new()
                 {
                    new CategoryModel()
@@ -266,7 +266,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Conjunto jantes cromadas 19'",
                                 Seller = Sellers[6],
                                 Spent = 699
@@ -274,7 +274,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Conjunto de Penus novos Michelin",
                                 Seller = Sellers[6],
                                 Spent = 405
@@ -282,7 +282,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Mudança de Óleo e filtros",
                                 Seller = Sellers[6],
                                 Spent = 120
@@ -290,7 +290,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Substituição do turbo",
                                 Seller = Sellers[6],
                                 Spent = 599
@@ -305,7 +305,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Compras da casa do mês",
                                 Seller = Sellers[1],
                                 Spent = 315
@@ -320,7 +320,7 @@
                     new EarningModel()
                     {
                         Account = Accounts[1],
-                        Date = DateTime.Now.AddMonths(-3),
+                        Date = DateTimeOffset.Now.AddMonths(-3),
                         Name = "Salário",
                         Value = 1500
                     }
@@ -330,7 +330,7 @@
 
         monthSheet4 = new MonthSheetModel()
             {
-                Date = DateTime.Now,
+                Date = DateTimeOffset.Now,
                 Categories = new()
                 {
                    new CategoryModel()
@@ -341,7 +341,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Compras da casa do mês",
                                 Seller = Sellers[1],
                                 Spent = 315.80
@@ -349,7 +349,7 @@
                            new ExpenseModel()
                            {
                                 Account = Accounts[1],
-                                BuyDate = DateTime.Now.AddMonths(-3),
+                                BuyDate = DateTimeOffset.Now.AddMonths(-3),
                                 Name = "Águas em promoção",
                                 Seller = Sellers[2],
                                 Spent = 13.90
@@ -364,7 +364,7 @@
                     new EarningModel()
                     {
                         Account = Accounts[1],
-                        Date = DateTime.Now.AddMonths(-3),
+                        Date = DateTimeOffset.Now.AddMonths(-3),
                         Name = "Salário",
                         Value = 1500
                     },

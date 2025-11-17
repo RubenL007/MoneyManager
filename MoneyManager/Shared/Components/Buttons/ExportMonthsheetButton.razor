@@ -99,7 +99,7 @@
                         ws.Cell(row, col++).Value = earning.Name;
                         ws.Cell(row, col++).SetValue(earning.Value).Style.NumberFormat.SetFormat("#,##0.00 €");
                         ws.Cell(row, col++).Value = earning.Account.Name;
-                        ws.Cell(row, col++).SetValue(earning.Date).Style.DateFormat.SetFormat("dd-MMM");
+                        ws.Cell(row, col++).SetValue(earning.Date.Date).Style.DateFormat.SetFormat("dd-MMM");
                         row++;
                     }
                 }
@@ -137,7 +137,7 @@
                                 ws.Cell(row, col++).SetValue(expense.Spent).Style.NumberFormat.SetFormat("#,##0.00 €");
                                 ws.Cell(row, col++).Value = expense.Seller.Name;
                                 ws.Cell(row, col++).Value = expense.Account.Name;
-                                ws.Cell(row, col++).SetValue(expense.BuyDate).Style.DateFormat.SetFormat("dd-MMM");
+                                ws.Cell(row, col++).SetValue(expense.BuyDate.Date).Style.DateFormat.SetFormat("dd-MMM");
                             }
                             col = 2;
                             row++;

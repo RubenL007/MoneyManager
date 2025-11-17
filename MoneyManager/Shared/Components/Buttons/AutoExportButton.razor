@@ -202,7 +202,7 @@
 
             return listItems.Any() ? string.Join(", ", listItems) : string.Empty;
         }
-        else if (value is DateTime data)
+        else if (value is DateTimeOffset data)
         {
             return data.ToString("d");
         }

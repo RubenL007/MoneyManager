@@ -13,7 +13,7 @@ namespace MoneyManager.Data.Models
 
         public SellerModel Seller { get; set; } = new();
 
-        public DateTime? BuyDate { get; set; } = null!;
+        public DateTimeOffset BuyDate { get; set; } = DateTimeOffset.Now;
 
         public AccountModel Account { get; set; } = new();
 

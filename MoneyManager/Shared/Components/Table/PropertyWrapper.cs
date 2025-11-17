@@ -35,6 +35,8 @@ namespace MoneyManager.Shared.Components
         {
             return new PropertyWrapper<bool>(item, property);
         }
+
+        #region Dates
         public static PropertyWrapper<DateTime> GetDateTimeWrapper(object item, PropertyInfo property)
         {
             return new PropertyWrapper<DateTime>(item, property);
@@ -43,9 +45,23 @@ namespace MoneyManager.Shared.Components
         {
             return new PropertyWrapper<DateTime?>(item, property);
         }   
+        public static PropertyWrapper<DateTimeOffset> GetDateTimeOffsetWrapper(object item, PropertyInfo property)
+        {
+            return new PropertyWrapper<DateTimeOffset>(item, property);
+        }
+        public static PropertyWrapper<DateTimeOffset?> GetDateTimeOffsetWrapperNullable(object item, PropertyInfo property)
+        {
+            return new PropertyWrapper<DateTimeOffset?>(item, property);
+        }
+        #endregion
+
         public static PropertyWrapper<object> GetObjectWrapper(object item, PropertyInfo property)
         {
             return new PropertyWrapper<object>(item, property);
+        }
+        public static PropertyWrapper<List<object>> GetListWrapper(object item, PropertyInfo property)
+        {
+            return new PropertyWrapper<List<object>>(item, property);
         }
     }
 }

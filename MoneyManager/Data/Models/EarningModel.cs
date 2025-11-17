@@ -10,7 +10,7 @@ namespace MoneyManager.Data.Models
         public Guid Id { get; set; } = Guid.NewGuid();
 
         public string Name { get; set; } = string.Empty;
-        public DateTime Date { get; set; }
+        public DateTimeOffset Date { get; set; } = DateTimeOffset.Now;
         public AccountModel Account { get; set; } = new();
         public double Value { get; set; } = 0;
     }

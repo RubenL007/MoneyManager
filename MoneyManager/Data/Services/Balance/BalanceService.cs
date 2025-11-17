@@ -27,11 +27,13 @@ namespace MoneyManager.Data.Services
         {
             string? userId = _userAuthentication.GetCurrentUserId();
 
-            var balanceObj = _balancesCollection.Find(a => a.UserId == userId
-                                                        && a.Id == balance.Id
-                                                                || (a.UserId == userId
-                                                                && a.Date.Year == balance.Date.Year
-                                                                && a.Date.Month == balance.Date.Month)).FirstOrDefault();
+            //fix DateTimeOffset error in mongo
+            var start = new DateTime(balance.Date.Year, balance.Date.Month, 1);
+            var end = start.AddMonths(1);
+
+            var balanceObj = _balancesCollection.Find(b => b.UserId == userId
+                                                        && b.Id == balance.Id
+                                                                || (b.UserId == userId && b.Date >= start && b.Date < end)).FirstOrDefault();
 
             if (balanceObj == null)
             {

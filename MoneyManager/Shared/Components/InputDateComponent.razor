@@ -22,7 +22,7 @@
     /// If this parameter is used, the component will automaticly limit the MinimumDate and MaximumDate to the first and last day of the month of the date provided.
     /// </summary>
     [Parameter]
-    public DateTime? LimitToThisDateMonth { get; set; } = null!;
+    public DateTimeOffset? LimitToThisDateMonth { get; set; } = null!;
 
     /// <summary>
     /// Sets a limit for the date, pass a string in the following format: "2018-12-31"
@@ -60,11 +60,11 @@
             if (Value == null || Value.Equals(default(TItem)))
             {
                 // handle nullable and non-nullable generically
-                var today = new DateTime(LimitToThisDateMonth.Value.Year, LimitToThisDateMonth.Value.Month, DateTime.Today.Day);
-                if (typeof(TItem) == typeof(DateTime))
+                var today = new DateTimeOffset(LimitToThisDateMonth.Value.Year, LimitToThisDateMonth.Value.Month, DateTimeOffset.Now.Day, DateTimeOffset.Now.Hour, DateTimeOffset.Now.Minute, DateTimeOffset.Now.Second, DateTimeOffset.Now.Offset);
+                if (typeof(TItem) == typeof(DateTimeOffset))
                     Value = (TItem)(object)today;
-                else if (typeof(TItem) == typeof(DateTime?))
-                    Value = (TItem)(object)(DateTime?)today;
+                else if (typeof(TItem) == typeof(DateTimeOffset?))
+                    Value = (TItem)(object)(DateTimeOffset?)today;
             }
         }
     }
@@ -77,11 +77,17 @@
 
         if (string.IsNullOrWhiteSpace(newValue))
         {
-            // Handle clearing
-            if (typeof(TItem) == typeof(DateTime?))
+
+            if (typeof(TItem) == typeof(DateTimeOffset?))
+            {
                 Value = (TItem)(object?)null!;
-            else if (typeof(TItem) == typeof(DateTime))
-                Value = default!;
+                CurrentValueAsString = string.Empty;
+            }
+            else if (typeof(TItem) == typeof(DateTimeOffset))
+            {
+                Value = default;
+                CurrentValueAsString = string.Empty;
+            }
         }
         else
         {

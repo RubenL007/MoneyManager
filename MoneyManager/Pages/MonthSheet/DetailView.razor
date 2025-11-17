@@ -76,7 +76,7 @@
                                 DeleteRowMethod=@(earning => MonthSheet.Earnings.Remove(earning))
                                 AddNewMethod=@(x=> MonthSheet.Earnings.Add(new()))
                                 IsEditableTable=true
-                                LimitDateInputsToThisDate=@MonthSheet.Date
+                                LimitDateInputsToThisDate=@MonthSheet.Date.Date
                                 OnValueChange=@(x=> StateHasChanged())
                                 DataForSelects=@(new List<SelectOptionSet> {
                                 new SelectOptionSet
@@ -147,7 +147,7 @@
                             DeleteRowMethod=@(expense => cat.Expenses.Remove(expense))
                             AddNewMethod=@(x => AddNewExpense(cat))
                             IsEditableTable=true
-                            LimitDateInputsToThisDate=@MonthSheet.Date
+                            LimitDateInputsToThisDate=@MonthSheet.Date.Date
                             OnValueChange=@(x=> StateHasChanged())
                             DataForSelects=@(new List<SelectOptionSet> {
                     new SelectOptionSet
@@ -180,8 +180,8 @@ else
     [Parameter] public Guid MonthSheetId { get; set; }
     #endregion
 
-    #region GetUri(string monthDate, Guid monthId)
-    public static string GetUri(DateTime monthDate, Guid monthId)
+    #region GetUri(DateTimeOffset monthDate, Guid monthId)
+    public static string GetUri(DateTimeOffset monthDate, Guid monthId)
     {
         string month = monthDate.Date.ToString("MMMM") + monthDate.Date.ToString("yyyy");
         return $"/Monthsheets/{month}/{monthId}";

@@ -40,14 +40,14 @@
     <ChartComponent >
         <LineChartComponent ChartTitle="Earnings and Spendings Overview">
             <LineSeriesComponent Data=@MonthSheets
-                                 CategoryPropertyXaxis=@nameof(MonthSheetModel.Date)
+                                 CategoryPropertyXaxis=@nameof(MonthSheetModel.ChartDate)
                                  ValuePropertyYaxis=@nameof(MonthSheetModel.Earned)
                                  SeriesTitle="Total Earned"
                                  LineType=@Shared.Components.Charts.Helpers.LineTypeEnum.Solid
                                  Color=@ColorsEnum.primary />
 
             <LineSeriesComponent Data=@MonthSheets
-                                 CategoryPropertyXaxis=@nameof(MonthSheetModel.Date)
+                                 CategoryPropertyXaxis=@nameof(MonthSheetModel.ChartDate)
                                  ValuePropertyYaxis=@nameof(MonthSheetModel.TotalSpent)
                                  SeriesTitle="Total Spent"
                                  LineType=@Shared.Components.Charts.Helpers.LineTypeEnum.Dashed
@@ -59,7 +59,7 @@
 @code {
     #region Properties
     List<MonthSheetModel> MonthSheets = new List<MonthSheetModel>();
-    DateTime NewMonthSheetDate = DateTime.Now;
+    DateTimeOffset NewMonthSheetDate = DateTimeOffset.Now;
     #endregion
 
     #region Task OnInitializedAsync()

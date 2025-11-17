@@ -11,7 +11,7 @@ namespace MoneyManager.Data.Models.Investments
 
         public string TransactionID { get; set; } = string.Empty;
         public bool IsBuyOperation { get; set; } = true;
-        public DateTime TransactionDate { get; set; } = DateTime.Now;
+        public DateTimeOffset TransactionDate { get; set; } = DateTime.Now;
 
         public double Money { get; set; } = 0;
         public double TransactionTax { get; set; } = 0;

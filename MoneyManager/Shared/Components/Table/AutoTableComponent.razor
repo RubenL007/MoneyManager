@@ -50,28 +50,28 @@
                                 <EditForm Model=property>
                                     @switch (propertyValue)
                                     {
-                                        case DateTime data:
-                                            <InputDateComponent Value=@PropertyWrapperHelper.GetDateTimeWrapper(item!, property).Value
-                                                                ValueExpression=@(() => PropertyWrapperHelper.GetDateTimeWrapper(item!, property).Value)
+                                        case DateTimeOffset data:
+                                            <InputDateComponent Value =@PropertyWrapperHelper.GetDateTimeOffsetWrapper(item!, property).Value
+                                                                ValueExpression=@(() => PropertyWrapperHelper.GetDateTimeOffsetWrapper(item!, property).Value)
                                                                 ViewMode=@ViewMode
                                                                 LimitToThisDateMonth=@(IsDateInputLimitedToDate? LimitDateInputsToThisDate : null) 
-                                                                ValueChanged=@(async (DateTime newValue) =>
+                                                                ValueChanged=@(async (DateTimeOffset newValue) =>
                                                                 {
                                                                   // To update and notify the parent view about the change
-                                                                    PropertyWrapperHelper.GetDateTimeWrapper(item!, property).Value = newValue;
+                                                                    PropertyWrapperHelper.GetDateTimeOffsetWrapper(item!, property).Value = newValue;
                                                                     await OnValueChange.InvokeAsync(null);
                                                                 }) />
                                             break;
 
-                                      @*   case null when property.PropertyType == typeof(DateTime?):
+                                        @*   case null when property.PropertyType == typeof(DateTimeOffset?):
                                             <InputDateComponent Value=@PropertyWrapperHelper.GetDateTimeWrapperNullable(item!, property).Value
-                                                                ValueExpression=@(() => PropertyWrapperHelper.GetDateTimeWrapperNullable(item!, property).Value)
+                                                                ValueExpression=@(() => PropertyWrapperHelper.GetDateTimeOffsetWrapperNullable(item!, property).Value)
                                                                 ViewMode=@ViewMode
                                                                 LimitToThisDateMonth=@(IsDateInputLimitedToDate? LimitDateInputsToThisDate : null)
-                                                                ValueChanged=@(async (DateTime? newValue) =>
+                                                                ValueChanged=@(async (DateTimeOffset? newValue) =>
                                                                 {
                                                                   // To update and notify the parent view about the change
-                                                                    PropertyWrapperHelper.GetDateTimeWrapperNullable(item!, property).Value = newValue;
+                                                                    PropertyWrapperHelper.GeDateTimeOffsetNullableWrapperNullable(item!, property).Value = newValue;
                                                                     await OnValueChange.InvokeAsync(null);
                                                                 }) />
 
@@ -333,6 +333,11 @@
         {
             if (IsEditableTable) return data.ToString("d");
             else return data.ToString("Y");
+        }
+        else if (value is DateTimeOffset dataOffset)
+        {
+            if (IsEditableTable) return dataOffset.ToString("d");
+            else return dataOffset.ToString("Y");
         }
 
         // If it's a complex object and not a string, try to extract a "Name" property

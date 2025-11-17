@@ -28,11 +28,15 @@ namespace MoneyManager.Data.Services
         {
             string? userId = _userAuthentication.GetCurrentUserId();
 
-            var monthSheetObj = _monthsCollection.Find(m => m.UserId == userId
-                                                       && m.Id == monthSheet.Id
-                                                            || (m.UserId == userId
-                                                            && m.Date.Year == monthSheet.Date.Year
-                                                            && m.Date.Month == monthSheet.Date.Month)).FirstOrDefault();
+            //fix DateTimeOffset error in mongo
+            var start = new DateTime(monthSheet.Date.Year, monthSheet.Date.Month, 1);
+            var end = start.AddMonths(1);
+
+            var monthSheetObj = _monthsCollection.Find(m => m.UserId == userId 
+                                                         && m.Id == monthSheet.Id 
+                                                         || (m.UserId == userId && m.Date >= start && m.Date < end))
+                                                 .FirstOrDefault();
+
             if (monthSheetObj == null)
             {
                 ConfigurationModel configurationResponse = _configurationService.GetConfiguration();

@@ -50,6 +50,7 @@
 
 <AutoTableComponent DataSource=@Subscriptions.OrderBy(s => s.IsTerminated == true).ThenBy(s => s.Value).ToList()
                     TItem=@SubscriptionModel
+                    DateInputFormat="d"
                     IsEditableTable=@(ViewMode == ViewModeEnum.Edit)
                     AddNewMethod=@(() => Subscriptions.Add(new()))
                     IsDateInputLimitedToDate=false

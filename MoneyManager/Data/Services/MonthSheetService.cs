@@ -65,7 +65,7 @@ namespace MoneyManager.Data.Services
             {
                 _monthsCollection.ReplaceOne(m => m.UserId == userId
                                              && m.Id == monthSheet.Id, monthSheet);
-                return "Month Sheet updated sucessfully.";
+                return "Month Sheet updated successfully.";
             }
             else
             {

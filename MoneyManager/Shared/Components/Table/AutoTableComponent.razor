@@ -269,6 +269,11 @@
     /// </summary>
     [Parameter]
     public RenderFragment FooterTools { get; set; } = null!;
+
+    /// <summary>
+    /// Sets the date inputs to display Month and Year
+    /// </summary>
+    [Parameter] public string DateInputFormat { get; set; } = "Y";
     #endregion
 
     #region Properties
@@ -323,13 +328,11 @@
         }
         else if (value is DateTime data)
         {
-            if (IsEditableTable) return data.ToString("d");
-            else return data.ToString("Y");
+            return data.ToString(DateInputFormat);
         }
         else if (value is DateTimeOffset dataOffset)
         {
-            if (IsEditableTable) return dataOffset.ToString("d");
-            else return dataOffset.ToString("Y");
+            return dataOffset.ToString(DateInputFormat);
         }
 
         // If it's a complex object and not a string, try to extract a "Name" property

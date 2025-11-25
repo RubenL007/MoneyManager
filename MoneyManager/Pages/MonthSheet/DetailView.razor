@@ -150,19 +150,18 @@
                             LimitDateInputsToThisDate=@MonthSheet.Date.Date
                             OnValueChange=@(x=> StateHasChanged())
                             DataForSelects=@(new List<SelectOptionSet> {
-                    new SelectOptionSet
-                    {
-                    PropertyName = nameof(ExpenseModel.Seller),
-                    PropertyType = typeof(SellerModel),
-                    Options = Sellers.Cast<object>().ToList()
-                    },
-                    new SelectOptionSet
-                    {
-                    PropertyName = nameof(ExpenseModel.Account),
-                    PropertyType = typeof(AccountModel),
-                    Options = Accounts.Cast<object>().ToList()
-                    },
-                    }) />
+                            new SelectOptionSet
+                            {
+                                PropertyName = nameof(ExpenseModel.Seller),
+                                PropertyType = typeof(SellerModel),
+                                Options = Sellers.Cast<object>().ToList()
+                            },
+                            new SelectOptionSet
+                            {
+                                PropertyName = nameof(ExpenseModel.Account),
+                                PropertyType = typeof(AccountModel),
+                                Options = Accounts.Cast<object>().ToList()
+                            }}) />
 
         <h4>Total Spent: @cat.TotalSpent €</h4>
         <br />

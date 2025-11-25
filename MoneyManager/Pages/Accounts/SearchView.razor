@@ -18,7 +18,10 @@
                     TItem=AccountModel
                     ViewMode=@ViewMode
                     IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
-                    DeleteRowMethod=@(row => DeleteAccount(row))>
+                    DeleteRowMethod=@(row => DeleteAccount(row)) 
+                    PropertiesNotShown=@(new () {
+                        typeof(AccountModel).GetProperty(nameof(AccountModel.Value))
+                    }) >
     <FooterTools>
         <EditForm Model=@Account>
             <div class="row d-flex align-items-center">

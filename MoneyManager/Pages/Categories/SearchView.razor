@@ -18,7 +18,11 @@
                     TItem=CategoryModel
                     ViewMode=@ViewMode
                     IsEditableTable=@(ViewMode == ViewModeEnum.View ? false : true)
-                    DeleteRowMethod=@(row => DeleteCategory(row))>
+                    DeleteRowMethod=@(row => DeleteCategory(row))
+                    PropertiesNotShown=@(new () {
+                        typeof(CategoryModel).GetProperty(nameof(CategoryModel.Expenses)), 
+                        typeof(CategoryModel).GetProperty(nameof(CategoryModel.TotalSpent))
+                    }) >
     <FooterTools>
         <EditForm Model=@Category>
             <div class="row d-flex align-items-center">

@@ -274,6 +274,11 @@
     /// Sets the date inputs to display Month and Year
     /// </summary>
     [Parameter] public string DateInputFormat { get; set; } = "Y";
+
+    /// <summary>
+    /// Properties assigned to not show their columns in the table
+    /// </summary>
+    [Parameter] public List<PropertyInfo> PropertiesNotShown { get; set; } = new();
     #endregion
 
     #region Properties
@@ -284,22 +289,18 @@
     protected override Task OnInitializedAsync()
     {
         //Prevents the Guid field and the UserId of being rendered on the Data Table
-        if (DataSource?.Any() == true)
-        {
-            Properties = typeof(TItem).GetProperties()
-                .Where(p => p.PropertyType != typeof(Guid) && p.Name != nameof(Tenantable.UserId))
-                .ToList();
+        Properties = typeof(TItem).GetProperties().ToList();
+        Properties.RemoveAll(p => p.Name == nameof(Tenantable.UserId)
+                               || p.PropertyType == typeof(Guid));
+
+        if (PropertiesNotShown.Any())
+        {        
+            foreach (var item in PropertiesNotShown)
+            {
+                Properties.RemoveAll(p => p.Name == item.Name);
+            }
         }
-
         return base.OnInitializedAsync();
-    }
-    #endregion
-
-    #region Task OnParametersSetAsync()
-    protected override async Task OnParametersSetAsync()
-    {
-        await UpdateProperties();
-        await Task.CompletedTask;
     }
     #endregion
 
@@ -384,19 +385,6 @@
         }
 
         return result.ToString();
-    }
-    #endregion
-
-    #region UpdateProperties()
-    private async Task UpdateProperties()
-    {
-        if (Properties != null && !Properties.Any())
-        {
-            Properties = typeof(TItem).GetProperties()
-                .Where(p => p.PropertyType != typeof(Guid) && p.Name != nameof(Tenantable.UserId))
-                .ToList();
-        }
-        await Task.CompletedTask;
     }
     #endregion
     #endregion

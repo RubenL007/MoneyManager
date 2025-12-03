@@ -31,6 +31,10 @@ namespace MoneyManager.Shared.Components
         {
             return new PropertyWrapper<double>(item, property);
         }
+        public static PropertyWrapper<int> GetIntWrapper(object item, PropertyInfo property)
+        {
+            return new PropertyWrapper<int>(item, property);
+        }
         public static PropertyWrapper<bool> GetBoolWrapper(object item, PropertyInfo property)
         {
             return new PropertyWrapper<bool>(item, property);

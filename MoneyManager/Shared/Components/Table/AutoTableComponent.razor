@@ -96,6 +96,18 @@
                                                                   await OnValueChange.InvokeAsync(null);
                                                               }) />
                                     }
+                                    else if (propType == typeof(int))
+                                    {
+                                        <InputNumberComponent Value=@PropertyWrapperHelper.GetIntWrapper(item!, property).Value
+                                                              ValueExpression=@(() => PropertyWrapperHelper.GetIntWrapper(item!, property).Value)
+                                                              ViewMode=@ViewMode
+                                                              ValueChanged=@(async (int newValue) =>
+                                                              {
+                                                                // To update and notify the parent view about the change
+                                                                  PropertyWrapperHelper.GetIntWrapper(item!, property).Value = newValue;
+                                                                  await OnValueChange.InvokeAsync(null);
+                                                              }) />
+                                    }
                                     else if (typeof(System.Collections.IEnumerable).IsAssignableFrom(propType) && propType != typeof(string) && propType.IsGenericType)
                                     {
                                         @foreach (var item in DataForSelects)

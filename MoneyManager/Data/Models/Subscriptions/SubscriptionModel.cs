@@ -41,7 +41,8 @@ namespace MoneyManager.Data.Models.Subscriptions
                 }
             }
         }
-        public int RecurringInterval = 1;
-        public RecurringUnitEnum RecurringUnit = RecurringUnitEnum.Month;
+
+        public int RecurringInterval { get; set; } = 1;
+        public RecurringUnitEnum RecurringUnit { get; set; } = RecurringUnitEnum.Monthly;
     }
 }

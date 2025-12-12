@@ -2,8 +2,8 @@
 {
     public enum RecurringUnitEnum
     {
-        Week, 
-        Month, 
-        Year,
+        Weekly, 
+        Monthly, 
+        Yearly,
     }
 }

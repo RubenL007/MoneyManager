@@ -1,0 +1,49 @@
+﻿@namespace MoneyManager.Shared.Components
+
+<select @onchange=@ChangeSelectedItem
+        id=@Id
+        disabled=@(ViewMode == ViewModeEnum.Edit ? false : true)>
+
+    @if (IsNullableEnum)
+    {
+        <option value=""></option>
+    }
+    @foreach (var value in Enum.GetValues(EnumType))
+    {
+        <option value=@value selected=@(object.Equals(value, SelectedItem))>
+            @value
+        </option>
+    }
+</select>
+
+@code {
+    #region Parameters
+    [Parameter] public Type EnumType { get; set; } = default!;
+
+    [Parameter] public object? SelectedItem { get; set; } = default!;
+    [Parameter] public EventCallback<object> SelectedItemChanged { get; set; }
+    [Parameter] public ViewModeEnum ViewMode { get; set; } = ViewModeEnum.View;
+    #endregion
+
+    #region Internal Properties
+    private string Id = Guid.NewGuid().ToString();
+    private bool IsNullableEnum => Nullable.GetUnderlyingType(EnumType) != null;
+    #endregion
+
+    #region Task ChangeSelectedItem(ChangeEventArgs e)
+    private Task ChangeSelectedItem(ChangeEventArgs e)
+    {
+        var stringValue = e.Value?.ToString();
+
+        if (IsNullableEnum && string.IsNullOrWhiteSpace(stringValue))
+        {
+            return SelectedItemChanged.InvokeAsync(null);
+        }
+
+        var typeToParse = Nullable.GetUnderlyingType(EnumType) ?? EnumType;
+        var parsed = Enum.Parse(typeToParse, stringValue!);
+
+        return SelectedItemChanged.InvokeAsync(parsed);
+    }
+    #endregion
+}

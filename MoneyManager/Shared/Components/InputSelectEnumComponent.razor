@@ -16,7 +16,7 @@
     }
     @foreach (var value in Enum.GetValues(EnumType))
     {
-        <option value=@value selected=@(value.Equals(SelectedItem)) >
+        <option value=@value selected=@(value.Equals(SelectedItem) )>
             @value
         </option>
     }

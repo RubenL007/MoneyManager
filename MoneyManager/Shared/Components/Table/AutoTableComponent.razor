@@ -132,6 +132,15 @@
                                                                   ViewMode=@ViewMode />
                                         }
                                     }
+                                    else if (propType.IsEnum)
+                                    {
+                                        foreach (var enu in EnumsTypes.Where(e => e == propType))
+                                        {
+                                        <AutoTableEnumSelect @bind-SelectedItem=@PropertyWrapperHelper.GetObjectWrapper(item!, property).Value
+                                                             EnumType=@enu
+                                                             ViewMode=@ViewMode />
+                                        }
+                                    }
                                     else
                                     {
                                         @ShowValue(item, property)
@@ -152,7 +161,7 @@
                             }
                             else if (property == Properties.FirstOrDefault() && OpenDetail.HasDelegate)
                             {
-                                <td @onclick=@(x => OpenDetail.InvokeAsync(item))
+                                <td @onclick=@(x => OpenDetail.InvokeAsync(item) )
                                     style="cursor:pointer; color: var(--primary);">
                                     @ShowValue(item, property)
                                 </td>
@@ -221,6 +230,9 @@
     /// </summary>
     [Parameter]
     public List<SelectOptionSet> DataForSelects { get; set; } = new();
+
+    [Parameter]
+    public List<Type> EnumsTypes { get; set; } = new();
 
     /// <summary>
     /// Use to give custom names to the table heads.

@@ -69,7 +69,8 @@
                                 PropertyType = typeof(SellerModel),
                                 Options = Sellers.Cast<object>().ToList()
                             }
-                        }) />
+                        })
+                    EnumsTypes=@(new(){ typeof(RecurringUnitEnum) }) />
 
 @code {
     #region Properties

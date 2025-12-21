@@ -63,7 +63,7 @@ namespace MoneyManager.Data.Services
                     {
                         monthSheet.Categories.Add(subscriptionsCategory);
                     }
-                    foreach (var sub in subscriptionsResponse)
+                    foreach (var sub in subscriptionsResponse.Where(s => !s.IsTerminated))
                     {
                         #region standard subExpense to add
                         ExpenseModel subExpense = new()
@@ -111,10 +111,10 @@ namespace MoneyManager.Data.Services
                                     break;
                             }
                         }
-                        if (monthSheet.Categories.Any(c => c.Name == "Subscriptions" && c.Expenses.Count == 0))
-                        {
-                            monthSheet.Categories.RemoveAll(c => c.Name == "Subscriptions");
-                        }
+                    }
+                    if (monthSheet.Categories.Any(c => c.Name == "Subscriptions" && c.Expenses.Count == 0))
+                    {
+                        monthSheet.Categories.RemoveAll(c => c.Name == "Subscriptions");
                     }
                     #endregion
                 }
@@ -201,7 +201,7 @@ namespace MoneyManager.Data.Services
             //add interval until targetMonth checks or passes
             while (currentRenewal <= targetMonth)
             {
-                if (currentRenewal.Year == targetMonth.Year 
+                if (currentRenewal.Year == targetMonth.Year
                 && currentRenewal.Month == targetMonth.Month)
                 {
                     return true;

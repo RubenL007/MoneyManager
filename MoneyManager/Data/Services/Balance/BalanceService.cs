@@ -84,7 +84,7 @@ namespace MoneyManager.Data.Services
         {
             string? userId = _userAuthentication.GetCurrentUserId();
 
-            return _balancesCollection.Find(a => a.UserId == userId).ToList();
+            return _balancesCollection.Find(a => a.UserId == userId).ToList().OrderByDescending(b => b.Date).ToList();
         }
         #endregion
 

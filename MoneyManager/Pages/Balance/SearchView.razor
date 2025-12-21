@@ -7,9 +7,9 @@
 @inject NavigationManager navigationManager
 
 <DefaultHeaderComponent Title="Balance"
-                        ViewMode=@ViewMode
-                        EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-                        SaveOnClick=@(x => UpdateBalances())>
+ViewMode=@ViewMode
+EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
+SaveOnClick=@(x => UpdateBalances())>
 </DefaultHeaderComponent>
 
 @if (ViewMode == ViewModeEnum.Edit)
@@ -17,14 +17,14 @@
     <div class="row d-flex align-items-center mt-2">
         <div class="col-auto">
             <ButtonComponent OnClick=@(x => AddNewBalance())
-                             ButtonType=@ButtonTypeEnum.Add
-                             DisplayName="Add New Balance"
-                             ViewMode=@(Balances.Any(b => b.Date.Year == Balance.Date.Year && b.Date.Month == Balance.Date.Month) ? ViewModeEnum.View : ViewMode) />
+            ButtonType=@ButtonTypeEnum.Add
+            DisplayName="Add New Balance"
+            ViewMode=@(Balances.Any(b => b.Date.Year == Balance.Date.Year && b.Date.Month == Balance.Date.Month) ? ViewModeEnum.View : ViewMode) />
         </div>
         <div class="col-auto">
             <EditForm Model=@Balance>
                 <InputDateComponent @bind-Value=@Balance.Date
-                                    ViewMode=@ViewMode />
+                ViewMode=@ViewMode />
             </EditForm>
         </div>
     </div>
@@ -38,14 +38,14 @@
             <CardComponent>
                 <div class="row">
                     <div class="col">
-                        <span>@balance.Date.ToString("Y")</span>
+                        <span class="fw-bold">@balance.Date.ToString("d")</span>
                     </div>
                     <div class="col-auto">
                         <ButtonComponent OnClick=@(() => DeleteBalance(balance))
-                                         Color=@ColorsEnum.danger
-                                         IconClass="oi oi-trash"
-                                         Tooltip="Delete this Balance"
-                                         IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false ) />
+                        Color=@ColorsEnum.danger
+                        IconClass="oi oi-trash"
+                        Tooltip="Delete this Balance"
+                        IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false ) />
                     </div>
                 </div>
                 @foreach (var account in balance.Accounts)
@@ -63,12 +63,16 @@
                         else
                         {
                             <InputNumberComponent @bind-Value=@account.Value
-                                                  ViewMode=@ViewMode
-                                                  DisplayName=@account.Name />
+                            ViewMode=@ViewMode
+                            DisplayName=@account.Name />
                         }
                     </EditForm>
                 }
-                <span class="align-self-end">Total @balance.TotalValue</span>
+                <span class="align-self-end fw-bold">Total @balance.TotalValue</span>
+                <span class=@($"align-self-end balance-comparison-values text-{(ValueComparisonWithPreviousBalance(balance) > 0 ? "primary" : "danger")}")
+                title="Relative to the previous balance.">
+                    @PercentageComparisonWithPreviousBalance(balance)% | @ValueComparisonWithPreviousBalance(balance)
+                </span>
             </CardComponent>
         </div>
     }
@@ -101,11 +105,11 @@
     #region Task AddNewBalance()
     private async Task AddNewBalance()
     {
-        if (Balance != null)
-        {
-            BalanceService.CreateBalance(Balance);
-            await SearchBalances();
-        }
+        BalanceService.CreateBalance(Balance);
+        Balances.Add(Balance);
+        Balances = Balances.OrderByDescending(b => b.Date).ToList();
+        Balance = new();
+        StateHasChanged();
         await Task.CompletedTask;
     }
     #endregion
@@ -129,6 +133,40 @@
         BalanceService.DeleteBalance(balance.Id);
         await SearchBalances();
         await Task.CompletedTask;
+    }
+    #endregion
+
+    #region double PercentageComparisonWithPreviousBalance(BalanceModel currentBalance)
+    private double PercentageComparisonWithPreviousBalance(BalanceModel currentBalance)
+    {
+        int currentBalanceIndex = Balances.IndexOf(currentBalance);
+        if (currentBalanceIndex != Balances.Count - 1)
+        {
+            double previousTotalValue = Balances[currentBalanceIndex + 1].TotalValue;
+            if (previousTotalValue == 0) return 100; //if previous 0 is increase of 100%
+
+            double currentTotalValue = currentBalance.TotalValue;
+            double difference = ((currentTotalValue - previousTotalValue) / previousTotalValue) * 100;
+
+            //if previous is less than 0 and current greater than 0, returns positive %
+            if (previousTotalValue < 0 && currentTotalValue > 0) difference = Math.Abs(difference);
+            return Math.Round(difference, 2, MidpointRounding.AwayFromZero);
+        }
+        return 0;
+    }
+    #endregion
+
+    #region double ValueComparisonWithPreviousBalance(BalanceModel currentBalance)
+    private double ValueComparisonWithPreviousBalance(BalanceModel currentBalance)
+    {
+        int currentBalanceIndex = Balances.IndexOf(currentBalance);
+        if (currentBalanceIndex != Balances.Count - 1)
+        {
+            double previousTotalValue = Balances[currentBalanceIndex + 1].TotalValue;
+
+            return currentBalance.TotalValue - previousTotalValue;
+        }
+        return 0;
     }
     #endregion
 }

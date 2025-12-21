@@ -46,7 +46,7 @@ namespace MoneyManager.Data.Services
                 ConfigurationModel configurationResponse = _configurationService.GetConfiguration();
 
                 monthSheet.UserId = userId!;
-                if (configurationResponse.DefaultCategories.Any()) monthSheet.Categories = configurationResponse.DefaultCategories;
+                if (configurationResponse.DefaultCategories.Any()) monthSheet.Categories.AddRange(configurationResponse.DefaultCategories);
                 monthSheet.EstimatedEarned = configurationResponse.DefaultEstimatedEarned;
                 monthSheet.EstimatedSpent = configurationResponse.DefaultEstimatedSpent;
 
@@ -59,7 +59,6 @@ namespace MoneyManager.Data.Services
                         Name = "Subscriptions",
                         UserId = subscriptionsResponse.First().UserId
                     };
-
                     if (!monthSheet.Categories.Any(c => c.Name == "Subscriptions"))
                     {
                         monthSheet.Categories.Add(subscriptionsCategory);
@@ -87,7 +86,6 @@ namespace MoneyManager.Data.Services
                         {
                             switch (sub.RecurringUnit)
                             {
-                                //TODO: check helpers because its working depending on the days selected, WIPS
                                 case RecurringUnitEnum.Monthly:
                                     if (IsRecurringMonth(sub.RenewalDate, sub.RecurringInterval, monthSheet.Date))
                                     {
@@ -112,6 +110,10 @@ namespace MoneyManager.Data.Services
                                 default:
                                     break;
                             }
+                        }
+                        if (monthSheet.Categories.Any(c => c.Name == "Subscriptions" && c.Expenses.Count == 0))
+                        {
+                            monthSheet.Categories.RemoveAll(c => c.Name == "Subscriptions");
                         }
                     }
                     #endregion
@@ -187,36 +189,46 @@ namespace MoneyManager.Data.Services
         #region Helpers
         public static bool IsRecurringMonth(DateTimeOffset renewalDate, int interval, DateTimeOffset monthSheetDate)
         {
+            if (interval <= 0) return false;
+            if (interval == 1) return true;
 
-            if (monthSheetDate < renewalDate)
-                return false;
+            //normalize dates to the first day to do comparison
+            var currentRenewal = new DateTimeOffset(renewalDate.Year, renewalDate.Month, 1, 0, 0, 0, renewalDate.Offset);
+            var targetMonth = new DateTimeOffset(monthSheetDate.Year, monthSheetDate.Month, 1, 0, 0, 0, monthSheetDate.Offset);
 
-            while (renewalDate <= monthSheetDate)
+            if (targetMonth < currentRenewal) return false;
+
+            //add interval until targetMonth checks or passes
+            while (currentRenewal <= targetMonth)
             {
-                if (renewalDate.Year == monthSheetDate.Year &&
-                    renewalDate.Month == monthSheetDate.Month)
+                if (currentRenewal.Year == targetMonth.Year 
+                && currentRenewal.Month == targetMonth.Month)
                 {
                     return true;
                 }
-
-                renewalDate = renewalDate.AddMonths(interval);
+                currentRenewal = currentRenewal.AddMonths(interval);
             }
             return false;
         }
 
         public static bool IsRecurringYear(DateTimeOffset renewalDate, int interval, DateTimeOffset monthSheetDate)
         {
-            if (monthSheetDate < renewalDate)
-                return false;
+            if (interval <= 0) return false;
 
-            while (renewalDate <= monthSheetDate)
+            //normalize dates to the first day to do comparison
+            var currentRenewal = new DateTimeOffset(renewalDate.Year, 1, 1, 0, 0, 0, renewalDate.Offset);
+            var targetYear = new DateTimeOffset(monthSheetDate.Year, 1, 1, 0, 0, 0, monthSheetDate.Offset);
+
+            if (targetYear < currentRenewal) return false;
+
+            //add interval until targetYear checks or passes
+            while (currentRenewal <= targetYear)
             {
-                if (renewalDate.Year == monthSheetDate.Year)
+                if (currentRenewal.Year == targetYear.Year)
                 {
                     return true;
                 }
-
-                renewalDate = renewalDate.AddYears(interval);
+                currentRenewal = currentRenewal.AddYears(interval);
             }
             return false;
         }

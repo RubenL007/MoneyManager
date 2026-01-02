@@ -7,29 +7,54 @@
 @inject NavigationManager navigationManager
 
 <DefaultHeaderComponent Title="Balance"
-ViewMode=@ViewMode
-EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
-SaveOnClick=@(x => UpdateBalances())>
+                        ViewMode=@ViewMode
+                        EditOnClick=@(x => ViewMode = ViewMode == ViewModeEnum.View ? ViewModeEnum.Edit : ViewModeEnum.View)
+                        SaveOnClick=@(x => UpdateBalances())>
 </DefaultHeaderComponent>
+
+<CardComponent @key=@Balances>
+    <ChartComponent>
+        <LineChartComponent ChartTitle="Balances Overview">
+            <LineSeriesComponent Data=@Balances
+                                 CategoryPropertyXaxis=@nameof(BalanceModel.ChartDate)
+                                 ValuePropertyYaxis=@nameof(BalanceModel.TotalValue)
+                                 SeriesTitle="Total"
+                                 LineType=@Shared.Components.Charts.Helpers.LineTypeEnum.Solid
+                                 Color=@ColorsEnum.primary />
+
+            @foreach (var account in ChartAccounts)
+            {
+                <LineSeriesComponent Data=@account.AccountBalances
+                                     CategoryPropertyXaxis=@nameof(ChartAccountBalanceModel.Date)
+                                     ValuePropertyYaxis=@nameof(ChartAccountBalanceModel.TotalValue)
+                                     SeriesTitle=@account.AccountName
+                                     LineType=@Shared.Components.Charts.Helpers.LineTypeEnum.Dotted
+                                     AllowMeanVisible=false
+                                     AllowMedianVisible=false
+                                     AllowModeVisible=false
+                                     AllowTrendVisible=false/>
+            }
+        </LineChartComponent>
+    </ChartComponent>
+</CardComponent>
 
 @if (ViewMode == ViewModeEnum.Edit)
 {
     <div class="row d-flex align-items-center mt-2">
         <div class="col-auto">
             <ButtonComponent OnClick=@(x => AddNewBalance())
-            ButtonType=@ButtonTypeEnum.Add
-            DisplayName="Add New Balance"
-            ViewMode=@(Balances.Any(b => b.Date.Year == Balance.Date.Year && b.Date.Month == Balance.Date.Month) ? ViewModeEnum.View : ViewMode) />
+                             ButtonType=@ButtonTypeEnum.Add
+                             DisplayName="Add New Balance"
+                             ViewMode=@(Balances.Any(b => b.Date.Year == Balance.Date.Year && b.Date.Month == Balance.Date.Month) ? ViewModeEnum.View : ViewMode) />
         </div>
         <div class="col-auto">
             <EditForm Model=@Balance>
                 <InputDateComponent @bind-Value=@Balance.Date
-                ViewMode=@ViewMode />
+                                    ViewMode=@ViewMode />
             </EditForm>
         </div>
     </div>
 }
-
 
 <div class="row row-cols-lg-4 row-cols-md-6 row-cols">
     @foreach (var balance in Balances)
@@ -42,10 +67,10 @@ SaveOnClick=@(x => UpdateBalances())>
                     </div>
                     <div class="col-auto">
                         <ButtonComponent OnClick=@(() => DeleteBalance(balance))
-                        Color=@ColorsEnum.danger
-                        IconClass="oi oi-trash"
-                        Tooltip="Delete this Balance"
-                        IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false ) />
+                                         Color=@ColorsEnum.danger
+                                         IconClass="oi oi-trash"
+                                         Tooltip="Delete this Balance"
+                                         IsVisible=@(ViewMode == ViewModeEnum.Edit ? true : false ) />
                     </div>
                 </div>
                 @foreach (var account in balance.Accounts)
@@ -63,14 +88,14 @@ SaveOnClick=@(x => UpdateBalances())>
                         else
                         {
                             <InputNumberComponent @bind-Value=@account.Value
-                            ViewMode=@ViewMode
-                            DisplayName=@account.Name />
+                                                  ViewMode=@ViewMode
+                                                  DisplayName=@account.Name />
                         }
                     </EditForm>
                 }
                 <span class="align-self-end fw-bold">Total @balance.TotalValue</span>
                 <span class=@($"align-self-end balance-comparison-values text-{(ValueComparisonWithPreviousBalance(balance) > 0 ? "primary" : "danger")}")
-                title="Relative to the previous balance.">
+                      title="Change relative to the previous balance.">
                     @PercentageComparisonWithPreviousBalance(balance)% | @ValueComparisonWithPreviousBalance(balance)
                 </span>
             </CardComponent>
@@ -82,6 +107,7 @@ SaveOnClick=@(x => UpdateBalances())>
     #region Properties
     BalanceModel Balance = new();
     List<BalanceModel> Balances = new();
+    List<ChartAccountModel> ChartAccounts = new();
     ViewModeEnum ViewMode = ViewModeEnum.View;
     #endregion
 
@@ -97,6 +123,33 @@ SaveOnClick=@(x => UpdateBalances())>
     private async Task SearchBalances()
     {
         Balances = BalanceService.SearchBalances();
+        if (Balances.Any())
+        {
+            ChartAccounts.Clear();
+
+            ChartAccounts = Balances.SelectMany(b => b.Accounts)
+                                    .GroupBy(a => a.Id)
+                                    .Select(g => new ChartAccountModel
+                                        {
+                                            AccountId = g.Key,
+                                            AccountName = g.First().Name,
+                                        }).ToList();
+
+            foreach (var chartAccount in ChartAccounts)
+            {
+                chartAccount.AccountBalances = Balances
+                    .SelectMany(b => b.Accounts
+                        .Where(a => a.Id == chartAccount.AccountId)
+                        .Select(a => new ChartAccountBalanceModel
+                            {
+                                TotalValue = a.Value,
+                                Date = b.ChartDate
+                            }))
+                    .OrderBy(x => x.Date)
+                    .ToList();
+            }
+        }
+
         StateHasChanged();
         await Task.CompletedTask;
     }
@@ -108,7 +161,11 @@ SaveOnClick=@(x => UpdateBalances())>
         BalanceService.CreateBalance(Balance);
         Balances.Add(Balance);
         Balances = Balances.OrderByDescending(b => b.Date).ToList();
-        Balance = new();
+        DateTimeOffset previousDate = Balance.Date;
+        Balance = new()
+            {
+                Date = previousDate
+            };
         StateHasChanged();
         await Task.CompletedTask;
     }

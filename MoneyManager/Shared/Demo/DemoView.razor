@@ -1,12 +1,19 @@
 ﻿@page "/Demo"
 @using MoneyManager.Data.Interface
 @using MoneyManager.Data.Models
+@using MoneyManager.Data.Interface.Subscriptions
+@using MoneyManager.Data.Models.Balance
+@using MoneyManager.Data.Models.Configuration
+@using MoneyManager.Data.Models.Subscriptions
 
 @inject NavigationManager navigationManager
 @inject IAccount accountService
 @inject ICategory categoryService
 @inject ISeller sellerService
 @inject IMonthSheet monthSheetService
+@inject IBalance balanceService
+@inject ISubscription subscriptionService
+@inject MoneyManager.Data.Interface.Configuration.IConfiguration configurationService
 
 <CardComponent>
     <h3>Demo Mode</h3>
@@ -42,6 +49,7 @@
 
     public List<SellerModel> Sellers = new()
     {
+        new SellerModel() { Name = "Spotify" },
         new SellerModel() { Name = "Trofa Saúde" },
         new SellerModel() { Name = "Continente" },
         new SellerModel() { Name = "Pingo Doce" },
@@ -62,6 +70,8 @@
         new CategoryModel() { Name = "Comida" },
         new CategoryModel() { Name = "Necessidades Básicas" },
     };
+
+    public SubscriptionModel Subscription = new();
 
     public MonthSheetModel monthSheet1 = new();
     public MonthSheetModel monthSheet2 = new();
@@ -88,6 +98,33 @@
         {
             categoryService.CreateCategory(category);
         }
+        #endregion
+        #region Fill Configuration
+        ConfigurationModel configResponse = configurationService.GetConfiguration();
+        ConfigurationModel ConfigToUpdate = new()
+            {
+                Id = configResponse.Id,
+                UserId = configResponse.UserId,
+                DefaultCategories = configResponse.DefaultCategories,
+                DefaultEstimatedEarned = 1000,
+                DefaultEstimatedSpent = 400
+            };
+        configResponse.DefaultCategories.Add(Categories[0]);
+        configurationService.UpdateConfiguration(ConfigToUpdate);
+
+        Subscription = new SubscriptionModel()
+            {
+                EndDate = new DateTimeOffset(2030, 08, 01, 12, 12, 12, 0, TimeSpan.Zero),
+                Name = "Spotify Premium",
+                RecurringUnit = RecurringUnitEnum.Monthly,
+                RecurringInterval = 1,
+                RenewalDate = DateTimeOffset.Now,
+                PaymentAccount = Accounts.First(),
+                Seller = Sellers.First(),
+                StartDate = DateTimeOffset.Now.AddMonths(-1),
+                Value = 17.99,
+            };
+        subscriptionService.CreateSubscription(Subscription);
         #endregion
         #region Create MonthSheets
         monthSheet1 = new MonthSheetModel()
@@ -372,7 +409,28 @@
             };
         monthSheetService.CreateMonthSheet(monthSheet4);
         #endregion
+        #region Create Balances
+        BalanceModel balance1 = new() { Date = DateTimeOffset.Now.AddMonths(-2) };
+        balanceService.CreateBalance(balance1);
+        balance1.Accounts[0].Value = 500;
+        balance1.Accounts[1].Value = 100;
+        balance1.Accounts[2].Value = 50;
+        balanceService.UpdateBalance(balance1);
 
+        BalanceModel balance2 = new() { Date = DateTimeOffset.Now.AddMonths(-1) };
+        balanceService.CreateBalance(balance2);
+        balance2.Accounts[0].Value = 700;
+        balance2.Accounts[1].Value = 80;
+        balance2.Accounts[2].Value = 20;
+        balanceService.UpdateBalance(balance2);
+
+        BalanceModel balance3 = new() { Date = DateTimeOffset.Now };
+        balanceService.CreateBalance(balance3);
+        balance3.Accounts[0].Value = 750;
+        balance3.Accounts[1].Value = 200;
+        balance3.Accounts[2].Value = 86;
+        balanceService.UpdateBalance(balance3);
+        #endregion
         await Task.CompletedTask;
     }
     #endregion
@@ -409,6 +467,30 @@
         foreach (var category in categories)
         {
             categoryService.DeleteCategory(category.Id);
+        }
+        #endregion
+
+        #region Clear Balances
+        var balances = balanceService.SearchBalances();
+        foreach (var balance in balances)
+        {
+            balanceService.DeleteBalance(balance.Id);
+        }
+        #endregion
+
+        #region Clear Configuration
+        var configuration = configurationService.GetConfiguration();
+        configuration.DefaultCategories.Clear();
+        configuration.DefaultEstimatedEarned = 0;
+        configuration.DefaultEstimatedSpent = 0;
+        configurationService.UpdateConfiguration(configuration);
+        #endregion
+
+        #region Clear Subscriptions
+        var subscriptions = subscriptionService.SearchSubscriptions();
+        foreach (var subscription in subscriptions)
+        {
+            subscriptionService.DeleteSubscription(subscription.Id);
         }
         #endregion
 

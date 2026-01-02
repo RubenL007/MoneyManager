@@ -143,5 +143,9 @@
 }
 
 .text-danger {
-    color: var(--danger);
+    color: var(--danger) !important;
+}
+
+.text-warning {
+    color: var(--warning) !important;
 }

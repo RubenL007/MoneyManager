@@ -118,7 +118,7 @@
 
             #region sub header cells
             row++;
-            var innerListProperties = elementType.GetProperties(); // get PropertyInfo for element type
+            var innerListProperties = elementType!.GetProperties(); // get PropertyInfo for element type
             for (int i = 0; i < innerListProperties.Length; i++)
             {
                 ws.Cell(row, colOffset + i)

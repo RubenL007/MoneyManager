@@ -16,8 +16,6 @@
     #endregion
 
     #region Properties
-    private int ListLevel = 0;
-    private int row = 1;
     private string ExcelBookName = "Month Sheets";
     private string FileName => Data.Count == 1 ? $"Month Sheet {(Data.OrderBy(x => x.Date).First().Date.ToString("Y"))}.xlsx"
                                       : $"Month Sheets - {(Data.OrderBy(x => x.Date).First().Date.ToString("Y"))} - {(Data.OrderBy(x => x.Date).Last().Date.ToString("Y"))}.xlsx";

@@ -21,9 +21,9 @@ Here are a few things that I want to add to this applicaton, and will try to do 
     <li><strong>✅ User Login</strong> - Implement user authentication to allow multiple users to manage their personal finances securely.</li>
     <li><strong>✅ Graphs & Insights</strong> - Visualizes your financial performance over the month and year, helping you track spending patterns and understand trends over time.</li>
     <li><strong>✅ Demo Mode</strong> - This makes it easy to explore, test, and understand how the application works.</li>
-    <li><strong>Configuration View</strong> - Simplifies the creation of month sheets with predefined categories and estimated values.</li>
+    <li><strong>✅ Configuration View</strong> - Simplifies the creation of month sheets with predefined categories and estimated values.</li>
+    <li><strong>✅ Balance Overview</strong> - Provides a clear, at-a-glance summary of your account balances.</li>
     <li><strong>Input Colors</strong> - Highlights positive and negative values for better visualization.</li>
-    <li><strong>Balance Overview</strong> - Provides a clear, at-a-glance summary of your account balances.</li>
     <li><strong>Filtering Options</strong> - Enables sorting and filtering of financial records for better organization.</li>
 </ul>
 
@@ -33,4 +33,4 @@ Here are a few things that I want to add to this applicaton, and will try to do 
 </p>
 
 <h5>Last Major Update</h5>
-<p>The latest major update (27/07/2025) added Demo Mode and included some quality-of-life improvements.</p>
+<p>The latest major update (02/01/2026) introduced the Configuration, Balances, and Investments views (the latter still a work in progress) and visually updated the buttons.</p>

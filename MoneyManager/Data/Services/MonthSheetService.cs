@@ -63,7 +63,8 @@ namespace MoneyManager.Data.Services
                     {
                         monthSheet.Categories.Add(subscriptionsCategory);
                     }
-                    foreach (var sub in subscriptionsResponse.Where(s => !s.IsTerminated))
+                    foreach (var sub in subscriptionsResponse.Where(s => s.EndDate != null && s.EndDate.Value.Year >= monthSheet.Date.Year
+                                                                      && s.EndDate != null && s.EndDate.Value.Month >= monthSheet.Date.Month))
                     {
                         #region standard subExpense to add
                         ExpenseModel subExpense = new()

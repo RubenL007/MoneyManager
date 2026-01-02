@@ -26,7 +26,7 @@ namespace MoneyManager.Data.Models.Subscriptions
 
         public bool IsTerminated
         {
-            get => EndDate != null;
+            get => EndDate != null && EndDate.Value < DateTime.Now;
             set
             {
                 if (value)
@@ -34,10 +34,6 @@ namespace MoneyManager.Data.Models.Subscriptions
                     // Setting true when previously false: if no date, assign today
                     if (EndDate == null)
                         EndDate = DateTimeOffset.Now;
-                }
-                else
-                {
-                    EndDate = null;
                 }
             }
         }
